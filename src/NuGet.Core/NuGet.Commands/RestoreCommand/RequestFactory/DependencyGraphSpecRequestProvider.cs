@@ -167,8 +167,6 @@ namespace NuGet.Commands
                 restoreArgs.CacheContext,
                 restoreArgs.Log);
 
-            var rootPath = Path.GetDirectoryName(project.PackageSpec.FilePath);
-
             IReadOnlyList<IAssetsLogMessage> projectAdditionalMessages = GetMessagesForProject(restoreArgs.AdditionalMessages, project.PackageSpec.FilePath);
 
             // Create request
@@ -181,13 +179,7 @@ namespace NuGet.Commands
                 restoreArgs.Log,
                 _lockFileBuilderCache)
             {
-                // Set properties from the restore metadata
-                ProjectStyle = project.PackageSpec.RestoreMetadata.ProjectStyle,
-                //  Project.json is special cased to put assets file and generated .props and targets in the project folder
-                RestoreOutputPath = project.PackageSpec.RestoreMetadata.ProjectStyle == ProjectStyle.ProjectJson ? rootPath : project.PackageSpec.RestoreMetadata.OutputPath,
-                DependencyGraphSpec = projectDgSpec,
-                MSBuildProjectExtensionsPath = projectPackageSpec.RestoreMetadata.OutputPath,
-                AdditionalMessages = projectAdditionalMessages
+                DependencyGraphSpec = projectDgSpec
             };
 
             var restoreLegacyPackagesDirectory = project.PackageSpec?.RestoreMetadata?.LegacyPackagesDirectory

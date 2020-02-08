@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Newtonsoft.Json.Linq;
 using NuGet.Common;
 using NuGet.Configuration;
 using NuGet.LibraryModel;
@@ -669,21 +670,16 @@ namespace NuGet.Commands.Test
                     identity.Version.ToString());
 
                 var logger = new TestLogger();
+                var tfm = FrameworkConstants.CommonFrameworks.NetCoreApp10;
+                var configJson = JObject.Parse($@" {{
+                    ""frameworks"": {{
+                        ""{tfm.GetShortFolderName()}"": {{
+                        }}
+                    }}
+                }}");
 
-                const string referenceSpec = @"
-                {
-                    ""frameworks"": {
-                        ""netcoreapp1.0"": {
-                            ""dependencies"": {
-                            }
-                        }
-                    }
-                }";
-                var projectName = "a";
-                var rootProjectsPath = pathContext.WorkingDirectory;
-                var projectDirectory = Path.Combine(rootProjectsPath, projectName);
-
-                var spec = JsonPackageSpecReader.GetPackageSpec(referenceSpec, projectName, Path.Combine(projectDirectory, projectName)).WithTestRestoreMetadata();
+                var specPath = Path.Combine(pathContext.SolutionRoot, "fake", "project.json");
+                var spec = JsonPackageSpecReader.GetPackageSpec(configJson.ToString(), "fake", specPath).WithTestRestoreMetadata();
 
                 spec.Dependencies.Add(new LibraryDependency
                 {
@@ -694,7 +690,7 @@ namespace NuGet.Commands.Test
 
                 var targetGraphs = new List<RestoreTargetGraph>
                 {
-                    OriginalCaseGlobalPackageFolderTests.GetRestoreTargetGraph(pathContext.PackageSource, identity, packagePath, logger)
+                    OriginalCaseGlobalPackageFolderTests.GetRestoreTargetGraph(pathContext.PackageSource, identity, packagePath, logger, tfm)
                 };
 
                 targetGraphs[0].Graphs.FirstOrDefault().Item.Data.Dependencies = spec.Dependencies.ToList();
@@ -734,12 +730,8 @@ namespace NuGet.Commands.Test
                     new NuGetv3LocalRepository(pathContext.UserPackagesFolder)
                 };
 
-                var restoreRequest = new TestRestoreRequest(spec, new[] { new PackageSource(pathContext.PackageSource) }, pathContext.PackagesV2, logger)
-                {
-                    ProjectStyle = spec.RestoreMetadata.ProjectStyle
-                };
-
-                var assetsFilePath = Path.Combine(projectDirectory, "obj", "project.assets.json");
+                var restoreRequest = new TestRestoreRequest(spec, new[] { new PackageSource(pathContext.PackageSource) }, pathContext.UserPackagesFolder, logger);
+                var assetsFilePath = Path.Combine(randomProjectDirectory, "obj", "project.assets.json");
 
                 // Act
                 var outputFiles = BuildAssetsUtils.GetMSBuildOutputFiles(spec, lockFile, targetGraphs, repositories, restoreRequest, assetsFilePath, true, logger);
@@ -781,21 +773,16 @@ namespace NuGet.Commands.Test
                     identity.Version.ToString());
 
                 var logger = new TestLogger();
+                var tfm = FrameworkConstants.CommonFrameworks.NetCoreApp10;
+                var configJson = JObject.Parse($@" {{
+                    ""frameworks"": {{
+                        ""{tfm.GetShortFolderName()}"": {{
+                        }}
+                    }}
+                }}");
 
-                const string referenceSpec = @"
-                {
-                    ""frameworks"": {
-                        ""netcoreapp1.0"": {
-                            ""dependencies"": {
-                            }
-                        }
-                    }
-                }";
-                var projectName = "a";
-                var rootProjectsPath = pathContext.WorkingDirectory;
-                var projectDirectory = Path.Combine(rootProjectsPath, projectName);
-
-                var spec = JsonPackageSpecReader.GetPackageSpec(referenceSpec, projectName, Path.Combine(projectDirectory, projectName)).WithTestRestoreMetadata();
+                var specPath = Path.Combine(pathContext.SolutionRoot, "fake", "project.json");
+                var spec = JsonPackageSpecReader.GetPackageSpec(configJson.ToString(), "fake", specPath).WithTestRestoreMetadata();
 
                 spec.Dependencies.Add(new LibraryDependency
                 {
@@ -805,7 +792,7 @@ namespace NuGet.Commands.Test
 
                 var targetGraphs = new List<RestoreTargetGraph>
                 {
-                    OriginalCaseGlobalPackageFolderTests.GetRestoreTargetGraph(pathContext.PackageSource, identity, packagePath, logger)
+                    OriginalCaseGlobalPackageFolderTests.GetRestoreTargetGraph(pathContext.PackageSource, identity, packagePath, logger, tfm)
                 };
 
                 targetGraphs[0].Graphs.FirstOrDefault().Item.Data.Dependencies = spec.Dependencies.ToList();
@@ -846,12 +833,8 @@ namespace NuGet.Commands.Test
                     new NuGetv3LocalRepository(pathContext.UserPackagesFolder)
                 };
 
-                var restoreRequest = new TestRestoreRequest(spec, new[] { new PackageSource(pathContext.PackageSource) }, pathContext.PackagesV2, logger)
-                {
-                    ProjectStyle = spec.RestoreMetadata.ProjectStyle
-                };
-
-                var assetsFilePath = Path.Combine(projectDirectory, "obj", "project.assets.json");
+                var restoreRequest = new TestRestoreRequest(spec, new[] { new PackageSource(pathContext.PackageSource) }, pathContext.UserPackagesFolder, logger);
+                var assetsFilePath = Path.Combine(randomProjectDirectory, "obj", "project.assets.json");
 
                 // Act
                 var outputFiles = BuildAssetsUtils.GetMSBuildOutputFiles(spec, lockFile, targetGraphs, repositories, restoreRequest, assetsFilePath, true, logger);
