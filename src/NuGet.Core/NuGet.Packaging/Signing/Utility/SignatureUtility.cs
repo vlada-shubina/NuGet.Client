@@ -623,7 +623,7 @@ namespace NuGet.Packaging.Signing
 
                 chain.ChainPolicy.ExtraStore.AddRange(extraStore);
 
-                chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
+                //chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
                 chain.Build(certificate);
 

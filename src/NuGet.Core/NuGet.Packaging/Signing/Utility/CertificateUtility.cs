@@ -296,7 +296,7 @@ namespace NuGet.Packaging.Signing
             {
                 var chain = chainHolder.Chain;
 
-                chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
+                //chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
                 chain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllowUnknownCertificateAuthority |
                     X509VerificationFlags.IgnoreRootRevocationUnknown |
                     X509VerificationFlags.IgnoreCertificateAuthorityRevocationUnknown |
