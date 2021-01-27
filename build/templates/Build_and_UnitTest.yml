@@ -488,6 +488,15 @@ steps:
     targetPath: "$(Build.Repository.LocalPath)\\logs\\LocalizationValidation"
   condition: "eq(variables['BuildRTM'], 'false')"
 
+- task: securedevelopmentteam.vss-secure-development-tools.build-task-policheck.PoliCheck@1
+  displayName: 'LocValidation: Wording Automatic Review'
+  inputs:
+    targetType: F
+    SOMEnabled: true
+    uploadToSOM: true
+    workspaceId: 'ce576670-f1b4-4c3d-b150-4bbfa665e203'
+  condition: "eq(variables['BuildRTM'], 'false')"
+
   # Use dotnet msbuild instead of MSBuild CLI.
   # Using MSBuild CLI results in an assembly binding failure for NuGet.Common.dll 4.4.0.3 because Microsoft.DotNet.Build.Tasks.Feed.dll references SleetLib.dll which references NuGet.Common 4.4.0.3.
   # The Microsoft.DotNet.Build.Tasks.Feed package includes NuGet.Common 4.9.0.6 and a binding redirection in Microsoft.DotNet.Build.Tasks.Feed.dll.config but the binding redirection is not processed.
