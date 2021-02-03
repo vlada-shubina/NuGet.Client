@@ -121,7 +121,8 @@ namespace NuGet.Packaging.Signing
                 signerInfo.Certificate,
                 timestampCms.Certificates,
                 logger,
-                CertificateType.Timestamp))
+                CertificateType.Timestamp,
+                allowUntrustedRoot: true))
             {
                 return EnsureCertificatesInCertificatesCollection(timestampCms, chain);
             }

@@ -31,7 +31,8 @@ namespace NuGet.Packaging.Signing
             X509Certificate2 certificate,
             X509Certificate2Collection extraStore,
             ILogger logger,
-            CertificateType certificateType)
+            CertificateType certificateType,
+            bool allowUntrustedRoot = false)
         {
             if (certificate == null)
             {
@@ -73,7 +74,7 @@ namespace NuGet.Packaging.Signing
                 X509ChainStatusFlags errorStatusFlags;
                 X509ChainStatusFlags warningStatusFlags;
 
-                GetChainStatusFlags(certificate, certificateType, out errorStatusFlags, out warningStatusFlags);
+                GetChainStatusFlags(certificate, certificateType, out errorStatusFlags, out warningStatusFlags, allowUntrustedRoot);
 
                 var fatalStatuses = new List<X509ChainStatus>();
                 var logCode = certificateType == CertificateType.Timestamp ? NuGetLogCode.NU3028 : NuGetLogCode.NU3018;
@@ -134,7 +135,8 @@ namespace NuGet.Packaging.Signing
             X509Certificate2 certificate,
             CertificateType certificateType,
             out X509ChainStatusFlags errorStatusFlags,
-            out X509ChainStatusFlags warningStatusFlags)
+            out X509ChainStatusFlags warningStatusFlags,
+            bool allowUntrustedRoot = false)
         {
             if (certificate == null)
             {
@@ -144,6 +146,11 @@ namespace NuGet.Packaging.Signing
             warningStatusFlags = X509ChainStatusFlags.RevocationStatusUnknown | X509ChainStatusFlags.OfflineRevocation;
 
             if (certificateType == CertificateType.Signature && CertificateUtility.IsSelfIssued(certificate))
+            {
+                warningStatusFlags |= X509ChainStatusFlags.UntrustedRoot;
+            }
+
+            if (allowUntrustedRoot)
             {
                 warningStatusFlags |= X509ChainStatusFlags.UntrustedRoot;
             }

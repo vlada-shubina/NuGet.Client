@@ -9,6 +9,7 @@ static NuGet.Packaging.Rules.AnalysisResources.InvalidUndottedFrameworkInFilesWa
 static NuGet.Packaging.Rules.AnalysisResources.InvalidUndottedFrameworkInFrameworkAssemblyGroupsWarning.get -> string
 static NuGet.Packaging.Rules.AnalysisResources.InvalidUndottedFrameworkInReferenceGroupsWarning.get -> string
 static NuGet.Packaging.Rules.AnalysisResources.InvalidUndottedFrameworkWarning.get -> string
+static NuGet.Packaging.Signing.CertificateChainUtility.GetCertificateChain(System.Security.Cryptography.X509Certificates.X509Certificate2 certificate, System.Security.Cryptography.X509Certificates.X509Certificate2Collection extraStore, NuGet.Common.ILogger logger, NuGet.Packaging.Signing.CertificateType certificateType, bool allowUntrustedRoot = false) -> NuGet.Packaging.Signing.IX509CertificateChain
 virtual NuGet.Packaging.PackagesConfigWriter.Dispose(bool disposing) -> void
 virtual NuGet.Packaging.Signing.KeyPairFileReader.Dispose(bool disposing) -> void
 virtual NuGet.Packaging.Signing.KeyPairFileWriter.Dispose(bool disposing) -> void

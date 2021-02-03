@@ -26,7 +26,7 @@ namespace Test.Utility.Signing
 {
     public static class SigningTestUtility
     {
-        private static readonly string _signatureLogPrefix = "Package '{0} {1}' from source '{2}':";
+        private static readonly string SignatureLogPrefix = "Package '{0} {1}' from source '{2}':";
 
         /// <summary>
         /// Modification generator that can be passed to TestCertificate.Generate().
@@ -599,10 +599,10 @@ namespace Test.Utility.Signing
 #if IS_DESKTOP
         public static DisposableList<IDisposable> RegisterDefaultResponders(
             this ISigningTestServer testServer,
-            TimestampService timestampService)
+            CertificateAuthority certificateAuthority)
         {
             var responders = new DisposableList<IDisposable>();
-            var ca = timestampService.CertificateAuthority;
+            CertificateAuthority ca = certificateAuthority;
 
             while (ca != null)
             {
@@ -611,6 +611,17 @@ namespace Test.Utility.Signing
 
                 ca = ca.Parent;
             }
+
+            return responders;
+        }
+
+        public static DisposableList<IDisposable> RegisterDefaultResponders(
+            this ISigningTestServer testServer,
+            TimestampService timestampService)
+        {
+            DisposableList<IDisposable> responders = RegisterDefaultResponders(
+                testServer,
+                timestampService.CertificateAuthority);
 
             responders.Add(testServer.RegisterResponder(timestampService));
 
@@ -751,7 +762,7 @@ namespace Test.Utility.Signing
 
         public static string AddSignatureLogPrefix(string log, PackageIdentity package, string source)
         {
-            return $"{string.Format(_signatureLogPrefix, package.Id, package.Version, source)} {log}";
+            return $"{string.Format(SignatureLogPrefix, package.Id, package.Version, source)} {log}";
         }
     }
 }

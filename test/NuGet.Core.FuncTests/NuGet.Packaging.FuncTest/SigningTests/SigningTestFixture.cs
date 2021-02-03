@@ -29,14 +29,18 @@ namespace NuGet.Packaging.FuncTest
         private SigningSpecifications _signingSpecifications;
         private Lazy<Task<SigningTestServer>> _testServer;
         private Lazy<Task<CertificateAuthority>> _defaultTrustedCertificateAuthority;
+        private Lazy<Task<CertificateAuthority>> _defaultUntrustedCertificateAuthority;
         private Lazy<Task<TimestampService>> _defaultTrustedTimestampService;
+        private Lazy<Task<TimestampService>> _defaultUntrustedTimestampService;
         private readonly DisposableList<IDisposable> _responders;
 
         public SigningTestFixture()
         {
             _testServer = new Lazy<Task<SigningTestServer>>(SigningTestServer.CreateAsync);
             _defaultTrustedCertificateAuthority = new Lazy<Task<CertificateAuthority>>(CreateDefaultTrustedCertificateAuthorityAsync);
+            _defaultUntrustedCertificateAuthority = new Lazy<Task<CertificateAuthority>>(CreateDefaultUntrustedCertificateAuthorityAsync);
             _defaultTrustedTimestampService = new Lazy<Task<TimestampService>>(CreateDefaultTrustedTimestampServiceAsync);
+            _defaultUntrustedTimestampService = new Lazy<Task<TimestampService>>(CreateDefaultUntrustedTimestampServiceAsync);
             _responders = new DisposableList<IDisposable>();
         }
 
@@ -191,12 +195,17 @@ namespace NuGet.Packaging.FuncTest
             return await _defaultTrustedTimestampService.Value;
         }
 
+        public async Task<TimestampService> GetDefaultUntrustedTimestampServiceAsync()
+        {
+            return await _defaultUntrustedTimestampService.Value;
+        }
+
         private async Task<CertificateAuthority> CreateDefaultTrustedCertificateAuthorityAsync()
         {
-            var testServer = await _testServer.Value;
-            var rootCa = CertificateAuthority.Create(testServer.Url);
-            var intermediateCa = rootCa.CreateIntermediateCertificateAuthority();
-            var rootCertificate = new X509Certificate2(rootCa.Certificate.GetEncoded());
+            SigningTestServer testServer = await _testServer.Value;
+            CertificateAuthority rootCa = CertificateAuthority.Create(testServer.Url);
+            CertificateAuthority intermediateCa = rootCa.CreateIntermediateCertificateAuthority();
+            X509Certificate2 rootCertificate = new X509Certificate2(rootCa.Certificate.GetEncoded());
             StoreLocation storeLocation = CertificateStoreUtilities.GetTrustedCertificateStoreLocation();
 
             _trustedServerRoot = TrustedTestCert.Create(
@@ -204,7 +213,49 @@ namespace NuGet.Packaging.FuncTest
                 StoreName.Root,
                 storeLocation);
 
-            var ca = intermediateCa;
+            RegisterDefaultResponders(testServer, intermediateCa);
+
+            return intermediateCa;
+        }
+
+        private async Task<CertificateAuthority> CreateDefaultUntrustedCertificateAuthorityAsync()
+        {
+            SigningTestServer testServer = await _testServer.Value;
+            CertificateAuthority rootCa = CertificateAuthority.Create(testServer.Url);
+            CertificateAuthority intermediateCa = rootCa.CreateIntermediateCertificateAuthority();
+
+            RegisterDefaultResponders(testServer, intermediateCa);
+
+            return intermediateCa;
+        }
+
+        private async Task<TimestampService> CreateDefaultTrustedTimestampServiceAsync()
+        {
+            SigningTestServer testServer = await _testServer.Value;
+            CertificateAuthority ca = await _defaultTrustedCertificateAuthority.Value;
+            TimestampService timestampService = TimestampService.Create(ca);
+
+            _responders.Add(testServer.RegisterResponder(timestampService));
+
+            return timestampService;
+        }
+
+        private async Task<TimestampService> CreateDefaultUntrustedTimestampServiceAsync()
+        {
+            SigningTestServer testServer = await _testServer.Value;
+            CertificateAuthority ca = await _defaultUntrustedCertificateAuthority.Value;
+            TimestampService timestampService = TimestampService.Create(ca);
+
+            _responders.Add(testServer.RegisterResponder(timestampService));
+
+            return timestampService;
+        }
+
+        private void RegisterDefaultResponders(
+            SigningTestServer testServer,
+            CertificateAuthority certificateAuthority)
+        {
+            CertificateAuthority ca = certificateAuthority;
 
             while (ca != null)
             {
@@ -213,19 +264,6 @@ namespace NuGet.Packaging.FuncTest
 
                 ca = ca.Parent;
             }
-
-            return intermediateCa;
-        }
-
-        private async Task<TimestampService> CreateDefaultTrustedTimestampServiceAsync()
-        {
-            var testServer = await _testServer.Value;
-            var ca = await _defaultTrustedCertificateAuthority.Value;
-            var timestampService = TimestampService.Create(ca);
-
-            _responders.Add(testServer.RegisterResponder(timestampService));
-
-            return timestampService;
         }
 
         public void Dispose()

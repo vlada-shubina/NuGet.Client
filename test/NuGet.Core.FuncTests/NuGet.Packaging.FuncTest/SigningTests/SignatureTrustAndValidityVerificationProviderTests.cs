@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,12 +16,11 @@ using NuGet.Packaging.Signing;
 using NuGet.Test.Utility;
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.X509;
-using Org.BouncyCastle.Crypto.Parameters;
 using Test.Utility;
 using Test.Utility.Signing;
 using Xunit;
 using BcAccuracy = Org.BouncyCastle.Asn1.Tsp.Accuracy;
-using DotNetUtilities = Org.BouncyCastle.Security.DotNetUtilities;
+using BcCertificate = Org.BouncyCastle.X509.X509Certificate;
 using HashAlgorithmName = NuGet.Common.HashAlgorithmName;
 
 namespace NuGet.Packaging.FuncTest
@@ -30,7 +28,7 @@ namespace NuGet.Packaging.FuncTest
     [Collection(SigningTestCollection.Name)]
     public class SignatureTrustAndValidityVerificationProviderTests
     {
-        private const string _untrustedChainCertError = "A certificate chain processed, but terminated in a root certificate which is not trusted by the trust provider.";
+        private const string UntrustedChainCertError = "A certificate chain processed, but terminated in a root certificate which is not trusted by the trust provider.";
         private readonly SignedPackageVerifierSettings _verifyCommandSettings = SignedPackageVerifierSettings.GetVerifyCommandDefaultPolicy(TestEnvironmentVariableReader.EmptyInstance);
         private readonly SignedPackageVerifierSettings _defaultSettings = SignedPackageVerifierSettings.GetDefault(TestEnvironmentVariableReader.EmptyInstance);
         private readonly SigningTestFixture _testFixture;
@@ -968,7 +966,7 @@ namespace NuGet.Packaging.FuncTest
 
                 Assert.Equal(SignatureVerificationStatus.Valid, status.Trust);
                 Assert.False(status.Issues.Where(i => i.Level >= Common.LogLevel.Warning)
-                    .Any(i => i.Message.Contains(_untrustedChainCertError)));
+                    .Any(i => i.Message.Contains(UntrustedChainCertError)));
             }
         }
 
@@ -1008,7 +1006,7 @@ namespace NuGet.Packaging.FuncTest
 
                 Assert.Equal(SignatureVerificationStatus.Valid, status.Trust);
                 Assert.False(status.Issues.Where(i => i.Level >= Common.LogLevel.Warning)
-                    .Any(i => i.Message.Contains(_untrustedChainCertError)));
+                    .Any(i => i.Message.Contains(UntrustedChainCertError)));
             }
         }
 
@@ -1395,7 +1393,6 @@ namespace NuGet.Packaging.FuncTest
                     signaturePlacement: SignaturePlacement.PrimarySignature,
                     repositoryCountersignatureVerificationBehavior: SignatureVerificationBehavior.Never,
                     revocationMode: RevocationMode.Online);
-                var testServer = await _fixture.GetSigningTestServerAsync();
                 var certificateAuthority = await _fixture.GetDefaultTrustedCertificateAuthorityAsync();
                 var issueCertificateOptions = IssueCertificateOptions.CreateDefaultForEndCertificate();
                 var bcCertificate = certificateAuthority.IssueCertificate(issueCertificateOptions);
@@ -1464,6 +1461,32 @@ namespace NuGet.Packaging.FuncTest
                     var status = await _provider.GetTrustResultAsync(packageReader, primarySignature, settings, CancellationToken.None);
 
                     Assert.Equal(expectedStatus, status.Trust);
+                }
+            }
+
+            [Fact]
+            public async Task GetTrustResultAsync_WithExpiredPrimaryCertificate_WithUntrustedTimestampCertificate_ReturnsStatusAsync()
+            {
+                SignedPackageVerifierSettings settings = SignedPackageVerifierSettings.GetAcceptModeDefaultPolicy();
+                CertificateAuthority certificateAuthority = await _fixture.GetDefaultTrustedCertificateAuthorityAsync();
+                TimestampService timestampService = await _fixture.GetDefaultUntrustedTimestampServiceAsync();
+
+                using (TrustedTestCert<TestCertificate> authorCertificate = _fixture.CreateTrustedTestCertificateThatWillExpireSoon())
+                using (Test test = await Test.CreateAuthorSignedPackageAsync(
+                    authorCertificate.Source.Cert,
+                    timestampService.Url))
+                using (var packageReader = new PackageArchiveReader(test.PackageFile.FullName))
+                {
+                    await SignatureTestUtility.WaitForCertificateExpirationAsync(authorCertificate.Source.Cert);
+
+                    PrimarySignature primarySignature = await packageReader.GetPrimarySignatureAsync(CancellationToken.None);
+                    PackageVerificationResult status = await _provider.GetTrustResultAsync(packageReader, primarySignature, settings, CancellationToken.None);
+
+                    Assert.Equal(SignatureVerificationStatus.Valid, status.Trust);
+                    Assert.Contains(
+                        status.Issues,
+                        issue => issue.Code == NuGetLogCode.NU3037
+                            && issue.Message == "The author primary signature validity period has expired.");
                 }
             }
 
@@ -1969,6 +1992,34 @@ namespace NuGet.Packaging.FuncTest
                     var status = await _provider.GetTrustResultAsync(packageReader, primarySignature, settings, CancellationToken.None);
 
                     Assert.Equal(expectedStatus, status.Trust);
+                }
+            }
+
+            [Fact]
+            public async Task GetTrustResultAsync_WithExpiredPrimaryCertificateAndUntrustedTimestamp_WithCountersignatureAndUntrustedTimestamp_ReturnsStatusAsync()
+            {
+                SignedPackageVerifierSettings settings = SignedPackageVerifierSettings.GetAcceptModeDefaultPolicy();
+                CertificateAuthority certificateAuthority = await _fixture.GetDefaultTrustedCertificateAuthorityAsync();
+                TimestampService timestampService = await _fixture.GetDefaultUntrustedTimestampServiceAsync();
+
+                using (TrustedTestCert<TestCertificate> authorCertificate = _fixture.CreateTrustedTestCertificateThatWillExpireSoon())
+                using (Test test = await Test.CreateAuthorSignedRepositoryCountersignedPackageAsync(
+                    authorCertificate.Source.Cert,
+                    _fixture.TrustedRepositoryCertificate.Source.Cert,
+                    timestampService.Url,
+                    timestampService.Url))
+                using (var packageReader = new PackageArchiveReader(test.PackageFile.FullName))
+                {
+                    await SignatureTestUtility.WaitForCertificateExpirationAsync(authorCertificate.Source.Cert);
+
+                    PrimarySignature primarySignature = await packageReader.GetPrimarySignatureAsync(CancellationToken.None);
+                    PackageVerificationResult status = await _provider.GetTrustResultAsync(packageReader, primarySignature, settings, CancellationToken.None);
+
+                    Assert.Equal(SignatureVerificationStatus.Valid, status.Trust);
+                    Assert.Contains(
+                        status.Issues,
+                        issue => issue.Code == NuGetLogCode.NU3037
+                            && issue.Message == "The author primary signature validity period has expired.");
                 }
             }
 

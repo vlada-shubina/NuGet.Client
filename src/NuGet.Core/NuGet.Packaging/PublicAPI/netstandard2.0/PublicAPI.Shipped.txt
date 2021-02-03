@@ -1583,7 +1583,6 @@ static NuGet.Packaging.Rules.RuleSet.PackageCreationRuleSet.get -> System.Collec
 static NuGet.Packaging.Rules.RuleSet.PackagesConfigToPackageReferenceMigrationRuleSet.get -> System.Collections.Generic.IEnumerable<NuGet.Packaging.Rules.IPackageRule>
 static NuGet.Packaging.Signing.Accuracy.Read(byte[] bytes) -> NuGet.Packaging.Signing.Accuracy
 static NuGet.Packaging.Signing.AlgorithmIdentifier.Read(byte[] bytes) -> NuGet.Packaging.Signing.AlgorithmIdentifier
-static NuGet.Packaging.Signing.CertificateChainUtility.GetCertificateChain(System.Security.Cryptography.X509Certificates.X509Certificate2 certificate, System.Security.Cryptography.X509Certificates.X509Certificate2Collection extraStore, NuGet.Common.ILogger logger, NuGet.Packaging.Signing.CertificateType certificateType) -> NuGet.Packaging.Signing.IX509CertificateChain
 static NuGet.Packaging.Signing.CertificateChainUtility.GetCertificateChain(System.Security.Cryptography.X509Certificates.X509Chain x509Chain) -> NuGet.Packaging.Signing.IX509CertificateChain
 static NuGet.Packaging.Signing.CertificateUtility.GetHash(System.Security.Cryptography.X509Certificates.X509Certificate2 certificate, NuGet.Common.HashAlgorithmName hashAlgorithm) -> byte[]
 static NuGet.Packaging.Signing.CertificateUtility.GetHashString(System.Security.Cryptography.X509Certificates.X509Certificate2 certificate, NuGet.Common.HashAlgorithmName hashAlgorithm) -> string

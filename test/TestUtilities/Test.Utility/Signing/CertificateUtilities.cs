@@ -10,7 +10,8 @@ using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
 using Xunit;
-using X509Certificate = Org.BouncyCastle.X509.X509Certificate;
+using BcCertificate = Org.BouncyCastle.X509.X509Certificate;
+using BcCertificateParser = Org.BouncyCastle.X509.X509CertificateParser;
 
 namespace Test.Utility.Signing
 {
@@ -25,7 +26,7 @@ namespace Test.Utility.Signing
             return generator.GenerateKeyPair();
         }
 
-        internal static string GenerateFingerprint(X509Certificate certificate)
+        internal static string GenerateFingerprint(BcCertificate certificate)
         {
             using (var hashAlgorithm = NuGet.Common.HashAlgorithmName.SHA256.GetHashProvider())
             {
@@ -40,7 +41,7 @@ namespace Test.Utility.Signing
             return Guid.NewGuid().ToString();
         }
 
-        public static X509Certificate2 GetCertificateWithPrivateKey(X509Certificate bcCertificate, AsymmetricCipherKeyPair keyPair)
+        public static X509Certificate2 GetCertificateWithPrivateKey(BcCertificate bcCertificate, AsymmetricCipherKeyPair keyPair)
         {
             Assert.IsType<RsaPrivateCrtKeyParameters>(keyPair.Private);
 
@@ -66,6 +67,13 @@ namespace Test.Utility.Signing
             } 
 #endif
             return certificate;
+        }
+
+        public static BcCertificate ToBcCertificate(X509Certificate2 certificate)
+        {
+            var parser = new BcCertificateParser();
+
+            return parser.ReadCertificate(certificate.RawData);
         }
     }
 }

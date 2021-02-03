@@ -1632,7 +1632,6 @@ static NuGet.Packaging.Signing.AttributeUtility.GetNuGetV3ServiceIndexUrl(System
 static NuGet.Packaging.Signing.AttributeUtility.GetSignatureType(System.Security.Cryptography.CryptographicAttributeObjectCollection signedAttributes) -> NuGet.Packaging.Signing.SignatureType
 static NuGet.Packaging.Signing.AttributeUtility.GetSignatureType(string oid) -> NuGet.Packaging.Signing.SignatureType
 static NuGet.Packaging.Signing.AttributeUtility.GetSignatureTypeOid(NuGet.Packaging.Signing.SignatureType signatureType) -> string
-static NuGet.Packaging.Signing.CertificateChainUtility.GetCertificateChain(System.Security.Cryptography.X509Certificates.X509Certificate2 certificate, System.Security.Cryptography.X509Certificates.X509Certificate2Collection extraStore, NuGet.Common.ILogger logger, NuGet.Packaging.Signing.CertificateType certificateType) -> NuGet.Packaging.Signing.IX509CertificateChain
 static NuGet.Packaging.Signing.CertificateChainUtility.GetCertificateChain(System.Security.Cryptography.X509Certificates.X509Chain x509Chain) -> NuGet.Packaging.Signing.IX509CertificateChain
 static NuGet.Packaging.Signing.CertificateUtility.GetHash(System.Security.Cryptography.X509Certificates.X509Certificate2 certificate, NuGet.Common.HashAlgorithmName hashAlgorithm) -> byte[]
 static NuGet.Packaging.Signing.CertificateUtility.GetHashString(System.Security.Cryptography.X509Certificates.X509Certificate2 certificate, NuGet.Common.HashAlgorithmName hashAlgorithm) -> string
