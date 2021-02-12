@@ -12,7 +12,7 @@
     <IncludeInVSIX>true</IncludeInVSIX>
     <Shipping>true</Shipping>
     <XPLATProject>true</XPLATProject>
-    <UsePublicApiAnalyzer>perTfm</UsePublicApiAnalyzer>
+    <UsePublicApiAnalyzer>false</UsePublicApiAnalyzer>
     <LangVersion>8</LangVersion>
   </PropertyGroup>
 
