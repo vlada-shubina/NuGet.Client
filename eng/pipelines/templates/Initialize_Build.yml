@@ -44,14 +44,12 @@ steps:
         exit 1
       }
 
-- task: PowerShell@2
+- task: PowerShell@1
   displayName: "Update Build Number"
   name: "updatebuildnumber"
   inputs:
     filePath: '$(System.DefaultWorkingDirectory)\scripts\\cibuild\\UpdateBuildNumber.ps1'
-    arguments: >
-      -sv $(SemanticVersion)
-      -r $[counter(format('{0}.{1}', variables['SemanticVersion'], variables['build.definitionname']), 0)]
+    arguments: -sv $(SemanticVersion) -r $[counter(format('{0}.{1}', variables['SemanticVersion'], variables['build.definitionname']), 0)]
     failOnStderr: true
 
 - task: PowerShell@1
