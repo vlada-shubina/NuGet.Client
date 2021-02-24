@@ -86,8 +86,10 @@ steps:
     scriptType: "inlineScript"
     inlineScript: |
       git remote add github https://github.com/NuGet/NuGet.Client.git
+      # If the CI agent is reused, and the github remote already exists, git will exit with code 3, as per their docs
+      if ($LASTEXITCODE -eq 3) { $LASTEXITCODE = 0 }
       Write-Host "##vso[task.setvariable variable=gitRepositoryRemoteName]github"
-  condition: " and(succeeded(),eq(variables['BuildRTM'], 'false'), eq(variables['IsOfficialBuild'], 'true'))" #run in official non-RTM builds, for generating sourcelink
+  condition: " and(succeeded(), eq(variables['IsOfficialBuild'], 'true'))" #run in official non-RTM builds, for generating sourcelink
 
 - task: MSBuild@1
   displayName: "Restore for VS2019"
