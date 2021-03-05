@@ -325,8 +325,10 @@
         AutomationProperties.IsOffscreenBehavior="Offscreen" />
     </Grid>
     <nuget:InfiniteScrollListBox
-      d:DataContext="{d:DesignData Source=/Design/PackageItemListViewSampleData.xaml,IsDesignTimeCreatable=True}"
       x:Name="_list"
+      DataContext="{Binding}"
+      ItemsSource="{Binding Collection}"
+      d:DataContext="{d:DesignData Source=/Design/PackageItemListViewSampleData.xaml,IsDesignTimeCreatable=True}"
       AutomationProperties.Name="{x:Static nuget:Resources.Accessibility_Packages}"
       DockPanel.Dock="Bottom"
       PreviewKeyUp="List_PreviewKeyUp"
@@ -342,8 +344,7 @@
       BorderThickness="0,0,0,0"
       HorizontalContentAlignment="Stretch"
       SelectionChanged="List_SelectionChanged"
-      Loaded="List_Loaded"
-      ItemsSource="{Binding}">
+      Loaded="List_Loaded">
       <!-- set the template to disable the background change when the IsEnabled is false. -->
       <ListBox.Template>
         <ControlTemplate
