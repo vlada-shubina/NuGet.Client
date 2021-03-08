@@ -15,7 +15,7 @@ namespace NuGet.PackageManagement.UI
     /// <summary>
     /// Represents a list of packages containing <see cref="PackageItemViewModel"/> objects.
     /// </summary>
-    public class PackageListViewModel
+    internal class PackageListViewModel
     {
         public ObservableCollection<PackageItemViewModel> Collection { get; private set; }
         public ICollectionView CollectionView
@@ -25,6 +25,8 @@ namespace NuGet.PackageManagement.UI
                 return CollectionViewSource.GetDefaultView(Collection);
             }
         }
+
+        public LoadingStatusIndicator LoadingStatusIndicator { get; private set; }
 
         private PackageListViewModel()
         { }

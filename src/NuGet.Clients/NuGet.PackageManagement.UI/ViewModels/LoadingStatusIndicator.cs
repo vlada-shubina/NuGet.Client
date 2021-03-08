@@ -14,6 +14,14 @@ namespace NuGet.PackageManagement.UI
         private string _errorMessage;
         private string _loadingMessage;
 
+        public bool HasStatusToDisplay
+        {
+            get
+            {
+                return Status == LoadingStatus.NoItemsFound || Status == LoadingStatus.Loading || Status == LoadingStatus.Ready;
+            }
+        }
+
         public LoadingStatus Status
         {
             get

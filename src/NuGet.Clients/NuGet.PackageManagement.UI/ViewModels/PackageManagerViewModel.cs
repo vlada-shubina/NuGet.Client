@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace NuGet.PackageManagement.UI
 {
-    public class PackageManagerViewModel
+    internal class PackageManagerViewModel
     {
         private ObservableCollection<PackageItemViewModel> _packageItemViewModels;
 
