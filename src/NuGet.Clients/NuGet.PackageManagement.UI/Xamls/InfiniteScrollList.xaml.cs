@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
@@ -13,6 +12,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
 using NuGet.Common;
@@ -30,7 +30,6 @@ namespace NuGet.PackageManagement.UI
     /// </summary>    
     public partial class InfiniteScrollList : UserControl
     {
-        private readonly LoadingStatusIndicator _loadingStatusIndicator = new LoadingStatusIndicator();
         private ScrollViewer _scrollViewer;
 
         public event SelectionChangedEventHandler SelectionChanged;
@@ -79,11 +78,16 @@ namespace NuGet.PackageManagement.UI
                 joinableTaskContext: _joinableTaskFactory.Value.Context,
                 mode: ReentrantSemaphore.ReentrancyMode.Stack);
 
-            BindingOperations.EnableCollectionSynchronization(ViewModel.Collection, _list.ItemsLock);
+            DataContextChanged += InfiniteScrollList_DataContextChanged;
+        }
 
-            CheckBoxesEnabled = false;
-
-            _loadingStatusIndicator.PropertyChanged += LoadingStatusIndicator_PropertyChanged;
+        private void InfiniteScrollList_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (ViewModel != null)
+            {
+                BindingOperations.EnableCollectionSynchronization(ViewModel.Collection, _list.ItemsLock);
+                ViewModel.LoadingStatusIndicator.PropertyChanged += LoadingStatusIndicator_PropertyChanged;
+            }
         }
 
         private void LoadingStatusIndicator_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -92,9 +96,9 @@ namespace NuGet.PackageManagement.UI
             {
                 await _joinableTaskFactory.Value.SwitchToMainThreadAsync();
                 if (e.PropertyName == nameof(LoadingStatusIndicator.Status)
-                    && _ltbLoading.Text != _loadingStatusIndicator.LocalizedStatus)
+                    && _ltbLoading.Text != ViewModel.LoadingStatusIndicator.LocalizedStatus)
                 {
-                    _ltbLoading.Text = _loadingStatusIndicator.LocalizedStatus;
+                    _ltbLoading.Text = ViewModel.LoadingStatusIndicator.LocalizedStatus;
                 }
             });
         }
@@ -145,7 +149,7 @@ namespace NuGet.PackageManagement.UI
                 }
                 else
                 {
-                    return PackageItems;
+                    return ViewModel.Collection;
                 }
             }
         }
@@ -184,7 +188,7 @@ namespace NuGet.PackageManagement.UI
             _loader = loader;
             _logger = logger;
             _initialSearchResultTask = searchResultTask;
-            _loadingStatusIndicator.Reset(loadingMessage);
+            ViewModel.LoadingStatusIndicator.LoadingMessage = loadingMessage;
             _loadingStatusBar.Visibility = Visibility.Hidden;
             _loadingStatusBar.Reset(loadingMessage, loader.IsMultiSource);
 
@@ -231,20 +235,12 @@ namespace NuGet.PackageManagement.UI
 
         private async Task RepopulatePackageListAsync(PackageItemViewModel selectedPackageItem, IPackageItemLoader currentLoader, CancellationTokenSource loadCts)
         {
-            await TaskScheduler.Default;
+            ViewModel.LoadingStatusIndicator.Status = LoadingStatus.Loading;
 
-            var addedLoadingIndicator = false;
+            await TaskScheduler.Default;
 
             try
             {
-                //TODO: loading status work
-                // add Loading... indicator if not present
-                if (!ViewModel.Collection.Contains(_loadingStatusIndicator))
-                {
-                    ViewModel.Collection.Add(_loadingStatusIndicator);
-                    addedLoadingIndicator = true;
-                }
-
                 await LoadItemsCoreAsync(currentLoader, loadCts.Token);
 
                 await _joinableTaskFactory.Value.SwitchToMainThreadAsync();
@@ -253,6 +249,8 @@ namespace NuGet.PackageManagement.UI
                 {
                     UpdateSelectedItem(selectedPackageItem);
                 }
+
+                ViewModel.LoadingStatusIndicator.Status = currentLoader.State.LoadingStatus;
             }
             catch (OperationCanceledException) when (!loadCts.IsCancellationRequested)
             {
@@ -267,7 +265,7 @@ namespace NuGet.PackageManagement.UI
                 // Do not log to the activity log, since it is not a NuGet error
                 _logger.Log(new LogMessage(LogLevel.Error, Resx.Resources.Text_UserCanceled));
 
-                _loadingStatusIndicator.SetError(Resx.Resources.Text_UserCanceled);
+                ViewModel.LoadingStatusIndicator.SetError(Resx.Resources.Text_UserCanceled);
 
                 _loadingStatusBar.SetCancelled();
                 _loadingStatusBar.Visibility = Visibility.Visible;
@@ -286,31 +284,10 @@ namespace NuGet.PackageManagement.UI
                 var errorMessage = ExceptionUtilities.DisplayMessage(ex);
                 _logger.Log(new LogMessage(LogLevel.Error, errorMessage));
 
-                _loadingStatusIndicator.SetError(errorMessage);
+                ViewModel.LoadingStatusIndicator.SetError(errorMessage);
 
                 _loadingStatusBar.SetError();
                 _loadingStatusBar.Visibility = Visibility.Visible;
-            }
-            finally
-            {
-                if (_loadingStatusIndicator.Status != LoadingStatus.NoItemsFound
-                    && _loadingStatusIndicator.Status != LoadingStatus.ErrorOccurred)
-                {
-                    // Ideally, after a search, it should report its status, and
-                    // do not keep the LoadingStatus.Loading forever.
-                    // This is a workaround.
-                    var emptyListCount = addedLoadingIndicator ? 1 : 0;
-
-                    //TODO: loading work.
-                    if (ViewModel.Collection.Count == emptyListCount)
-                    {
-                        _loadingStatusIndicator.Status = LoadingStatus.NoItemsFound;
-                    }
-                    else
-                    {
-                        ViewModel.Collection.Remove(_loadingStatusIndicator);
-                    }
-                }
             }
 
             UpdateCheckBoxStatus();
@@ -320,14 +297,6 @@ namespace NuGet.PackageManagement.UI
 
         internal void FilterItems(ItemFilter itemFilter, CancellationToken token)
         {
-
-            //TODO: loading status
-            if (!ViewModel.Collection.Contains(_loadingStatusIndicator))
-            {
-                ViewModel.Collection.Add(_loadingStatusIndicator);
-            }
-            _loadingStatusIndicator.Status = LoadingStatus.Loading;
-
             // If there is another async loading process - cancel it.
             var loadCts = CancellationTokenSource.CreateLinkedTokenSource(token);
             Interlocked.Exchange(ref _loadCts, loadCts)?.Cancel();
@@ -349,15 +318,12 @@ namespace NuGet.PackageManagement.UI
                 //If no items are shown in the filter, indicate in the list that no packages are found.
                 if (FilteredItemsCount == 0)
                 {
-                    _loadingStatusIndicator.Status = LoadingStatus.NoItemsFound;
+                    ViewModel.LoadingStatusIndicator.Status = LoadingStatus.NoItemsFound;
                 }
                 else
                 {
-                    //TODO: loading status
-                    if (ViewModel.Collection.Contains(_loadingStatusIndicator))
-                    {
-                        ViewModel.Collection.Remove(_loadingStatusIndicator);
-                    }
+                    //TODO: verify this works
+                    ViewModel.LoadingStatusIndicator.Status = LoadingStatus.NoMoreItems;
                 }
             }
 
@@ -368,7 +334,7 @@ namespace NuGet.PackageManagement.UI
 
         private void ApplyUIFilterForUpdatesAvailable()
         {
-            ViewModel.CollectionView.Filter = (item) => item == _loadingStatusIndicator || (item as PackageItemViewModel).IsUpdateAvailable;
+            ViewModel.CollectionView.Filter = (item) => (item as PackageItemViewModel).IsUpdateAvailable;
         }
 
         private void ClearUIFilter()
@@ -500,17 +466,7 @@ namespace NuGet.PackageManagement.UI
                         _loadingStatusBar.Visibility = desiredVisibility;
                     }
 
-                    _loadingStatusIndicator.Status = state.LoadingStatus;
-
-                    //TODO: loading status
-                    if (!ViewModel.Collection.Contains(_loadingStatusIndicator))
-                    {
-                        await _list.ItemsLock.ExecuteAsync(() =>
-                        {
-                            Items.Add(_loadingStatusIndicator);
-                            return Task.CompletedTask;
-                        });
-                    }
+                    ViewModel.LoadingStatusIndicator.Status = state.LoadingStatus;
                 }
             });
         }
@@ -549,35 +505,30 @@ namespace NuGet.PackageManagement.UI
         /// <param name="refresh">Clears <see cref="Items"> list if set to <c>true</c></param>
         private void UpdatePackageList(IEnumerable<PackageItemViewModel> packages, bool refresh)
         {
-            _joinableTaskFactory.Value.Run(async () =>
-            {
-                // Synchronize updating Items list
-                await _list.ItemsLock.ExecuteAsync(() =>
-                {
-                    //TODO: loading status
-                    // remove the loading status indicator if it's in the list
-                    bool removed = ViewModel.Collection.Remove(_loadingStatusIndicator);
 
+            // Synchronize updating Items list
+            _list.ItemsLock.ExecuteAsync(async () =>
+            {
+                await _joinableTaskFactory.Value.SwitchToMainThreadAsync();
+
+                NuGetUIThreadHelper.JoinableTaskFactory.WithPriority(Dispatcher, DispatcherPriority.Background).Run(() =>
+                {
                     if (refresh)
                     {
                         ClearPackageList();
                     }
 
-                    // add newly loaded items
-                    foreach (var package in packages)
+                        // add newly loaded items
+                        foreach (var package in packages)
                     {
                         package.PropertyChanged += Package_PropertyChanged;
                         ViewModel.Collection.Add(package);
                         _selectedCount = package.IsSelected ? _selectedCount + 1 : _selectedCount;
                     }
 
-                    if (removed)
-                    {
-                        Items.Add(_loadingStatusIndicator);
-                    }
-
                     return Task.CompletedTask;
                 });
+                return Task.CompletedTask;
             });
         }
 
@@ -586,7 +537,7 @@ namespace NuGet.PackageManagement.UI
         /// </summary>
         private void ClearPackageList()
         {
-            foreach (var package in PackageItems)
+            foreach (PackageItemViewModel package in ViewModel.Collection)
             {
                 package.PropertyChanged -= Package_PropertyChanged;
                 package.Dispose();
@@ -718,33 +669,26 @@ namespace NuGet.PackageManagement.UI
 
         private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
-            if (_loader?.State.LoadingStatus == LoadingStatus.Ready)
+            //Scrolled down to the bottom of the viewport and there's more to load.
+            if (!e.Handled
+                && e.VerticalChange > 0
+                && _scrollViewer.VerticalOffset == _scrollViewer.ScrollableHeight
+                && _loader?.State.LoadingStatus == LoadingStatus.Ready)
             {
-                var first = _scrollViewer.VerticalOffset;
-                var last = _scrollViewer.ViewportHeight + first;
-                if (_scrollViewer.ViewportHeight > 0 && last >= ViewModel.Collection.Count)
-                {
-                    NuGetUIThreadHelper.JoinableTaskFactory.RunAsync(() =>
-                        LoadItemsAsync(selectedPackageItem: null, token: CancellationToken.None)
-                    );
-                }
+                e.Handled = true;
+
+                NuGetUIThreadHelper.JoinableTaskFactory.RunAsync(() =>
+                    LoadItemsAsync(selectedPackageItem: null, token: CancellationToken.None)
+                );
             }
         }
 
         private void SelectAllPackagesCheckBox_Checked(object sender, RoutedEventArgs e)
         {
             //TODO: is this only filtered items?
-            foreach (var item in ViewModel.Collection)
+            foreach (PackageItemViewModel package in ViewModel.Collection)
             {
-                var package = item as PackageItemViewModel;
-
-                //TODO: loading status
-                // note that item could be the loading indicator, thus we need to check
-                // for null here.
-                if (package != null)
-                {
-                    package.IsSelected = true;
-                }
+                package.IsSelected = true;
             }
         }
 
@@ -794,7 +738,7 @@ namespace NuGet.PackageManagement.UI
 
         public void ResetLoadingStatusIndicator()
         {
-            _loadingStatusIndicator.Reset(string.Empty);
+            ViewModel.LoadingStatusIndicator.Reset(string.Empty);
         }
     }
 }

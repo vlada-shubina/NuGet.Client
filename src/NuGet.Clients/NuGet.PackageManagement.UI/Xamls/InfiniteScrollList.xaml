@@ -126,18 +126,6 @@
         Value="Transparent" />
     </Style>
 
-    <!-- the style of the loading status indicator within the ListBox. -->
-    <Style
-      x:Key="loadingStatusIndicatorStyle"
-      TargetType="{x:Type nuget:LoadingStatusIndicator}">
-      <Setter
-        Property="Template"
-        Value="{StaticResource LoadingStatusIndicatorTemplate}" />
-      <Setter
-        Property="Focusable"
-        Value="False" />
-    </Style>
-
     <!-- the style of the ListBoxItem when the item is a package. -->
     <Style
       x:Key="packageItemStyle"
@@ -215,7 +203,7 @@
 
                   <!--Loading Status Indicator-->
                   <Grid
-                     DataContext="{Binding LoadingStatusIndicator}"
+                     Focusable="False"
                      Width="{TemplateBinding ActualWidth}"
                      SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                      Margin="0,8"
@@ -225,10 +213,11 @@
                       FontStyle="Italic"
                       HorizontalAlignment="Center"
                       Text="{x:Static nuget:Resources.Text_NoPackagesFound}"
-                      Visibility="Collapsed" />
+                      Visibility="{Binding ShowNoPackagesFound, Converter={StaticResource BooleanToVisibilityConverter}}" />
                     <Grid
+                      DataContext="{Binding LoadingStatusIndicator}"
                       Name="_progressBar"
-                      Visibility="Collapsed"
+                     Visibility="{Binding IsRunning, Converter={StaticResource BooleanToVisibilityConverter}}" 
                       HorizontalAlignment="Center"
                       Height="22">
                       <Grid.ColumnDefinitions>
@@ -249,32 +238,6 @@
                         HorizontalAlignment="Left" 
                         VerticalAlignment="Center"/>
                     </Grid>
-                    <Grid.Triggers>
-                      <DataTrigger
-                      Binding="{Binding Path=Status}"
-                      Value="Loading">
-                        <Setter
-                        TargetName="_progressBar"
-                        Property="Visibility"
-                        Value="Visible" />
-                      </DataTrigger>
-                      <DataTrigger
-                      Binding="{Binding Path=Status}"
-                      Value="Ready">
-                        <Setter
-                        TargetName="_progressBar"
-                        Property="Visibility"
-                        Value="Visible" />
-                      </DataTrigger>
-                      <DataTrigger
-                      Binding="{Binding Path=Status}"
-                      Value="NoItemsFound">
-                        <Setter
-                        TargetName="_noItemsFound"
-                        Property="Visibility"
-                        Value="Visible" />
-                      </DataTrigger>
-                    </Grid.Triggers>
                   </Grid>
                 </WrapPanel>
               </ScrollViewer>

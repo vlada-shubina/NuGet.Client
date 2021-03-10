@@ -143,6 +143,7 @@
     <Compile Include="UserInterfaceService\ProgressDialogData.cs" />
     <Compile Include="ViewModels\PackageListViewModel.cs" />
     <Compile Include="ViewModels\PackageManagerViewModel.cs" />
+    <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="Xamls\DeprecatedFrameworkWindow.xaml.cs">
       <DependentUpon>DeprecatedFrameworkWindow.xaml</DependentUpon>
     </Compile>
