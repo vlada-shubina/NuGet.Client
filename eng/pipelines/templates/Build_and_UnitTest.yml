@@ -114,7 +114,7 @@ steps:
     solution: "build\\build.proj"
     msbuildVersion: "16.0"
     configuration: "$(BuildConfiguration)"
-    msbuildArguments: "/t:BuildNoVSIX /p:BuildRTM=$(BuildRTM) /p:BuildNumber=$(BuildNumber) /p:SkipILMergeOfNuGetExe=true /p:GitRepositoryRemoteName=github" -bl:$(Build.Repository.LocalPath)\\artifacts\\binlog\\build.binlog"
+    msbuildArguments: "/t:BuildNoVSIX /p:BuildRTM=$(BuildRTM) /p:BuildNumber=$(BuildNumber) /p:SkipILMergeOfNuGetExe=true /p:GitRepositoryRemoteName=github -bl:$(Build.Repository.LocalPath)\\artifacts\\binlog\\build.binlog"
     maximumCpuCount: true
 
 - task: MSBuild@1
@@ -499,7 +499,7 @@ steps:
 - task: PublishPipelineArtifact@1
   displayName: "Publish binlogs"
   inputs:
-    artifactName: binlog - $(Agent.JobName)
+    artifactName: binlog - $(Agent.JobName) - Attempt $(System.JobAttempt)
     targetPath: "$(Build.Repository.LocalPath)\\artifacts\\binlog"
   condition: "always()"
 
