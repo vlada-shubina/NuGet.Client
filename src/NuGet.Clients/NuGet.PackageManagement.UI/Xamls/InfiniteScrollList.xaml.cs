@@ -544,6 +544,7 @@ namespace NuGet.PackageManagement.UI
             }
 
             ViewModel.Collection.Clear();
+            _scrollViewer.ScrollToHome();
             _loadingStatusBar.ItemsLoaded = 0;
         }
 

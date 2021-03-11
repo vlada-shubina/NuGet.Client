@@ -15,7 +15,7 @@ namespace NuGet.PackageManagement.UI
         {
             get
             {
-                return Status == LoadingStatus.NoItemsFound || Status == LoadingStatus.Loading || Status == LoadingStatus.Ready;
+                return Status == LoadingStatus.NoItemsFound || Status == LoadingStatus.Loading;
             }
         }
 
