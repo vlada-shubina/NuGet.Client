@@ -356,6 +356,11 @@ namespace NuGet.PackageManagement.UI
                     TelemetryServiceUtility.StartOrResumeTimer();
 
                     IReadOnlyList<ProjectAction> actions = await resolveActionsAsync(projectManagerService);
+                    //TODO: remove probably
+                    if (actions.Count == 0)
+                    {
+                        throw new ApplicationException("There are no resolved actions!!!");
+                    }
                     IReadOnlyList<PreviewResult> results = await GetPreviewResultsAsync(projectManagerService, actions, cancellationToken);
 
                     if (operationType == NuGetOperationType.Uninstall)
