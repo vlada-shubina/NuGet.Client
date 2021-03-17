@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -171,6 +172,44 @@ namespace NuGet.PackageManagement.VisualStudio.Test
                 Mock.Get(_metadataResource).Verify(
                     x => x.GetMetadataAsync(TestPackageIdentity.Id, true, false, It.IsAny<SourceCacheContext>(), It.IsAny<Common.ILogger>(), It.IsAny<CancellationToken>()),
                     Times.Once);
+            }
+
+            [Fact]
+            public async Task GetPackageMetadataListAsync_GetPackageMetadataAsync_HasSameMetadata()
+            {
+                // Arrange
+                string[] versions = { "0.0.1", "1.0.0", "2.0.1", "2.0.0", "1.0.1" };
+                SetupRemotePackageMetadata(TestPackageIdentity.Id, versions);
+
+                var packagesFromGetPackageMetadataAsync = new List<PackageIdentity>();
+
+                // Act
+                foreach (string version in versions)
+                {
+                    var testPackageIdentity = new PackageIdentity(TestPackageIdentity.Id, new NuGetVersion(version));
+
+                    IPackageSearchMetadata foundMetadata = await _target.GetPackageMetadataAsync(
+                    identity: testPackageIdentity,
+                    includePrerelease: true,
+                    cancellationToken: CancellationToken.None);
+
+                    packagesFromGetPackageMetadataAsync.Add(foundMetadata.Identity);
+                }
+
+                IEnumerable<IPackageSearchMetadata> list = await _target.GetPackageMetadataListAsync(
+                    TestPackageIdentity.Id,
+                    includePrerelease: true,
+                    includeUnlisted: false,
+                    cancellationToken: CancellationToken.None);
+
+                List<PackageIdentity> packagesFromGetPackageMetadataListAsync = list.Select(metadata => metadata.Identity).ToList();
+
+                // Assert
+                Assert.Equal(packagesFromGetPackageMetadataAsync.Count, packagesFromGetPackageMetadataListAsync.Count);
+                foreach (PackageIdentity package in packagesFromGetPackageMetadataAsync)
+                {
+                    Assert.True(packagesFromGetPackageMetadataListAsync.Contains(package));
+                }
             }
 
             [Fact]
