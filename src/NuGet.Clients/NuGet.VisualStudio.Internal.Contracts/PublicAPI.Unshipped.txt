@@ -1,4 +1,7 @@
 #nullable enable
+NuGet.VisualStudio.Internal.Contracts.IRestoreService
+NuGet.VisualStudio.Internal.Contracts.IRestoreService.RestoreAsync(string! dgSpecJson, string! solutionRoot, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<string!>!
 NuGet.VisualStudio.Internal.Contracts.PackageDeprecationMetadataContextInfo.Message.get -> string?
 NuGet.VisualStudio.Internal.Contracts.PackageDeprecationMetadataContextInfo.PackageDeprecationMetadataContextInfo(string? message, System.Collections.Generic.IReadOnlyCollection<string!>? reasons, NuGet.VisualStudio.Internal.Contracts.AlternatePackageMetadataContextInfo? alternatePackageContextInfo) -> void
 NuGet.VisualStudio.Internal.Contracts.PackageSearchMetadataContextInfo.ReadmeUrl.get -> System.Uri?
+static readonly NuGet.VisualStudio.Internal.Contracts.NuGetServices.RestoreService -> Microsoft.ServiceHub.Framework.ServiceRpcDescriptor!

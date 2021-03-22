@@ -13,6 +13,7 @@ NuGet.VisualStudio.Interop.dll
 NuGet.VisualStudio.Implementation.dll
 NuGet.VisualStudio.Internal.Contracts.dll
 NuGet.VisualStudio.OnlineEnvironment.Client.dll
+NuGet.VisualStudio.ServiceHub.dll
 
 # MS delay signed assemblies
 Microsoft.Build.NuGetSdkResolver.dll
@@ -27,6 +28,7 @@ NuGet.LibraryModel.dll
 NuGet.PackageManagement.dll
 NuGet.PackageManagement.UI.dll
 NuGet.Packaging.dll
+NuGet.Packaging.Core.dll
 NuGet.ProjectModel.dll
 NuGet.Protocol.dll
 NuGet.Resolver.dll

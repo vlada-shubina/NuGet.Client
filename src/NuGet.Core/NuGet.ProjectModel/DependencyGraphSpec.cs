@@ -270,9 +270,16 @@ namespace NuGet.ProjectModel
         {
             using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
             using (var streamReader = new StreamReader(stream))
+            {
+                return Load(streamReader);
+            }
+        }
+
+        public static DependencyGraphSpec Load(TextReader streamReader)
+        {
             using (var jsonReader = new JsonTextReader(streamReader))
             {
-                var dgspec = new DependencyGraphSpec(path);
+                var dgspec = new DependencyGraphSpec();
                 bool wasObjectRead;
 
                 try
@@ -294,7 +301,7 @@ namespace NuGet.ProjectModel
                             case "projects":
                                 jsonReader.ReadObject(projectsPropertyName =>
                                 {
-                                    PackageSpec packageSpec = JsonPackageSpecReader.GetPackageSpec(jsonReader, path);
+                                    PackageSpec packageSpec = JsonPackageSpecReader.GetPackageSpec(jsonReader, null);
 
                                     dgspec._projects.Add(projectsPropertyName, packageSpec);
                                 });
@@ -308,7 +315,7 @@ namespace NuGet.ProjectModel
                 }
                 catch (JsonReaderException ex)
                 {
-                    throw FileFormatException.Create(ex, path);
+                    throw FileFormatException.Create(ex, null);
                 }
 
                 if (!wasObjectRead || jsonReader.TokenType != JsonToken.EndObject)
@@ -330,6 +337,13 @@ namespace NuGet.ProjectModel
         {
             using (var fileStream = new FileStream(path, FileMode.Create))
             using (var textWriter = new StreamWriter(fileStream))
+            {
+                Save(textWriter);
+            }
+        }
+
+        public void Save(TextWriter textWriter)
+        {
             using (var jsonWriter = new JsonTextWriter(textWriter))
             using (var writer = new RuntimeModel.JsonObjectWriter(jsonWriter))
             {

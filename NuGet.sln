@@ -242,6 +242,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NuGet.VisualStudio.Internal
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NuGet.Tools.Test", "test\NuGet.Clients.Tests\NuGet.Tools.Test\NuGet.Tools.Test.csproj", "{FC1F1CF8-4902-46F0-929F-204E5B1B6D53}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NuGet.VisualStudio.ServiceHub", "src\NuGet.Clients\NuGet.VisualStudio.ServiceHub\NuGet.VisualStudio.ServiceHub.csproj", "{DE0CA971-AB42-48A2-9516-A19D89F05330}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -588,6 +590,10 @@ Global
 		{FC1F1CF8-4902-46F0-929F-204E5B1B6D53}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC1F1CF8-4902-46F0-929F-204E5B1B6D53}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC1F1CF8-4902-46F0-929F-204E5B1B6D53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE0CA971-AB42-48A2-9516-A19D89F05330}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE0CA971-AB42-48A2-9516-A19D89F05330}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE0CA971-AB42-48A2-9516-A19D89F05330}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE0CA971-AB42-48A2-9516-A19D89F05330}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -688,6 +694,7 @@ Global
 		{C7CE3001-1DCB-4D66-B583-AF54A59BD552} = {506AF844-92E0-4404-BBFC-0AB073890A72}
 		{C24DD62A-905D-4C48-A17A-B83107F17EA7} = {01BC4531-1E25-48D7-A8FD-A47D6FEC47FB}
 		{FC1F1CF8-4902-46F0-929F-204E5B1B6D53} = {01BC4531-1E25-48D7-A8FD-A47D6FEC47FB}
+		{DE0CA971-AB42-48A2-9516-A19D89F05330} = {08F523EC-3C2A-4A00-A54C-2E54C5AC856B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3747A66A-00D1-41B8-A9C5-ED0D7BEA9D25}

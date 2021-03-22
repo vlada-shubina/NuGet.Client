@@ -13,7 +13,9 @@ using System.Threading.Tasks;
 using Microsoft;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.ServiceBroker;
 using Microsoft.VisualStudio.Threading;
+using Newtonsoft.Json;
 using NuGet.Commands;
 using NuGet.Common;
 using NuGet.Configuration;
@@ -29,6 +31,7 @@ using NuGet.ProjectModel;
 using NuGet.Protocol.Core.Types;
 using NuGet.Shared;
 using NuGet.VisualStudio;
+using NuGet.VisualStudio.Internal.Contracts;
 using NuGet.VisualStudio.Telemetry;
 using Task = System.Threading.Tasks.Task;
 
@@ -426,24 +429,54 @@ namespace NuGet.SolutionRestoreManager
                                 var providerCache = new RestoreCommandProvidersCache();
                                 Action<SourceCacheContext> cacheModifier = (cache) => { };
 
-                                var isRestoreOriginalAction = true;
+                                string dgSpecJson;
+                                using (var stringWriter = new StringWriter())
+                                {
+                                    dgSpec.Save(stringWriter);
+                                    dgSpecJson = stringWriter.ToString();
+                                }
+
+                                //var isRestoreOriginalAction = true;
                                 var isRestoreSucceeded = true;
                                 IReadOnlyList<RestoreSummary> restoreSummaries = null;
                                 try
                                 {
-                                    restoreSummaries = await DependencyGraphRestoreUtility.RestoreAsync(
-                                       _solutionManager,
-                                       dgSpec,
-                                       cacheContext,
-                                       providerCache,
-                                       cacheModifier,
-                                       sources,
-                                       _nuGetProjectContext.OperationId,
-                                       forceRestore,
-                                       isRestoreOriginalAction,
-                                       additionalMessages,
-                                       l,
-                                       t);
+                                    var serviceContainer = await _asyncServiceProvider.GetServiceAsync<SVsBrokeredServiceContainer, IBrokeredServiceContainer>();
+                                    var serviceBroker = serviceContainer.GetFullAccessServiceBroker();
+                                    IRestoreService restoreService = null;
+                                    try
+                                    {
+                                        restoreService = await serviceBroker.GetProxyAsync<IRestoreService>(NuGetServices.RestoreService, cancellationToken: t);
+                                        if (restoreService != null)
+                                        {
+                                            var result = await restoreService.RestoreAsync(dgSpecJson, _solutionManager.SolutionDirectory, t);
+                                            restoreSummaries = JsonConvert.DeserializeObject<List<RestoreSummary>>(result);
+                                        }
+                                    }
+                                    catch( Exception e)
+                                    {
+                                        var msg = e.ToString();
+                                        throw;
+                                    }
+                                    finally
+                                    {
+                                        (restoreService as IDisposable)?.Dispose();
+                                    }
+
+
+                                    //restoreSummaries = await DependencyGraphRestoreUtility.RestoreAsync(
+                                    //   _solutionManager,
+                                    //   dgSpec,
+                                    //   cacheContext,
+                                    //   providerCache,
+                                    //   cacheModifier,
+                                    //   sources,
+                                    //   _nuGetProjectContext.OperationId,
+                                    //   forceRestore,
+                                    //   isRestoreOriginalAction,
+                                    //   additionalMessages,
+                                    //   l,
+                                    //   t);
 
                                     _packageCount += restoreSummaries.Select(summary => summary.InstallCount).Sum();
                                     isRestoreSucceeded = restoreSummaries.All(summary => summary.Success == true);

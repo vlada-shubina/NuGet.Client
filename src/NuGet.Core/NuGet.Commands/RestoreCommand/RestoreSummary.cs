@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using NuGet.Common;
 using NuGet.Protocol.Core.Types;
 using NuGet.Shared;
@@ -61,6 +62,7 @@ namespace NuGet.Commands
             Errors = errors.ToArray();
         }
 
+        [JsonConstructor]
         public RestoreSummary(
             bool success,
             string inputPath,

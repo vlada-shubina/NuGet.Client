@@ -90,6 +90,7 @@ Microsoft.VisualStudio.Shell.Interop.16.6.DesignTime.dll
 Microsoft.Win32.Registry.dll
 Nerdbank.Streams.dll
 System.Buffers.dll
+System.Diagnostics.DiagnosticSource.dll
 System.IO.Pipelines.dll
 System.IdentityModel.Tokens.Jwt.dll
 System.Memory.dll

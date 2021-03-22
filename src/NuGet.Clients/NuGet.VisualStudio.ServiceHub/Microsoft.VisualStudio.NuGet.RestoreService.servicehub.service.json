@@ -1,0 +1,11 @@
+{
+  "host": "desktopClr",
+  "hostId": "NuGet",
+  "entryPoint": {
+    "assemblyPath": "NuGet.VisualStudio.ServiceHub.dll",
+    "fullClassName": "NuGet.VisualStudio.ServiceHub.ServiceFactory",
+    "appBasePath": "%VSAPPIDDIR%",
+    "configPath": "%PkgDefApplicationConfigFile%"
+  },
+  "versionRange": "[1.0, 1.0]"
+}
