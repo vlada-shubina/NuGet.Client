@@ -48,8 +48,10 @@ namespace NuGet.PackageManagement.VisualStudio.Test
                 logger: NullLogger.Instance);
         }
 
-        [Fact]
-        public async Task GetPackagesWithUpdatesAsync_WithAllVersions_RetrievesSingleUpdate()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task GetPackagesWithUpdatesAsync_WithAllVersions_RetrievesSingleUpdate(bool isUIFiltering)
         {
             // Arrange
             var testPackageIdentity = new PackageCollectionItem("FakePackage", new NuGetVersion("1.0.0"), installedReferences: null);
@@ -69,7 +71,8 @@ namespace NuGet.PackageManagement.VisualStudio.Test
             IEnumerable<IPackageSearchMetadata> packages = await _target.GetPackagesWithUpdatesAsync(
                 searchText: "fake",
                 new SearchFilter(includePrerelease: false),
-                CancellationToken.None);
+                CancellationToken.None,
+                isUIFiltering);
 
             // Assert
             Assert.Single(packages);
@@ -81,6 +84,54 @@ namespace NuGet.PackageManagement.VisualStudio.Test
             Assert.Equal(
                 new[] { "2.0.1", "2.0.0", "1.0.1", "1.0.0", "0.0.1" },
                 actualVersions.Select(v => v.Version.ToString()).ToArray());
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task GetPackagesWithUpdatesAsync_WhenNoUpdates_RetrievesInstalledVersion(bool isUIFiltering)
+        {
+            // Arrange
+            var installedVersion = "2.0.1";
+            var testPackageIdentity = new PackageCollectionItem("FakePackage", new NuGetVersion(installedVersion), installedReferences: null);
+            var serviceBroker = new Mock<IServiceBroker>();
+            Mock<INuGetProjectManagerService> projectManagerService = SetupProjectManagerService(serviceBroker);
+
+            IProjectContextInfo projectA = SetupProject(projectManagerService, "FakePackage", installedVersion);
+            SetupRemotePackageMetadata("FakePackage", "0.0.1", "1.0.0", "2.0.1", "2.0.0", "1.0.1");
+
+            var _target = new UpdatePackageFeed(
+                serviceBroker.Object,
+                new[] { testPackageIdentity },
+                _metadataProvider,
+                new[] { projectA });
+
+            // Act
+            IEnumerable<IPackageSearchMetadata> packages = await _target.GetPackagesWithUpdatesAsync(
+                searchText: "fake",
+                new SearchFilter(includePrerelease: false),
+                CancellationToken.None,
+                isUIFiltering);
+
+            // Assert
+
+            // Expect installed package even though Updates do not exist.
+            if (isUIFiltering)
+            {
+                Assert.Single(packages);
+                IPackageSearchMetadata updateCandidate = packages.Single();
+                Assert.Equal(installedVersion, updateCandidate.Identity.Version.ToString());
+
+                IEnumerable<VersionInfo> actualVersions = await updateCandidate.GetVersionsAsync();
+                Assert.NotEmpty(actualVersions);
+                Assert.Equal(
+                    new[] { "2.0.1", "2.0.0", "1.0.1", "1.0.0", "0.0.1" },
+                    actualVersions.Select(v => v.Version.ToString()).ToArray());
+            }
+            else // Expect no package since Updates do not exist.
+            {
+                Assert.Empty(packages);
+            }
         }
 
         [Fact]

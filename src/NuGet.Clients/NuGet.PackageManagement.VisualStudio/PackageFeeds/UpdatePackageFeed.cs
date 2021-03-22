@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft;
 using Microsoft.ServiceHub.Framework;
+using NuGet.Packaging.Core;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 using NuGet.VisualStudio.Internal.Contracts;
@@ -49,7 +50,7 @@ namespace NuGet.PackageManagement.VisualStudio
                 throw new InvalidOperationException("Invalid token");
             }
 
-            IEnumerable<IPackageSearchMetadata> packagesWithUpdates = await GetPackagesWithUpdatesAsync(searchToken.SearchString, searchToken.SearchFilter, cancellationToken);
+            IEnumerable<IPackageSearchMetadata> packagesWithUpdates = await GetPackagesWithUpdatesAsync(searchToken.SearchString, searchToken.SearchFilter, cancellationToken, includeInstalledWithoutUpdates: searchToken.IsUIFiltering);
 
             IPackageSearchMetadata[] items = packagesWithUpdates
                 .Skip(searchToken.StartIndex)
@@ -68,48 +69,50 @@ namespace NuGet.PackageManagement.VisualStudio
             return result;
         }
 
-        public async Task<IEnumerable<IPackageSearchMetadata>> GetPackagesWithUpdatesAsync(string searchText, SearchFilter searchFilter, CancellationToken cancellationToken)
+        public async Task<IEnumerable<IPackageSearchMetadata>> GetPackagesWithUpdatesAsync(string searchText, SearchFilter searchFilter,
+            CancellationToken cancellationToken, bool includeInstalledWithoutUpdates = false)
         {
-            var packages = _installedPackages
+            IEnumerable<PackageIdentity> packages = _installedPackages
                 .Where(p => !p.IsAutoReferenced())
                 .GetEarliest()
                 .Where(p => p.Id.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) != -1);
 
             // Prefetch metadata for all installed packages
-            var prefetch = await TaskCombinators.ThrottledAsync(
+            IEnumerable<IEnumerable<IPackageSearchMetadata>> prefetch = await TaskCombinators.ThrottledAsync(
                 packages,
                 (p, t) => _metadataProvider.GetPackageMetadataListAsync(p.Id, searchFilter.IncludePrerelease, includeUnlisted: false, cancellationToken: t),
                 cancellationToken);
 
             // Flatten the result list
-            var prefetchedPackages = prefetch
+            IPackageSearchMetadata[] prefetchedPackages = prefetch
                 .Where(p => p != null)
                 .SelectMany(p => p)
                 .ToArray();
 
             // Traverse all projects and determine packages with updates
             var packagesWithUpdates = new List<IPackageSearchMetadata>();
-            foreach (var project in _projects)
+            foreach (IProjectContextInfo project in _projects)
             {
-                var installed = await project.GetInstalledPackagesAsync(_serviceBroker, cancellationToken);
-                foreach (var installedPackage in installed)
+                IReadOnlyCollection<IPackageReferenceContextInfo> installed = await project.GetInstalledPackagesAsync(_serviceBroker, cancellationToken);
+                foreach (IPackageReferenceContextInfo installedPackage in installed)
                 {
-                    var installedVersion = installedPackage.Identity.Version;
-                    var allowedVersions = installedPackage.AllowedVersions ?? VersionRange.All;
+                    NuGetVersion installedVersion = installedPackage.Identity.Version;
+                    VersionRange allowedVersions = installedPackage.AllowedVersions ?? VersionRange.All;
 
                     // filter packages based on current package identity
-                    var allPackages = prefetchedPackages
+                    IPackageSearchMetadata[] allPackages = prefetchedPackages
                         .Where(p => StringComparer.OrdinalIgnoreCase.Equals(
                             p.Identity.Id,
                             installedPackage.Identity.Id))
                         .ToArray();
 
                     // and allowed versions
-                    var allowedPackages = allPackages
+                    IEnumerable<IPackageSearchMetadata> allowedPackages = allPackages
                         .Where(p => allowedVersions.Satisfies(p.Identity.Version));
 
+                    
                     // peek the highest available
-                    var highest = allowedPackages
+                    IPackageSearchMetadata highest = allowedPackages
                         .OrderByDescending(e => e.Identity.Version, VersionComparer.VersionRelease)
                         .FirstOrDefault();
 
@@ -117,6 +120,14 @@ namespace NuGet.PackageManagement.VisualStudio
                         VersionComparer.VersionRelease.Compare(installedVersion, highest.Identity.Version) < 0)
                     {
                         packagesWithUpdates.Add(highest.WithVersions(ToVersionInfo(allPackages)));
+                    }
+                    else if (includeInstalledWithoutUpdates) // Add package even if no update is available when UI filtering, as they'll be filtered later.
+                    {
+                        // Include the installed metadata.
+                        IPackageSearchMetadata installedWithMetadata = allPackages.Single(metadata => metadata.Identity.Equals(installedPackage.Identity))
+                            ?.WithVersions(ToVersionInfo(allPackages));
+
+                        packagesWithUpdates.Add(installedWithMetadata);
                     }
                 }
             }

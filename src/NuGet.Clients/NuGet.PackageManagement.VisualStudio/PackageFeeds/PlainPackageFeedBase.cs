@@ -15,6 +15,7 @@ namespace NuGet.PackageManagement.VisualStudio
         public int StartIndex { get; set; }
         public string SearchString { get; set; }
         public SearchFilter SearchFilter { get; set; }
+        public bool IsUIFiltering { get; set; }
     }
 
     /// <summary>

@@ -53,21 +53,21 @@ namespace NuGet.PackageManagement.VisualStudio
                 throw new InvalidOperationException("Invalid token");
             }
 
-            var packages = _installedPackages
+            PackageIdentity[] packages = _installedPackages
                 .GetLatest()
                 .Where(p => p.Id.IndexOf(searchToken.SearchString, StringComparison.OrdinalIgnoreCase) != -1)
                 .OrderBy(p => p.Id)
                 .Skip(searchToken.StartIndex)
                 .ToArray();
 
-            var items = await TaskCombinators.ThrottledAsync(
+            IEnumerable<IPackageSearchMetadata> items = await TaskCombinators.ThrottledAsync(
                 packages,
                 (p, t) => GetPackageMetadataAsync(p, searchToken.SearchFilter.IncludePrerelease, t),
                 cancellationToken);
 
             //  The packages were originally sorted which is important because we Skip based on that sort
             //  however the asynchronous execution has randomly reordered the set. So we need to resort. 
-            var result = SearchResult.FromItems(items.OrderBy(p => p.Identity.Id).ToArray());
+            SearchResult<IPackageSearchMetadata> result = SearchResult.FromItems(items.OrderBy(p => p.Identity.Id).ToArray());
 
             var loadingStatus = packages.Length == 0
                 ? LoadingStatus.NoItemsFound

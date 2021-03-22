@@ -109,6 +109,54 @@ namespace NuGet.PackageManagement.VisualStudio.Test
                 Assert.Equal(expectedVersionStrings, (await metadata.GetVersionsAsync()).Select(v => v.Version.ToString()).OrderBy(v => v));
                 Assert.Same(deprecationMetadata, await metadata.GetDeprecationMetadataAsync());
             }
+
+            [Fact]
+            public async Task GetPackageMetadataListAsync_GetPackageMetadataAsync_HasSameMetadata()
+            {
+                // Arrange
+                var localOnlyPackage = new PackageIdentity(TestPackageIdentity.Id, new NuGetVersion("3.1.2"));
+                Mock.Get(_localMetadataResource)
+                    .Setup(x => x.GetMetadataAsync(TestPackageIdentity.Id, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<SourceCacheContext>(),
+                        It.IsAny<ILogger>(), It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(new[] { PackageSearchMetadataBuilder.FromIdentity(localOnlyPackage).Build() });
+
+                string[] versions = { "0.0.1", "1.0.0", "2.0.1", "2.0.0", "1.0.1" };
+                SetupRemotePackageMetadata(TestPackageIdentity.Id, versions);
+
+                var packagesFromGetPackageMetadataAsync = new List<PackageIdentity>();
+
+                // Act
+                foreach (string version in versions)
+                {
+                    var testPackageIdentity = new PackageIdentity(TestPackageIdentity.Id, new NuGetVersion(version));
+
+                    IPackageSearchMetadata foundMetadata = await _target.GetPackageMetadataAsync(
+                    identity: testPackageIdentity,
+                    includePrerelease: true,
+                    cancellationToken: CancellationToken.None);
+
+                    packagesFromGetPackageMetadataAsync.Add(foundMetadata.Identity);
+                }
+
+                IEnumerable<IPackageSearchMetadata> list = await _target.GetPackageMetadataListAsync(
+                    TestPackageIdentity.Id,
+                    includePrerelease: true,
+                    includeUnlisted: false,
+                    cancellationToken: CancellationToken.None);
+
+                List<PackageIdentity> packagesFromGetPackageMetadataListAsync = list.Select(metadata => metadata.Identity).ToList();
+
+                // Assert
+                Mock.Get(_localMetadataResource).Verify(
+                    resx => resx.GetMetadataAsync(TestPackageIdentity.Id, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<SourceCacheContext>(),
+                        It.IsAny<ILogger>(), It.IsAny<CancellationToken>()),
+                    Times.Once);
+                Assert.Equal(packagesFromGetPackageMetadataAsync.Distinct().Count(), packagesFromGetPackageMetadataListAsync.Distinct().Count());
+                foreach (PackageIdentity package in packagesFromGetPackageMetadataAsync)
+                {
+                    Assert.True(packagesFromGetPackageMetadataListAsync.Contains(package));
+                }
+            }
         }
 
         public class NoLocalProviderTests : SourceRepositoryCreator
@@ -205,7 +253,7 @@ namespace NuGet.PackageManagement.VisualStudio.Test
                 List<PackageIdentity> packagesFromGetPackageMetadataListAsync = list.Select(metadata => metadata.Identity).ToList();
 
                 // Assert
-                Assert.Equal(packagesFromGetPackageMetadataAsync.Count, packagesFromGetPackageMetadataListAsync.Count);
+                Assert.Equal(packagesFromGetPackageMetadataAsync.Distinct().Count(), packagesFromGetPackageMetadataListAsync.Distinct().Count());
                 foreach (PackageIdentity package in packagesFromGetPackageMetadataAsync)
                 {
                     Assert.True(packagesFromGetPackageMetadataListAsync.Contains(package));
