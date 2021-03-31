@@ -4,7 +4,7 @@ $VSVersion = "16.0"
 $Configuration = "Debug"
 $NETFramework = "net472"
 $NETStandard = "netstandard2.0"
-$NETCoreApp = "netcoreapp2.1"
+$NETCoreApp = "netcoreapp5.0"
 
 <#
 Auto bootstraps NuGet for debugging the targets. This includes both restore and pack and is the recommended way to test things :) 
