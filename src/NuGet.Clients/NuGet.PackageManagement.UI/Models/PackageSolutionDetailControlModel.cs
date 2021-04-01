@@ -124,6 +124,12 @@ namespace NuGet.PackageManagement.UI
         private async Task UpdateInstalledVersionsAsync(CancellationToken cancellationToken)
         {
             var hash = new HashSet<NuGetVersion>();
+            IReadOnlyCollection<IPackageReferenceContextInfo> installedPackages =
+                await _projects.Select(p => p.NuGetProject).GetInstalledPackagesAsync(ServiceBroker, cancellationToken);
+
+            //IPackageReferenceContextInfo installedPackage = installedPackages
+            //    .Where(p => StringComparer.OrdinalIgnoreCase.Equals(p.Identity.Id, packageId))
+            //    .FirstOrDefault();
 
             foreach (var project in _projects)
             {
@@ -181,10 +187,6 @@ namespace NuGet.PackageManagement.UI
             AutoSelectProjects();
         }
 
-        /// <summary>
-        /// This method is called from several methods that are called from properties and LINQ queries
-        /// It is likely not called more than once in an action.
-        /// </summary>
         private async Task<IPackageReferenceContextInfo> GetInstalledPackageAsync(
             IProjectContextInfo project,
             string packageId,

@@ -4,6 +4,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft;
@@ -37,18 +38,24 @@ namespace NuGet.PackageManagement.VisualStudio
         }
 
         public static async ValueTask<IReadOnlyCollection<IPackageReferenceContextInfo>> GetInstalledPackagesAsync(
-            this IProjectContextInfo projectContextInfo,
+            this IEnumerable<IProjectContextInfo> projectContextInfos,
             IServiceBroker serviceBroker,
             CancellationToken cancellationToken)
         {
-            Assumes.NotNull(projectContextInfo);
+            Assumes.NotNull(projectContextInfos);
             Assumes.NotNull(serviceBroker);
 
             cancellationToken.ThrowIfCancellationRequested();
 
+            var projectIds = (IReadOnlyCollection<string>?)projectContextInfos.Select(pci => pci.ProjectId);
+            if (projectIds is null)
+            {
+                return new List<IPackageReferenceContextInfo>();
+            }
+
             using (INuGetProjectManagerService projectManager = await GetProjectManagerAsync(serviceBroker, cancellationToken))
             {
-                return await projectManager.GetInstalledPackagesAsync(new string[] { projectContextInfo.ProjectId }, cancellationToken);
+                return await projectManager.GetInstalledPackagesAsync(projectIds, cancellationToken);
             }
         }
 

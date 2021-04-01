@@ -372,13 +372,13 @@ namespace NuGet.PackageManagement.VisualStudio.Test
 
                 TelemetryActivity.NuGetTelemetryService = new NuGetVSTelemetryService(telemetrySession.Object);
 
-                IReadOnlyCollection<IPackageReferenceContextInfo> packages = await _projectManager.GetInstalledPackagesAsync(
+                Dictionary<NuGetProject, IReadOnlyCollection<IPackageReferenceContextInfo>> packages = await _projectManager.GetInstalledPackagesAsync(
                     new[] { projectId },
                     CancellationToken.None);
 
                 Assert.Equal(1, packages.Count);
                 IPackageReferenceContextInfo expected = PackageReferenceContextInfo.Create(packageReference);
-                IPackageReferenceContextInfo actual = packages.Single();
+                IPackageReferenceContextInfo actual = packages.Single().Value.Single();
 
                 Assert.Equal(expected.AllowedVersions, actual.AllowedVersions);
                 Assert.Equal(expected.Framework, actual.Framework);

@@ -296,5 +296,6 @@ namespace NuGet.PackageManagement.UI.Test.Models
 
             Assert.Equal(expectedVersions, actualVersions);
         }
+
     }
 }

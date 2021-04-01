@@ -99,7 +99,7 @@ namespace NuGet.PackageManagement.VisualStudio
             return await ProjectContextInfo.CreateAsync(project, cancellationToken);
         }
 
-        public async ValueTask<IReadOnlyCollection<IPackageReferenceContextInfo>> GetInstalledPackagesAsync(
+        public async ValueTask<Dictionary<NuGetProject, IReadOnlyCollection<IPackageReferenceContextInfo>>> GetInstalledPackagesAsync(
             IReadOnlyCollection<string> projectIds,
             CancellationToken cancellationToken)
         {
@@ -107,19 +107,35 @@ namespace NuGet.PackageManagement.VisualStudio
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            IReadOnlyList<NuGetProject> projects = await GetProjectsAsync(projectIds, cancellationToken);
+            var distinctProjectIds = (IReadOnlyCollection<string>)projectIds.Distinct();
+            IReadOnlyList<NuGetProject> projects = await GetProjectsAsync(distinctProjectIds, cancellationToken);
 
-            List<Task<IEnumerable<PackageReference>>> tasks = projects
-                .Select(project => project.GetInstalledPackagesAsync(cancellationToken))
-                .ToList();
-            IEnumerable<PackageReference>[] results = await Task.WhenAll(tasks);
+            //
+            ////KeyValuePair<NuGetProject, IEnumerable<PackageReference>>[]? results =
+            ////await Task.WhenAll(
+            ////    dict.Select(
+            ////        async pair => new KeyValuePair<NuGetProject, IEnumerable<PackageReference>>(pair.Key, await pair.Value)));
 
-            var installedPackages = new List<PackageReferenceContextInfo>();
+            Dictionary<NuGetProject, Task<IEnumerable<PackageReference>>>? dict = projects.ToDictionary(p => p, p => p.GetInstalledPackagesAsync(cancellationToken));
+            await Task.WhenAll(
+                dict.Select(
+                    async pair => await pair.Value));
+
+            var dictToReturn = new Dictionary<NuGetProject, IReadOnlyCollection<IPackageReferenceContextInfo>>();
             GetInstalledPackagesAsyncTelemetryEvent? telemetryEvent = null;
 
-            for (var i = 0; i < results.Length; ++i)
+            //TODO: I think this is redundant due to WhenAll
+            //Task<IEnumerable<PackageReference>>? faultedTask = dict.Select(pair => pair.Value).FirstOrDefault(task => task.IsCompleted == false);
+            //if (faultedTask != null)
+            //{
+            //    throw faultedTask.Exception;
+            //}
+
+            var installedPackages = new List<IPackageReferenceContextInfo>();
+
+            foreach (KeyValuePair<NuGetProject, Task<IEnumerable<PackageReference>>> pair in dict)
             {
-                IEnumerable<PackageReference> packageReferences = results[i];
+                IEnumerable<PackageReference> packageReferences = pair.Value.Result;
                 int totalCount = 0;
                 int nullCount = 0;
 
@@ -139,11 +155,13 @@ namespace NuGet.PackageManagement.VisualStudio
                     installedPackages.Add(installedPackage);
                 }
 
+                dictToReturn.Add(pair.Key, installedPackages);
+
                 if (nullCount > 0)
                 {
                     telemetryEvent ??= new GetInstalledPackagesAsyncTelemetryEvent();
 
-                    NuGetProject project = projects[i];
+                    NuGetProject project = pair.Key;
 
                     string projectId = project.GetMetadata<string>(NuGetProjectMetadataKeys.ProjectId);
                     NuGetProjectType projectType = VSTelemetryServiceUtility.GetProjectType(project);
@@ -157,7 +175,7 @@ namespace NuGet.PackageManagement.VisualStudio
                 TelemetryActivity.EmitTelemetryEvent(telemetryEvent);
             }
 
-            return installedPackages;
+            return dictToReturn;
         }
 
         public async ValueTask<IInstalledAndTransitivePackages> GetInstalledAndTransitivePackagesAsync(

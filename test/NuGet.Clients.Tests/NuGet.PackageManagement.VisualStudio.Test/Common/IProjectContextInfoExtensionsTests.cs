@@ -93,7 +93,7 @@ namespace NuGet.PackageManagement.VisualStudio.Test
         {
             await VerifyMicrosoftAssumesExceptionAsync(
                 () => IProjectContextInfoExtensions.GetInstalledPackagesAsync(
-                    projectContextInfo: null,
+                    projectContextInfos: null,
                     Mock.Of<IServiceBroker>(),
                     CancellationToken.None)
                 .AsTask());
