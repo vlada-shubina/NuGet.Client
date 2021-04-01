@@ -99,12 +99,15 @@ namespace NuGet.PackageManagement.VisualStudio
             return await ProjectContextInfo.CreateAsync(project, cancellationToken);
         }
 
-        public async ValueTask<Dictionary<NuGetProject, IReadOnlyCollection<IPackageReferenceContextInfo>>> GetInstalledPackagesAsync(
+        public async ValueTask<IReadOnlyDictionary<NuGetProject, IReadOnlyCollection<IPackageReferenceContextInfo>>> GetInstalledPackagesAsync(
             IReadOnlyCollection<string> projectIds,
             CancellationToken cancellationToken)
         {
-            Assumes.NotNullOrEmpty(projectIds);
 
+            // TODO: Return just Project ID strings.
+
+            Assumes.NotNullOrEmpty(projectIds);
+            
             cancellationToken.ThrowIfCancellationRequested();
 
             var distinctProjectIds = (IReadOnlyCollection<string>)projectIds.Distinct();
@@ -117,6 +120,9 @@ namespace NuGet.PackageManagement.VisualStudio
             ////        async pair => new KeyValuePair<NuGetProject, IEnumerable<PackageReference>>(pair.Key, await pair.Value)));
 
             Dictionary<NuGetProject, Task<IEnumerable<PackageReference>>>? dict = projects.ToDictionary(p => p, p => p.GetInstalledPackagesAsync(cancellationToken));
+
+            // 
+            // WhenAny, if task failed, cancel wrapping token.
             await Task.WhenAll(
                 dict.Select(
                     async pair => await pair.Value));
