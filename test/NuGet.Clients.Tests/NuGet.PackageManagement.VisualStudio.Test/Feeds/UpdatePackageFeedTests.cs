@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -317,8 +318,8 @@ namespace NuGet.PackageManagement.VisualStudio.Test
             string packageVersion,
             string allowedVersions = null)
         {
+            string projectId = Guid.NewGuid().ToString();
             var packageIdentity = new PackageIdentity(packageId, NuGetVersion.Parse(packageVersion));
-
             var installedPackages = new PackageReferenceContextInfo[]
             {
                 PackageReferenceContextInfo.Create(
@@ -331,13 +332,15 @@ namespace NuGet.PackageManagement.VisualStudio.Test
                         allowedVersions: allowedVersions != null ? VersionRange.Parse(allowedVersions) : null))
             };
 
-            string projectId = Guid.NewGuid().ToString();
+            var dictionary = new Dictionary<string, IReadOnlyCollection<IPackageReferenceContextInfo>>();
+            dictionary.Add(projectId, installedPackages);
+            var expectedResult = new ReadOnlyDictionary<string, IReadOnlyCollection<IPackageReferenceContextInfo>>(dictionary);
 
             projectManagerService.Setup(
                     x => x.GetInstalledPackagesAsync(
                         It.Is<IReadOnlyCollection<string>>(projectIds => projectIds.Single() == projectId),
                         It.IsAny<CancellationToken>()))
-                .Returns(new ValueTask<IReadOnlyCollection<IPackageReferenceContextInfo>>(installedPackages));
+                .Returns(new ValueTask<IReadOnlyDictionary<string, IReadOnlyCollection<IPackageReferenceContextInfo>>>(expectedResult));
 
             var project = new Mock<IProjectContextInfo>();
 

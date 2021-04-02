@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceHub.Framework;
@@ -128,7 +129,8 @@ namespace NuGet.PackageManagement.VisualStudio.Test
             var projectManagerService = new Mock<INuGetProjectManagerService>();
             var project = new Mock<IProjectContextInfo>();
             string projectId = Guid.NewGuid().ToString();
-            var expectedResult = new List<IPackageReferenceContextInfo>();
+            var dictionary = new Dictionary<string, IReadOnlyCollection<IPackageReferenceContextInfo>>();
+            var expectedResult = new ReadOnlyDictionary<string, IReadOnlyCollection<IPackageReferenceContextInfo>>(dictionary);
 
             project.SetupGet(x => x.ProjectId)
                 .Returns(projectId);
@@ -137,7 +139,7 @@ namespace NuGet.PackageManagement.VisualStudio.Test
                 x => x.GetInstalledPackagesAsync(
                     It.Is<string[]>(projectIds => projectIds.Length == 1 && string.Equals(projectId, projectIds[0])),
                     It.IsAny<CancellationToken>()))
-                .Returns(new ValueTask<IReadOnlyCollection<IPackageReferenceContextInfo>>(expectedResult));
+                .Returns(new ValueTask<IReadOnlyDictionary<string, IReadOnlyCollection<IPackageReferenceContextInfo>>>(expectedResult));
 
             serviceBroker.Setup(
 #pragma warning disable ISB001 // Dispose of proxies
