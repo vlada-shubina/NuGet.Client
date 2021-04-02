@@ -372,7 +372,7 @@ namespace NuGet.PackageManagement.VisualStudio.Test
 
                 TelemetryActivity.NuGetTelemetryService = new NuGetVSTelemetryService(telemetrySession.Object);
 
-                Dictionary<NuGetProject, IReadOnlyCollection<IPackageReferenceContextInfo>> packages = await _projectManager.GetInstalledPackagesAsync(
+                IReadOnlyDictionary<string, IReadOnlyCollection<IPackageReferenceContextInfo>> packages = await _projectManager.GetInstalledPackagesAsync(
                     new[] { projectId },
                     CancellationToken.None);
 

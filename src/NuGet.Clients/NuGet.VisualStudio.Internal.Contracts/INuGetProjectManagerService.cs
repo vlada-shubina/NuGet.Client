@@ -15,7 +15,7 @@ namespace NuGet.VisualStudio.Internal.Contracts
 {
     public interface INuGetProjectManagerService : IDisposable
     {
-        ValueTask<Dictionary<NuGetProject, IReadOnlyCollection<IPackageReferenceContextInfo>>> GetInstalledPackagesAsync(
+        ValueTask<IReadOnlyDictionary<string, IReadOnlyCollection<IPackageReferenceContextInfo>>> GetInstalledPackagesAsync(
             IReadOnlyCollection<string> projectIds,
             CancellationToken cancellationToken);
         ValueTask<IInstalledAndTransitivePackages> GetInstalledAndTransitivePackagesAsync(

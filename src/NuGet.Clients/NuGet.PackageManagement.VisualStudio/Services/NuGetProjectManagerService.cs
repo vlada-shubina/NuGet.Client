@@ -99,35 +99,41 @@ namespace NuGet.PackageManagement.VisualStudio
             return await ProjectContextInfo.CreateAsync(project, cancellationToken);
         }
 
-        public async ValueTask<IReadOnlyDictionary<NuGetProject, IReadOnlyCollection<IPackageReferenceContextInfo>>> GetInstalledPackagesAsync(
+        /// <summary>
+        /// Returns a dictionary of projectId to installed PackageReferences.
+        /// </summary>
+        /// <param name="projectIds"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>Dictionary of projectId to installed PackageReferences</returns>
+        public async ValueTask<IReadOnlyDictionary<string, IReadOnlyCollection<IPackageReferenceContextInfo>>> GetInstalledPackagesAsync(
             IReadOnlyCollection<string> projectIds,
             CancellationToken cancellationToken)
         {
-
             // TODO: Return just Project ID strings.
 
             Assumes.NotNullOrEmpty(projectIds);
             
             cancellationToken.ThrowIfCancellationRequested();
 
-            var distinctProjectIds = (IReadOnlyCollection<string>)projectIds.Distinct();
+            var distinctProjectIds = projectIds.Distinct().ToList().AsReadOnly();
             IReadOnlyList<NuGetProject> projects = await GetProjectsAsync(distinctProjectIds, cancellationToken);
-
+            
             //
             ////KeyValuePair<NuGetProject, IEnumerable<PackageReference>>[]? results =
             ////await Task.WhenAll(
             ////    dict.Select(
             ////        async pair => new KeyValuePair<NuGetProject, IEnumerable<PackageReference>>(pair.Key, await pair.Value)));
 
-            Dictionary<NuGetProject, Task<IEnumerable<PackageReference>>>? dict = projects.ToDictionary(p => p, p => p.GetInstalledPackagesAsync(cancellationToken));
+            Dictionary<NuGetProject, Task<IEnumerable<PackageReference>>>? dict = projects.ToDictionary(
+                project => project,
+                project => project.GetInstalledPackagesAsync(cancellationToken));
 
-            // 
-            // WhenAny, if task failed, cancel wrapping token.
+            // TODO: may try WhenAny, if task failed, cancel wrapping token.
             await Task.WhenAll(
                 dict.Select(
                     async pair => await pair.Value));
 
-            var dictToReturn = new Dictionary<NuGetProject, IReadOnlyCollection<IPackageReferenceContextInfo>>();
+            var dictToReturn = new Dictionary<string, IReadOnlyCollection<IPackageReferenceContextInfo>>();
             GetInstalledPackagesAsyncTelemetryEvent? telemetryEvent = null;
 
             //TODO: I think this is redundant due to WhenAll
@@ -141,6 +147,8 @@ namespace NuGet.PackageManagement.VisualStudio
 
             foreach (KeyValuePair<NuGetProject, Task<IEnumerable<PackageReference>>> pair in dict)
             {
+                NuGetProject project = pair.Key;
+                string projectId = project.GetMetadata<string>(NuGetProjectMetadataKeys.ProjectId);
                 IEnumerable<PackageReference> packageReferences = pair.Value.Result;
                 int totalCount = 0;
                 int nullCount = 0;
@@ -161,15 +169,16 @@ namespace NuGet.PackageManagement.VisualStudio
                     installedPackages.Add(installedPackage);
                 }
 
-                dictToReturn.Add(pair.Key, installedPackages);
+                dictToReturn.Add(projectId, installedPackages);
 
                 if (nullCount > 0)
                 {
                     telemetryEvent ??= new GetInstalledPackagesAsyncTelemetryEvent();
 
-                    NuGetProject project = pair.Key;
+                    //NuGetProject project = projects.FirstOrDefault(p => string.Equals(
+                    //    p.GetMetadata<string>(NuGetProjectMetadataKeys.ProjectId),
+                    //    projectId, StringComparison.OrdinalIgnoreCase)); StringComparer.OrdinalIgnoreCase.Equals(
 
-                    string projectId = project.GetMetadata<string>(NuGetProjectMetadataKeys.ProjectId);
                     NuGetProjectType projectType = VSTelemetryServiceUtility.GetProjectType(project);
 
                     telemetryEvent.AddProject(projectType, projectId, nullCount, totalCount);

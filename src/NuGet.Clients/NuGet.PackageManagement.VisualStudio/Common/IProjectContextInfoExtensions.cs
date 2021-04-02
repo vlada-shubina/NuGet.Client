@@ -4,6 +4,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,6 +39,32 @@ namespace NuGet.PackageManagement.VisualStudio
         }
 
         public static async ValueTask<IReadOnlyCollection<IPackageReferenceContextInfo>> GetInstalledPackagesAsync(
+            this IProjectContextInfo projectContextInfo,
+            IServiceBroker serviceBroker,
+            CancellationToken cancellationToken)
+        {
+            Assumes.NotNull(projectContextInfo);
+            Assumes.NotNull(serviceBroker);
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            using (INuGetProjectManagerService projectManager = await GetProjectManagerAsync(serviceBroker, cancellationToken))
+            {
+                IReadOnlyDictionary<string, IReadOnlyCollection<IPackageReferenceContextInfo>>? dictionary =
+                    await projectManager.GetInstalledPackagesAsync(new string[] { projectContextInfo.ProjectId }, cancellationToken);
+
+                return (IReadOnlyCollection<IPackageReferenceContextInfo>)dictionary.Values.SelectMany(packages => packages);
+            }
+        }
+
+        /// <summary>
+        /// Gets installed packages for each project, and returns a dictionary mapping ProjectID to installed PackageReferences.
+        /// </summary>
+        /// <param name="projectContextInfos"></param>
+        /// <param name="serviceBroker"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public static async ValueTask<IReadOnlyDictionary<string, IReadOnlyCollection<IPackageReferenceContextInfo>>> GetInstalledPackagesAsync(
             this IEnumerable<IProjectContextInfo> projectContextInfos,
             IServiceBroker serviceBroker,
             CancellationToken cancellationToken)
@@ -47,10 +74,11 @@ namespace NuGet.PackageManagement.VisualStudio
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            var projectIds = (IReadOnlyCollection<string>?)projectContextInfos.Select(pci => pci.ProjectId);
+            ReadOnlyCollection<string>? projectIds = projectContextInfos.Select(pci => pci.ProjectId).ToList().AsReadOnly();
+
             if (projectIds is null)
             {
-                return new List<IPackageReferenceContextInfo>();
+                return new Dictionary<string, IReadOnlyCollection<IPackageReferenceContextInfo>>();
             }
 
             using (INuGetProjectManagerService projectManager = await GetProjectManagerAsync(serviceBroker, cancellationToken))
