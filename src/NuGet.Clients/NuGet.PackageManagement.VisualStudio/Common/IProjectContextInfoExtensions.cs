@@ -53,7 +53,7 @@ namespace NuGet.PackageManagement.VisualStudio
                 IReadOnlyDictionary<string, IReadOnlyCollection<IPackageReferenceContextInfo>>? dictionary =
                     await projectManager.GetInstalledPackagesAsync(new string[] { projectContextInfo.ProjectId }, cancellationToken);
 
-                return (IReadOnlyCollection<IPackageReferenceContextInfo>)dictionary.Values.SelectMany(packages => packages);
+                return dictionary.Values.SelectMany(packages => packages).ToList().AsReadOnly();
             }
         }
 

@@ -295,7 +295,7 @@ namespace NuGet.PackageManagement.VisualStudio
         {
             IReadOnlyDictionary<string, IReadOnlyCollection<IPackageReferenceContextInfo>>? packageReferences =
                 await projectContextInfos.GetInstalledPackagesAsync(_serviceBroker, cancellationToken);
-            return packageReferences.SelectMany(e => e.Value).ToList();
+            return packageReferences.SelectMany(e => e.Value).ToList().AsReadOnly();
         }
 
         private async ValueTask<IInstalledAndTransitivePackages> GetInstalledAndTransitivePackagesAsync(IReadOnlyCollection<IProjectContextInfo> projectContextInfos, CancellationToken cancellationToken)
