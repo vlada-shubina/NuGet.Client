@@ -143,10 +143,9 @@ namespace NuGet.PackageManagement.VisualStudio
             //    throw faultedTask.Exception;
             //}
 
-            var installedPackages = new List<IPackageReferenceContextInfo>();
-
             foreach (KeyValuePair<NuGetProject, Task<IEnumerable<PackageReference>>> pair in dict)
             {
+                var installedPackages = new List<IPackageReferenceContextInfo>();
                 NuGetProject project = pair.Key;
                 string projectId = project.GetMetadata<string>(NuGetProjectMetadataKeys.ProjectId);
                 IEnumerable<PackageReference> packageReferences = pair.Value.Result;
