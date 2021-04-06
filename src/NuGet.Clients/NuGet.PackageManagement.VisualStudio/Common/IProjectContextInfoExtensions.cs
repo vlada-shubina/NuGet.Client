@@ -47,6 +47,11 @@ namespace NuGet.PackageManagement.VisualStudio
             Assumes.NotNull(serviceBroker);
 
             cancellationToken.ThrowIfCancellationRequested();
+            var telemetryEvent2 = new Telemetry.GetInstalledPackagesAsyncTelemetryEvent();
+            telemetryEvent2["projectIds"] = projectContextInfo.ProjectId;
+            telemetryEvent2["projectIdsCount"] = 1;
+            telemetryEvent2["stack"] = System.Environment.StackTrace;
+            NuGet.Common.TelemetryActivity.EmitTelemetryEvent(telemetryEvent2);
 
             using (INuGetProjectManagerService projectManager = await GetProjectManagerAsync(serviceBroker, cancellationToken))
             {
@@ -76,6 +81,12 @@ namespace NuGet.PackageManagement.VisualStudio
 
             ReadOnlyCollection<string>? projectIds = projectContextInfos.Select(pci => pci.ProjectId).ToList().AsReadOnly();
 
+            var telemetryEvent2 = new Telemetry.GetInstalledPackagesAsyncTelemetryEvent();
+            telemetryEvent2["projectIds"] = string.Join("; ", projectIds);
+            telemetryEvent2["projectIdsCount"] = projectIds.Count;
+            telemetryEvent2["stack"] = System.Environment.StackTrace;
+            NuGet.Common.TelemetryActivity.EmitTelemetryEvent(telemetryEvent2);
+
             if (projectIds is null)
             {
                 return new Dictionary<string, IReadOnlyCollection<IPackageReferenceContextInfo>>();
@@ -96,6 +107,12 @@ namespace NuGet.PackageManagement.VisualStudio
             Assumes.NotNull(serviceBroker);
 
             cancellationToken.ThrowIfCancellationRequested();
+
+            var telemetryEvent2 = new Telemetry.GetInstalledPackagesAsyncTelemetryEvent();
+            telemetryEvent2["projectIds"] = projectContextInfo.ProjectId;
+            telemetryEvent2["projectIdsCount"] = 1;
+            telemetryEvent2["stack"] = System.Environment.StackTrace;
+            NuGet.Common.TelemetryActivity.EmitTelemetryEvent(telemetryEvent2);
 
             using (INuGetProjectManagerService projectManager = await GetProjectManagerAsync(serviceBroker, cancellationToken))
             {

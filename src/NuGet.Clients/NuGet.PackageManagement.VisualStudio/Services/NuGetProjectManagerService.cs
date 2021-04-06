@@ -115,6 +115,14 @@ namespace NuGet.PackageManagement.VisualStudio
             
             cancellationToken.ThrowIfCancellationRequested();
 
+            //TODO: remove this
+            var telemetryEvent2 = new GetInstalledPackagesAsyncTelemetryEvent();
+            telemetryEvent2["projectIds"] = string.Join("; ", projectIds);
+            telemetryEvent2["projectIdsCount"] = projectIds.Count;
+            telemetryEvent2["stack"] = System.Environment.StackTrace;
+            TelemetryActivity.EmitTelemetryEvent(telemetryEvent2);
+            
+
             var distinctProjectIds = projectIds.Distinct().ToList().AsReadOnly();
             IReadOnlyList<NuGetProject> projects = await GetProjectsAsync(distinctProjectIds, cancellationToken);
             
@@ -142,6 +150,8 @@ namespace NuGet.PackageManagement.VisualStudio
             //{
             //    throw faultedTask.Exception;
             //}
+
+            
 
             foreach (KeyValuePair<NuGetProject, Task<IEnumerable<PackageReference>>> pair in dict)
             {
