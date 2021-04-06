@@ -231,6 +231,9 @@ namespace NuGet.PackageManagement.UI
             // but for project view, get the allowed version range and pass it to package item view model to choose the latest version based on that
             if (_packageReferences == null && !_context.IsSolution)
             {
+                //_context.Projects.GetInstalledPackagesAsync(_context.ServiceBroker, cancellationToken);
+
+                //TODO: if this is !IsSolution, how can there be multiple projects here??
                 IEnumerable<Task<IReadOnlyCollection<IPackageReferenceContextInfo>>> tasks = _context.Projects
                     .Select(project => project.GetInstalledPackagesAsync(
                         _context.ServiceBroker,

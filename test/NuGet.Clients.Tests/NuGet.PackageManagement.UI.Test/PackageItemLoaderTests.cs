@@ -178,5 +178,88 @@ namespace NuGet.PackageManagement.UI.Test
                 Assert.NotNull(results.First().PackagePath);
             }
         }
+
+//        [Fact]
+//        public async Task UpdateStateAndReportAsync_Invokes()
+//        {
+//            // Arrange
+//            var solutionManager = Mock.Of<INuGetSolutionManagerService>();
+//            var uiContext = new Mock<INuGetUIContext>();
+//            var searchService = Mock.Of<INuGetSearchService>();
+//            var packageFileService = Mock.Of<INuGetPackageFileService>();
+
+//            uiContext.Setup(x => x.SolutionManagerService)
+//                .Returns(solutionManager);
+
+//            var projectManagerService = new Mock<INuGetProjectManagerService>();
+
+//            List<IProjectContextInfo> projects = new List<IProjectContextInfo>();
+//            projects.Add(new ProjectContextInfo("1", ProjectModel.ProjectStyle.PackageReference, NuGetProjectKind.PackagesConfig));
+//            projects.Add(new ProjectContextInfo("2", ProjectModel.ProjectStyle.PackageReference, NuGetProjectKind.PackagesConfig));
+//            projects.Add(new ProjectContextInfo("3", ProjectModel.ProjectStyle.PackageReference, NuGetProjectKind.PackagesConfig));
+
+//            uiContext.SetupGet(x => x.Projects).Returns(projects);
+
+//            projectManagerService.Setup(x => x.GetProjectsAsync(It.IsAny<CancellationToken>())).ReturnsAsync(projects);
+//            projectManagerService.Setup(x => x.GetInstalledPackagesAsync(It.IsAny<IReadOnlyCollection<string>>(), It.IsAny<CancellationToken>()))
+//                .Returns(new ValueTask<IReadOnlyDictionary<string, IReadOnlyCollection<IPackageReferenceContextInfo>>>());
+
+//            var serviceBroker = new Mock<IServiceBroker>();
+//#pragma warning disable ISB001 // Dispose of proxies
+//            serviceBroker.Setup(x => x.GetProxyAsync<INuGetProjectManagerService>(It.Is<ServiceJsonRpcDescriptor>(d => d.Moniker == NuGetServices.ProjectManagerService.Moniker), It.IsAny<ServiceActivationOptions>(), It.IsAny<CancellationToken>()))
+//                .ReturnsAsync(projectManagerService.Object);
+//#pragma warning restore ISB001 // Dispose of proxies
+
+//            uiContext.Setup(x => x.ServiceBroker)
+//                .Returns(serviceBroker.Object);
+
+//            var responses = new Dictionary<string, string>
+//            {
+//                {
+//                    "https://api-v3search-0.nuget.org/query?q=EntityFramework&skip=0&take=26&prerelease=false&semVerLevel=2.0.0",
+//                    ProtocolUtility.GetResource("NuGet.PackageManagement.UI.Test.compiler.resources.EntityFrameworkSearch.json", GetType())
+//                },
+//                { "http://testsource.com/v3/index.json", JsonData.IndexWithoutFlatContainer }
+//            };
+
+//            var repo = StaticHttpHandler.CreateSource("http://testsource.com/v3/index.json", Repository.Provider.GetCoreV3(), responses);
+//            //IReadOnlyDictionary<string, IReadOnlyCollection<IPackageReferenceContextInfo>>? packageReferences =
+//            //    await projects.GetInstalledPackagesAsync(serviceBroker, cancellationToken).ConfigureAwait(true);
+//            var context = new PackageLoadContext(isSolution: false, uiContext.Object);
+
+//            var loader = await PackageItemLoader.CreateAsync(
+//                serviceBroker.Object,
+//                context,
+//                new List<PackageSourceContextInfo> { PackageSourceContextInfo.Create(repo.PackageSource) },
+//                NuGet.VisualStudio.Internal.Contracts.ItemFilter.All,
+//                searchService,
+//                packageFileService,
+//                "EntityFramework",
+//                includePrerelease: false);
+
+//            var packageSearchMetadata = new PackageSearchMetadataBuilder.ClonedPackageSearchMetadata()
+//            {
+//                Identity = new PackageIdentity("NuGet.org", new NuGetVersion("1.0")),
+//                PrefixReserved = true
+//            };
+
+//            var packageSearchMetadataContextInfo = new List<PackageSearchMetadataContextInfo>()
+//            {
+//                PackageSearchMetadataContextInfo.Create(packageSearchMetadata)
+//            };
+
+//            var searchResult = new SearchResultContextInfo(
+//                packageSearchMetadataContextInfo,
+//                new Dictionary<string, LoadingStatus> { { "Completed", LoadingStatus.Ready } },
+//                hasMoreItems: false);
+
+
+//            // Act
+//            await loader.UpdateStateAndReportAsync(searchResult, progress: null, CancellationToken.None);
+//            var items = loader.GetCurrent();
+
+//            // Assert
+
+//        }
     }
 }
