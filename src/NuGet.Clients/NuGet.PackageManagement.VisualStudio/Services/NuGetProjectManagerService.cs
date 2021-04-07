@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -116,12 +117,15 @@ namespace NuGet.PackageManagement.VisualStudio
             cancellationToken.ThrowIfCancellationRequested();
 
             //TODO: remove this
-            var telemetryEvent2 = new GetInstalledPackagesAsyncTelemetryEvent();
-            telemetryEvent2["projectIds"] = string.Join("; ", projectIds);
-            telemetryEvent2["projectIdsCount"] = projectIds.Count;
-            telemetryEvent2["stack"] = System.Environment.StackTrace;
-            TelemetryActivity.EmitTelemetryEvent(telemetryEvent2);
-            
+            var projectContext = await ServiceLocator.GetInstanceAsync<INuGetProjectContext>();
+            var stopWatch = Stopwatch.StartNew();
+
+            //var telemetryEvent2 = new GetInstalledPackagesAsyncTelemetryEvent();
+            //telemetryEvent2["projectIds"] = string.Join("; ", projectIds);
+            //telemetryEvent2["projectIdsCount"] = projectIds.Count;
+            //telemetryEvent2["stack"] = System.Environment.StackTrace;
+            //TelemetryActivity.EmitTelemetryEvent(telemetryEvent2);
+
 
             var distinctProjectIds = projectIds.Distinct().ToList().AsReadOnly();
             IReadOnlyList<NuGetProject> projects = await GetProjectsAsync(distinctProjectIds, cancellationToken);
@@ -150,8 +154,6 @@ namespace NuGet.PackageManagement.VisualStudio
             //{
             //    throw faultedTask.Exception;
             //}
-
-            
 
             foreach (KeyValuePair<NuGetProject, Task<IEnumerable<PackageReference>>> pair in dict)
             {
@@ -199,6 +201,9 @@ namespace NuGet.PackageManagement.VisualStudio
                 TelemetryActivity.EmitTelemetryEvent(telemetryEvent);
             }
 
+            var time = DatetimeUtility.ToReadableTimeFormat(stopWatch.Elapsed);
+            projectContext.Log(MessageLevel.Info, "-----\tNuGetProjectManagerService.GetInstalledPackagesAsync(IReadOnlyCollection<string> projectIds,)\t\tDuration\t\t " + time + " -----");
+
             return dictToReturn;
         }
 
@@ -209,6 +214,10 @@ namespace NuGet.PackageManagement.VisualStudio
             Assumes.NotNullOrEmpty(projectIds);
 
             cancellationToken.ThrowIfCancellationRequested();
+
+            //TODO: remove this
+            var projectContext = await ServiceLocator.GetInstanceAsync<INuGetProjectContext>();
+            var stopWatch = Stopwatch.StartNew();
 
             IReadOnlyList<NuGetProject> projects = await GetProjectsAsync(projectIds, cancellationToken);
 
@@ -236,6 +245,10 @@ namespace NuGet.PackageManagement.VisualStudio
 
             PackageReferenceContextInfo[] installedPackagesContextInfos = installedPackages.SelectMany(e => e).Select(pr => PackageReferenceContextInfo.Create(pr)).ToArray();
             PackageReferenceContextInfo[] transitivePackageContextInfos = prStyleReferences.SelectMany(e => e.TransitivePackages).Select(pr => PackageReferenceContextInfo.Create(pr)).ToArray();
+
+            var time = DatetimeUtility.ToReadableTimeFormat(stopWatch.Elapsed);
+            projectContext.Log(MessageLevel.Info, "-----\tNuGetProjectManagerService.GetInstalledAndTransitivePackagesAsync(IReadOnlyCollection<string> projectIds,)\t\tDuration\t\t " + time + " -----");
+
             return new InstalledAndTransitivePackages(installedPackagesContextInfos, transitivePackageContextInfos);
         }
 

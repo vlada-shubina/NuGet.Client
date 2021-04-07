@@ -5,11 +5,13 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft;
 using Microsoft.ServiceHub.Framework;
+using NuGet.Common;
 using NuGet.Frameworks;
 using NuGet.Packaging.Core;
 using NuGet.VisualStudio.Internal.Contracts;
@@ -47,18 +49,24 @@ namespace NuGet.PackageManagement.VisualStudio
             Assumes.NotNull(serviceBroker);
 
             cancellationToken.ThrowIfCancellationRequested();
-            var telemetryEvent2 = new Telemetry.GetInstalledPackagesAsyncTelemetryEvent();
-            telemetryEvent2["projectIds"] = projectContextInfo.ProjectId;
-            telemetryEvent2["projectIdsCount"] = 1;
-            telemetryEvent2["stack"] = System.Environment.StackTrace;
-            NuGet.Common.TelemetryActivity.EmitTelemetryEvent(telemetryEvent2);
+            //TODO: remove this
+            var projectContext = await NuGet.VisualStudio.ServiceLocator.GetInstanceAsync<ProjectManagement.INuGetProjectContext>();
+            var stopWatch = Stopwatch.StartNew();
+            //var telemetryEvent2 = new Telemetry.GetInstalledPackagesAsyncTelemetryEvent();
+            //telemetryEvent2["projectIds"] = projectContextInfo.ProjectId;
+            //telemetryEvent2["projectIdsCount"] = 1;
+            //telemetryEvent2["stack"] = System.Environment.StackTrace;
+            //NuGet.Common.TelemetryActivity.EmitTelemetryEvent(telemetryEvent2);
 
             using (INuGetProjectManagerService projectManager = await GetProjectManagerAsync(serviceBroker, cancellationToken))
             {
                 IReadOnlyDictionary<string, IReadOnlyCollection<IPackageReferenceContextInfo>>? dictionary =
                     await projectManager.GetInstalledPackagesAsync(new string[] { projectContextInfo.ProjectId }, cancellationToken);
 
-                return dictionary.Values.SelectMany(packages => packages).ToList().AsReadOnly();
+                var returnMe = dictionary.Values.SelectMany(packages => packages).ToList().AsReadOnly();
+                var time = DatetimeUtility.ToReadableTimeFormat(stopWatch.Elapsed);
+                projectContext?.Log(ProjectManagement.MessageLevel.Info, "----\tIProjectContextInfoExtensions.GetInstalledPackagesAsync(this IProjectContextInfo projectContextInfo, projectContextInfos,,)\t\tDuration\t\t " + time + " -----");
+                return returnMe;
             }
         }
 
@@ -79,13 +87,17 @@ namespace NuGet.PackageManagement.VisualStudio
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            ReadOnlyCollection<string>? projectIds = projectContextInfos.Select(pci => pci.ProjectId).ToList().AsReadOnly();
+            //TODO: remove this
+            var projectContext = await NuGet.VisualStudio.ServiceLocator.GetInstanceAsync<ProjectManagement.INuGetProjectContext>();
+            var stopWatch = Stopwatch.StartNew();
 
-            var telemetryEvent2 = new Telemetry.GetInstalledPackagesAsyncTelemetryEvent();
-            telemetryEvent2["projectIds"] = string.Join("; ", projectIds);
-            telemetryEvent2["projectIdsCount"] = projectIds.Count;
-            telemetryEvent2["stack"] = System.Environment.StackTrace;
-            NuGet.Common.TelemetryActivity.EmitTelemetryEvent(telemetryEvent2);
+            //var telemetryEvent2 = new Telemetry.GetInstalledPackagesAsyncTelemetryEvent();
+            //telemetryEvent2["projectIds"] = string.Join("; ", projectIds);
+            //telemetryEvent2["projectIdsCount"] = projectIds.Count;
+            //telemetryEvent2["stack"] = System.Environment.StackTrace;
+            //NuGet.Common.TelemetryActivity.EmitTelemetryEvent(telemetryEvent2);
+
+            ReadOnlyCollection<string>? projectIds = projectContextInfos.Select(pci => pci.ProjectId).ToList().AsReadOnly();
 
             if (projectIds is null)
             {
@@ -94,7 +106,12 @@ namespace NuGet.PackageManagement.VisualStudio
 
             using (INuGetProjectManagerService projectManager = await GetProjectManagerAsync(serviceBroker, cancellationToken))
             {
-                return await projectManager.GetInstalledPackagesAsync(projectIds, cancellationToken);
+                var packages = await projectManager.GetInstalledPackagesAsync(projectIds, cancellationToken);
+
+                var time = DatetimeUtility.ToReadableTimeFormat(stopWatch.Elapsed);
+                projectContext?.Log(ProjectManagement.MessageLevel.Info, "----\tIProjectContextInfoExtensions.GetInstalledPackagesAsync(this IEnumerable<IProjectContextInfo> projectContextInfos,,)\t\tDuration\t\t " + time + " -----");
+
+                return packages;
             }
         }
 
@@ -108,15 +125,22 @@ namespace NuGet.PackageManagement.VisualStudio
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            var telemetryEvent2 = new Telemetry.GetInstalledPackagesAsyncTelemetryEvent();
-            telemetryEvent2["projectIds"] = projectContextInfo.ProjectId;
-            telemetryEvent2["projectIdsCount"] = 1;
-            telemetryEvent2["stack"] = System.Environment.StackTrace;
-            NuGet.Common.TelemetryActivity.EmitTelemetryEvent(telemetryEvent2);
+            //TODO: remove this
+            var projectContext = await NuGet.VisualStudio.ServiceLocator.GetInstanceAsync<ProjectManagement.INuGetProjectContext>();
+            var stopWatch = Stopwatch.StartNew();
+
+            //var telemetryEvent2 = new Telemetry.GetInstalledPackagesAsyncTelemetryEvent();
+            //telemetryEvent2["projectIds"] = projectContextInfo.ProjectId;
+            //telemetryEvent2["projectIdsCount"] = 1;
+            //telemetryEvent2["stack"] = System.Environment.StackTrace;
+            //NuGet.Common.TelemetryActivity.EmitTelemetryEvent(telemetryEvent2);
 
             using (INuGetProjectManagerService projectManager = await GetProjectManagerAsync(serviceBroker, cancellationToken))
             {
-                return await projectManager.GetInstalledAndTransitivePackagesAsync(new string[] { projectContextInfo.ProjectId }, cancellationToken);
+                var returnMe = await projectManager.GetInstalledAndTransitivePackagesAsync(new string[] { projectContextInfo.ProjectId }, cancellationToken);
+                var time = DatetimeUtility.ToReadableTimeFormat(stopWatch.Elapsed);
+                projectContext?.Log(ProjectManagement.MessageLevel.Info, "----\tIProjectContextInfoExtensions.GetInstalledAndTransitivePackagesAsync(this IProjectContextInfo projectContextInfo,)\t\tDuration\t\t " + time + " -----");
+                return returnMe;
             }
         }
 
