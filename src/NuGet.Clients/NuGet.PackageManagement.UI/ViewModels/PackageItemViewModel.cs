@@ -47,6 +47,8 @@ namespace NuGet.PackageManagement.UI
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public event EventHandler DeprecationLoadFailed;
+
         public string Id { get; set; }
 
         public NuGetVersion Version { get; set; }
@@ -650,11 +652,28 @@ namespace NuGet.PackageManagement.UI
 
         private async System.Threading.Tasks.Task ReloadPackageDeprecationAsync()
         {
-            PackageDeprecationMetadataContextInfo result = await _backgroundDeprecationMetadataLoader.Value;
+            try
+            {
+                PackageDeprecationMetadataContextInfo result = await _backgroundDeprecationMetadataLoader.Value;
 
-            await NuGetUIThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                await NuGetUIThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            IsPackageDeprecated = result != null;
+                IsPackageDeprecated = result != null;
+
+                if (Id == "Newtonsoft.Json")
+                {
+                    throw new ApplicationException("donnie1");
+                }
+
+                if (Id == "Serilog")
+                {
+                    throw new OperationCanceledException("donnie2");
+                }
+            }
+            catch (Exception ex)
+            {
+                DeprecationLoadFailed?.Invoke(this, new ErrorEventArgs(ex));
+            }
         }
 
         private async System.Threading.Tasks.Task ReloadProvidersAsync()

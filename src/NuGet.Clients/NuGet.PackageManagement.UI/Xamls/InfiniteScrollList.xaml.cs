@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -486,6 +487,7 @@ namespace NuGet.PackageManagement.UI
                     foreach (var package in packages)
                     {
                         package.PropertyChanged += Package_PropertyChanged;
+                        package.DeprecationLoadFailed += Package_DeprecationLoadFailed;
                         Items.Add(package);
                         _selectedCount = package.IsSelected ? _selectedCount + 1 : _selectedCount;
                     }
@@ -500,6 +502,18 @@ namespace NuGet.PackageManagement.UI
             });
         }
 
+        private void Package_DeprecationLoadFailed(object sender, EventArgs e)
+        {
+            var package = sender as PackageItemViewModel;
+            Exception exception = (e as ErrorEventArgs)?.GetException();
+
+            string packageIdMessage = package != null ? package.Id : "<one or more packages>";
+            string exceptionMessage = exception != null ? exception.Message : "<unspecified error>";
+
+            string error = "Deprecation information could not be loaded for " + packageIdMessage + " due to: " + exceptionMessage;
+            _logger?.Log(ProjectManagement.MessageLevel.Warning, error);
+        }
+
         /// <summary>
         /// Clear <c>Items</c> list and removes the event handlers for each element
         /// </summary>
@@ -508,6 +522,7 @@ namespace NuGet.PackageManagement.UI
             foreach (var package in PackageItems)
             {
                 package.PropertyChanged -= Package_PropertyChanged;
+                package.DeprecationLoadFailed -= Package_DeprecationLoadFailed;
             }
 
             Items.Clear();
