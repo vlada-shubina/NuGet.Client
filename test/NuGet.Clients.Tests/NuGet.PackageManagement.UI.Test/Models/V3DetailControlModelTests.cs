@@ -262,19 +262,17 @@ namespace NuGet.PackageManagement.UI.Test.Models
                 new VersionInfoContextInfo(new NuGetVersion("2.10.0")),
             };
 
-            var vm = new PackageItemViewModel()
-            {
-                InstalledVersion = installedVersion,
-                Version = installedVersion,
-                Versions = new Lazy<Task<IReadOnlyCollection<VersionInfoContextInfo>>>(() => Task.FromResult<IReadOnlyCollection<VersionInfoContextInfo>>(testVersions)),
-            };
+            var mockVM = new Mock<PackageItemViewModel>();
+            mockVM.Object.InstalledVersion = installedVersion;
+            mockVM.Object.Version= installedVersion;
+            mockVM.Setup(vm => vm.GetVersionsAsync()).Returns(Task.FromResult<IReadOnlyCollection<VersionInfoContextInfo>>(testVersions));
 
             // Act
 
             await _testInstance.SetCurrentPackageAsync(
-                vm,
+                mockVM.Object,
                 ItemFilter.All,
-                () => vm);
+                () => mockVM.Object);
 
             // Assert
             var expectedAdditionalInfo = string.Empty;
