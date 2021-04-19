@@ -32,6 +32,8 @@ namespace NuGet.Commands
 
         private const int MACOS_INVALID_CERT = -25257;
 
+        private const string PEM_EXTENTION = ".pem";
+
 
 #if IS_SIGNING_SUPPORTED && IS_CORECLR
         //Generic exception ASN1 corrupted data
@@ -120,38 +122,84 @@ namespace NuGet.Commands
         {
             X509Certificate2 cert;
 
-            if (!string.IsNullOrEmpty(options.CertificatePassword))
+            CertificateFileExtensionType certFileType;
+
+            string extension = Path.GetExtension(options.CertificatePath) ?? string.Empty;
+
+            if (extension.Equals(PEM_EXTENTION, StringComparison.OrdinalIgnoreCase))
             {
-                cert = new X509Certificate2(options.CertificatePath, options.CertificatePassword); // use the password if the user provided it.
+                certFileType = CertificateFileExtensionType.Pem;
             }
             else
             {
-#if IS_DESKTOP
-                try
-                {
-                    cert = new X509Certificate2(options.CertificatePath);
-                }
-                catch (CryptographicException ex)
-                {
-                    // prompt user for password if needed
-                    if (ex.HResult == ERROR_INVALID_PASSWORD_HRESULT &&
-                        !options.NonInteractive)
-                    {
-                        using (var password = await options.PasswordProvider.GetPassword(options.CertificatePath, options.Token))
-                        {
-                            cert = new X509Certificate2(options.CertificatePath, password);
-                        }
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-#else
-                cert = new X509Certificate2(options.CertificatePath);
-#endif
+                certFileType = CertificateFileExtensionType.Others;
             }
 
+
+            if (!string.IsNullOrEmpty(options.CertificatePassword))
+            {
+
+                if (certFileType == CertificateFileExtensionType.Pem)
+                //X509Certificate2 constructor doesn't support a .pem file with a private key, so we need to use CreateFromPemFile instead. And CreateFromPemFile is only supported in .NET5+ 
+                {
+#if IS_SIGNING_SUPPORTED && IS_CORECLR
+                    cert = X509Certificate2.CreateFromPemFile(options.CertificatePath, options.CertificatePassword); // use the password if the user provided it.
+#else
+                    throw new SignCommandException(
+                            LogMessage.CreateError(NuGetLogCode.NU3001,
+                            string.Format(CultureInfo.CurrentCulture,
+                                Strings.SignCommandUnsupportedCertException,
+                                options.CertificatePath)));
+#endif
+                }
+                else
+                {
+                    cert = new X509Certificate2(options.CertificatePath, options.CertificatePassword); // use the password if the user provided it.
+                }
+            }
+            else
+            {
+                if (certFileType == CertificateFileExtensionType.Pem)
+                //X509Certificate2 constructor doesn't support a .pem file with a private key, so we need to use CreateFromPemFile instead. And CreateFromPemFile is only supported in .NET5+ 
+                {
+#if IS_SIGNING_SUPPORTED && IS_CORECLR
+                    cert = X509Certificate2.CreateFromPemFile(options.CertificatePath);
+#else
+                    throw new SignCommandException(
+                        LogMessage.CreateError(NuGetLogCode.NU3001,
+                        string.Format(CultureInfo.CurrentCulture,
+                        Strings.SignCommandUnsupportedCertException,
+                        options.CertificatePath)));
+#endif
+                }
+                else
+                {
+#if IS_DESKTOP
+                    try
+                    {
+                        cert = new X509Certificate2(options.CertificatePath);
+                    }
+                    catch (CryptographicException ex)
+                    {
+                        // prompt user for password if needed
+                        if (ex.HResult == ERROR_INVALID_PASSWORD_HRESULT &&
+                            !options.NonInteractive)
+                        {
+                            using (var password = await options.PasswordProvider.GetPassword(options.CertificatePath, options.Token))
+                            {
+                                cert = new X509Certificate2(options.CertificatePath, password);
+                            }
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+#else
+                    cert = new X509Certificate2(options.CertificatePath);
+#endif
+                }
+            }
             return cert;
         }
 
