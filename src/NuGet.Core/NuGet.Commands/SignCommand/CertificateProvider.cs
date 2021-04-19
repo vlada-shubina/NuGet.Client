@@ -140,10 +140,10 @@ namespace NuGet.Commands
             {
 
                 if (certFileType == CertificateFileExtensionType.Pem)
-                //X509Certificate2 constructor doesn't support a .pem file with a private key, so we need to use CreateFromPemFile instead. And CreateFromPemFile is only supported in .NET5+ 
+                //X509Certificate2 constructor doesn't support a .pem file with a private key, so we need to use CreateFromEncryptedPemFile instead. And CreateFromEncryptedPemFile is only supported in .NET5+ 
                 {
 #if IS_SIGNING_SUPPORTED && IS_CORECLR
-                    cert = X509Certificate2.CreateFromPemFile(options.CertificatePath, options.CertificatePassword); // use the password if the user provided it.
+                    cert = X509Certificate2.CreateFromEncryptedPemFile(options.CertificatePath, options.CertificatePassword); // use the password if the user provided it.
 #else
                     throw new SignCommandException(
                             LogMessage.CreateError(NuGetLogCode.NU3001,
