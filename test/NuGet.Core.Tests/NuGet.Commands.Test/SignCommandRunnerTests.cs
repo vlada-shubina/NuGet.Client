@@ -5,12 +5,15 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading.Tasks;
 using NuGet.Common;
 using NuGet.Test.Utility;
 using Test.Utility.Signing;
 using Xunit;
+using HashAlgorithmName = NuGet.Common.HashAlgorithmName;
 
 namespace NuGet.Commands.Test
 {
@@ -208,7 +211,43 @@ namespace NuGet.Commands.Test
             }
         }
 #endif
+        // Skip the tests when signing is not supported.
+#if IS_SIGNING_SUPPORTED && IS_CORECLR
+        [Fact]
+        public async Task ExecuteCommandAsync_WithExistingCertificateFromPEMPathAndNoPassword_Succeed()
+        {
+            string password = "password";
+            using (var test = await Test.CreateAsync(_fixture.GetDefaultCertificateWithSpecifiedPassword(password)))
+            {
+                const string fileName = "ExistingCertFile.pem";
+                var pemPath = Path.Combine(test.Directory.Path, fileName);
 
+                var pemString = CreateConsolidatedPemFromCert(test.Certificate, password);
+
+                File.WriteAllText(pemPath, pemString);
+
+                test.Args.CertificatePath = pemPath;
+                test.Args.CertificatePassword = "password";
+
+                test.Args.SignatureHashAlgorithm = HashAlgorithmName.SHA256;
+                test.Args.TimestampHashAlgorithm = HashAlgorithmName.SHA256;
+
+                var returncode = test.Runner.ExecuteCommandAsync(test.Args).Result;
+                Assert.Equal(returncode, 0);
+
+                var packagePaths = test.Args.PackagePaths;
+                Assert.Equal(packagePaths.Count, 1);
+
+                var packagePath = packagePaths[0];
+                using (var zip = new ZipArchive(File.OpenRead(packagePath), ZipArchiveMode.Read))
+                {
+                    var signatureEntry = zip.GetEntry(".signature.p7s");
+
+                    Assert.NotNull(signatureEntry);
+                }
+            }
+        }
+#endif
         [Fact]
         public async Task ExecuteCommandAsync_WithAmbiguousMatch_ThrowsAsync()
         {
@@ -267,7 +306,37 @@ namespace NuGet.Commands.Test
                 $"NuGet.Commands.Test.compiler.resources.{name}",
                 typeof(SignCommandRunnerTests));
         }
+#if IS_SIGNING_SUPPORTED && IS_CORECLR
+        internal string CreateConsolidatedPemFromCert(X509Certificate2 certificate, string password)
+        {
+            StringBuilder consolidatedPem = new StringBuilder();
+            byte[] certificateBytes = certificate.RawData;
+            char[] certificatePem = PemEncoding.Write("CERTIFICATE", certificateBytes);
+            consolidatedPem.Append(certificatePem);
 
+            using (AsymmetricAlgorithm key = certificate.GetRSAPrivateKey())
+            {
+                byte[] pubKeyBytes = key.ExportSubjectPublicKeyInfo();
+                char[] pubKeyPem = PemEncoding.Write("PUBLIC KEY", pubKeyBytes);
+                consolidatedPem.Append(pubKeyPem);
+
+                byte[] encryptedPrivKeyBytes = key.ExportEncryptedPkcs8PrivateKey(
+                password,
+                new PbeParameters(
+                    PbeEncryptionAlgorithm.Aes256Cbc,
+                    System.Security.Cryptography.HashAlgorithmName.SHA256,
+                    iterationCount: 100_000));
+                char[] privKeyPem = PemEncoding.Write("PRIVATE KEY", encryptedPrivKeyBytes);
+                consolidatedPem.Append(privKeyPem);
+
+                //byte[] privKeyBytes = key.ExportPkcs8PrivateKey();
+                //char[] privKeyPem = PemEncoding.Write("PRIVATE KEY", privKeyBytes);
+                //consolidatedPem.Append(privKeyPem);
+
+                return consolidatedPem.ToString();
+            }
+        }
+#endif
         private sealed class Test : IDisposable
         {
             private bool _isDisposed;

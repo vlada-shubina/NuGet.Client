@@ -47,6 +47,12 @@ namespace NuGet.Commands.Test
             return certWithPrivateKey;
         }
 
+        public X509Certificate2 GetDefaultCertificateWithSpecifiedPassword(string password)
+        {
+            var certWithPrivateKeySpecifiedPassword = SigningTestUtility.GetPublicCertWithPrivateKeySpecifiedPassword(_defaultCertificate, password);
+            return certWithPrivateKeySpecifiedPassword;
+        }
+
         public X509Certificate2 GetTrustedCertificate()
         {
             return _trustedDefaultCertificate.TrustedCert;
