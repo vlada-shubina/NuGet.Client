@@ -562,6 +562,14 @@ namespace Test.Utility.Signing
             return new X509Certificate2(cert.Export(X509ContentType.Pfx, password), password, X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
         }
 
+        /// <summary>
+        /// Returns the public cert with the private key protected by specified password.
+        /// </summary>
+        public static X509Certificate2 GetPublicCertWithPrivateKeyAndSpecifiedPassword(X509Certificate2 cert, string password)
+        {
+            return new X509Certificate2(cert.Export(X509ContentType.Pfx, password), password, X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
+        }
+
         public static TrustedTestCert<TestCertificate> GenerateTrustedTestCertificate()
         {
             var actionGenerator = CertificateModificationGeneratorForCodeSigningEkuCert;

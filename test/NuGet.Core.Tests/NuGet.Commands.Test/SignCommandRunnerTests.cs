@@ -214,7 +214,7 @@ namespace NuGet.Commands.Test
         // Skip the tests when signing is not supported.
 #if IS_SIGNING_SUPPORTED && IS_CORECLR
         [Fact]
-        public async Task ExecuteCommandAsync_WithExistingCertificateFromPEMPathAndNoPassword_Succeed()
+        public async Task ExecuteCommandAsync_WithExistingCertificateFromPEMPathAndRightPassword_Succeed()
         {
             string password = "password";
             using (var test = await Test.CreateAsync(_fixture.GetDefaultCertificateWithSpecifiedPassword(password)))
@@ -245,6 +245,33 @@ namespace NuGet.Commands.Test
 
                     Assert.NotNull(signatureEntry);
                 }
+            }
+        }
+
+        [Fact]
+        public async Task ExecuteCommandAsync_WithExistingCertificateFromPEMPathAndIncorrectPassword_Throw()
+        {
+            string password = "password";
+            using (var test = await Test.CreateAsync(_fixture.GetDefaultCertificateWithSpecifiedPassword(password)))
+            {
+                const string fileName = "ExistingCertFile.pem";
+                var pemPath = Path.Combine(test.Directory.Path, fileName);
+
+                var pemString = CreateConsolidatedPemFromCert(test.Certificate, password);
+
+                File.WriteAllText(pemPath, pemString);
+
+                test.Args.CertificatePath = pemPath;
+                test.Args.CertificatePassword = "Incorrectpassword";
+
+                test.Args.SignatureHashAlgorithm = HashAlgorithmName.SHA256;
+                test.Args.TimestampHashAlgorithm = HashAlgorithmName.SHA256;
+
+                var exception = await Assert.ThrowsAsync<SignCommandException>(
+                    () => test.Runner.ExecuteCommandAsync(test.Args));
+
+                Assert.Equal(NuGetLogCode.NU3001, exception.AsLogMessage().Code);
+                Assert.Equal($"Certificate file '{pemPath}' is invalid. For a list of accepted ways to provide a certificate, visit https://docs.nuget.org/docs/reference/command-line-reference", exception.Message);
             }
         }
 #endif
@@ -309,32 +336,27 @@ namespace NuGet.Commands.Test
 #if IS_SIGNING_SUPPORTED && IS_CORECLR
         internal string CreateConsolidatedPemFromCert(X509Certificate2 certificate, string password)
         {
-            StringBuilder consolidatedPem = new StringBuilder();
-            byte[] certificateBytes = certificate.RawData;
-            char[] certificatePem = PemEncoding.Write("CERTIFICATE", certificateBytes);
-            consolidatedPem.Append(certificatePem);
+            PbeParameters pbe = new PbeParameters(PbeEncryptionAlgorithm.Aes128Cbc, System.Security.Cryptography.HashAlgorithmName.SHA256, 600_000);
+            var certPem = new string(PemEncoding.Write("CERTIFICATE", certificate.RawData));
+            string keyPem;
 
-            using (AsymmetricAlgorithm key = certificate.GetRSAPrivateKey())
+            if (certificate.GetECDsaPrivateKey() is ECDsa ecdsaKey)
             {
-                byte[] pubKeyBytes = key.ExportSubjectPublicKeyInfo();
-                char[] pubKeyPem = PemEncoding.Write("PUBLIC KEY", pubKeyBytes);
-                consolidatedPem.Append(pubKeyPem);
-
-                byte[] encryptedPrivKeyBytes = key.ExportEncryptedPkcs8PrivateKey(
-                password,
-                new PbeParameters(
-                    PbeEncryptionAlgorithm.Aes256Cbc,
-                    System.Security.Cryptography.HashAlgorithmName.SHA256,
-                    iterationCount: 100_000));
-                char[] privKeyPem = PemEncoding.Write("PRIVATE KEY", encryptedPrivKeyBytes);
-                consolidatedPem.Append(privKeyPem);
-
-                //byte[] privKeyBytes = key.ExportPkcs8PrivateKey();
-                //char[] privKeyPem = PemEncoding.Write("PRIVATE KEY", privKeyBytes);
-                //consolidatedPem.Append(privKeyPem);
-
-                return consolidatedPem.ToString();
+                keyPem = new string(PemEncoding.Write("ENCRYPTED PRIVATE KEY", ecdsaKey.ExportEncryptedPkcs8PrivateKey(password, pbe)));
             }
+            else if (certificate.GetRSAPrivateKey() is RSA rsaKey)
+            {
+                keyPem = new string(PemEncoding.Write("ENCRYPTED PRIVATE KEY", rsaKey.ExportEncryptedPkcs8PrivateKey(password, pbe)));
+            }
+            else if (certificate.GetDSAPrivateKey() is DSA dsaKey)
+            {
+                keyPem = new string(PemEncoding.Write("ENCRYPTED PRIVATE KEY", dsaKey.ExportEncryptedPkcs8PrivateKey(password, pbe)));
+            }
+            else
+            {
+                throw new CryptographicException("Unknown certificate algorithm");
+            }
+            return certPem + "\n" + keyPem;
         }
 #endif
         private sealed class Test : IDisposable

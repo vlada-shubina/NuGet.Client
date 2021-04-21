@@ -49,7 +49,7 @@ namespace NuGet.Commands.Test
 
         public X509Certificate2 GetDefaultCertificateWithSpecifiedPassword(string password)
         {
-            var certWithPrivateKeySpecifiedPassword = SigningTestUtility.GetPublicCertWithPrivateKeySpecifiedPassword(_defaultCertificate, password);
+            var certWithPrivateKeySpecifiedPassword = SigningTestUtility.GetPublicCertWithPrivateKeyAndSpecifiedPassword(_defaultCertificate, password);
             return certWithPrivateKeySpecifiedPassword;
         }
 
