@@ -112,7 +112,9 @@ namespace NuGet.CommandLine.XPlat
                         Logger = getLogger()
                     };
 
-                    setLogLevel(XPlatUtility.MSBuildVerbosityToNuGetLogLevel(verbosity.Value()));
+                    // If not verbosity passed then it defaults LogLevel.Minimal which result no message displayed because successfull message are logged at Loglevel.Information.
+                    // Since NuGet LogLevel.Information is equal to MSBuild normal, we need to defaults "N"
+                    setLogLevel(XPlatUtility.MSBuildVerbosityToNuGetLogLevel(verbosity.Value() ?? "N"));
 
 #pragma warning disable CS0618 // Type or member is obsolete
                     var sourceProvider = new PackageSourceProvider(settings, enablePackageSourcesChangedEvent: false);

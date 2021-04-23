@@ -37,7 +37,7 @@ namespace Dotnet.Integration.Test
                     <configuration>
                         <trustedSigners>
                             <author name=""signer"">
-                                <certificate fingerprint=""abcdef"" hashAlgorithm=""SHA256"" allowUntrustedRoot=""false"" />
+                                <certificate fingerprint=""abcdef"" hashAlgorithm=""SHA256"" allowUntrustedRoot=""false""/>
                             </author>
                         </trustedSigners>
                     </configuration>";
@@ -94,7 +94,7 @@ namespace Dotnet.Integration.Test
                     <configuration>
                         <trustedSigners>
                             <author name=""signer"">
-                                <certificate fingerprint=""abcdef"" hashAlgorithm=""SHA256"" allowUntrustedRoot=""false"" />
+                                <certificate fingerprint=""abcdef"" hashAlgorithm=""SHA256"" allowUntrustedRoot=""false""/>
                             </author>
                         </trustedSigners>
                     </configuration>";
@@ -197,14 +197,14 @@ namespace Dotnet.Integration.Test
                 string expectedResult = SettingsTestUtils.RemoveWhitespace($@"<?xml version=""1.0"" encoding=""utf-8""?>
                     <configuration>
                       <packageSources>
-                        <!--To inherit the global NuGet package sources remove the < clear /> line below-->
+                        <!--To inherit the global NuGet package sources remove the <clear /> line below-->
                         <clear/>
                         <add key = ""NuGetSource"" value = ""{pathContext.PackageSource}""/>
-                       </packageSources >
+                       </packageSources>
                       <config>
                         <add key = ""signaturevalidationmode"" value = ""accept""/>
                       </config>
-                      < trustedSigners>
+                      <trustedSigners>
                             <author name = ""nuget"">
                                  <certificate fingerprint = ""{certFingerprint}"" hashAlgorithm = ""SHA256"" allowUntrustedRoot = ""{allowUntruestedRootValue}""/>
                             </author>
@@ -254,14 +254,14 @@ namespace Dotnet.Integration.Test
                 string expectedResult = SettingsTestUtils.RemoveWhitespace($@"<?xml version=""1.0"" encoding=""utf-8""?>
                     <configuration>
                       <packageSources>
-                        <!--To inherit the global NuGet package sources remove the < clear /> line below-->
+                        <!--To inherit the global NuGet package sources remove the <clear /> line below-->
                         <clear/>
                         <add key = ""NuGetSource"" value = ""{pathContext.PackageSource}""/>
-                       </packageSources >
+                       </packageSources>
                       <config>
                         <add key = ""signaturevalidationmode"" value = ""accept""/>
                       </config>
-                      < trustedSigners>
+                      <trustedSigners>
                             <author name = ""nuget"">
                                  <certificate fingerprint = ""{certFingerprint}"" hashAlgorithm = ""SHA256"" allowUntrustedRoot = ""false""/>
                             </author>
@@ -306,7 +306,7 @@ namespace Dotnet.Integration.Test
 
                 string expectedResult = SettingsTestUtils.RemoveWhitespace($@"<?xml version=""1.0"" encoding=""utf-8""?>
                      <configuration>
-                      < trustedSigners>
+                      <trustedSigners>
                             <author name = ""nuget"">
                                  <certificate fingerprint = ""{certFingerprint}"" hashAlgorithm = ""SHA256"" allowUntrustedRoot = ""{allowUntruestedRootValue}""/>
                             </author>
@@ -363,9 +363,9 @@ namespace Dotnet.Integration.Test
 
                 string expectedResult = SettingsTestUtils.RemoveWhitespace($@"<?xml version=""1.0"" encoding=""utf-8""?>
                 <configuration>
-                    < trustedSigners>
+                    <trustedSigners>
                         <repository name = ""nuget"" serviceIndex=""https://serviceindex.test/v3/index.json"">
-                                < certificate fingerprint = ""{certFingerprint}"" hashAlgorithm = ""SHA256"" allowUntrustedRoot = ""{allowUntruestedRootValue}""/>{expectedOwners}
+                                <certificate fingerprint = ""{certFingerprint}"" hashAlgorithm = ""SHA256"" allowUntrustedRoot = ""{allowUntruestedRootValue}""/>{expectedOwners}
                         </repository>
                     </trustedSigners>
                 </configuration>");
@@ -411,9 +411,9 @@ namespace Dotnet.Integration.Test
 
                 string expectedResult = SettingsTestUtils.RemoveWhitespace($@"<?xml version=""1.0"" encoding=""utf-8""?>
                 <configuration>
-                    < trustedSigners>
+                    <trustedSigners>
                         <author name = ""{authorName}"">
-                                < certificate fingerprint = ""{certFingerprint}"" hashAlgorithm = ""SHA256"" allowUntrustedRoot = ""{allowUntruestedRootValue}""/>
+                                <certificate fingerprint = ""{certFingerprint}"" hashAlgorithm = ""SHA256"" allowUntrustedRoot = ""{allowUntruestedRootValue}""/>
                         </author>
                     </trustedSigners>
                 </configuration>");
@@ -443,7 +443,7 @@ namespace Dotnet.Integration.Test
 <configuration>
     <trustedSigners>
         <author name=""MyCompanyCert"">
-            <certificate fingerprint=""abcdefg"" hashAlgorithm=""SHA256"" allowUntrustedRoot=""false"" />
+            <certificate fingerprint=""abcdefg"" hashAlgorithm=""SHA256"" allowUntrustedRoot=""false""/>
         </author>
     </trustedSigners>
 </configuration>";
@@ -465,10 +465,10 @@ namespace Dotnet.Integration.Test
 
                 string expectedResult = SettingsTestUtils.RemoveWhitespace($@"<?xml version=""1.0"" encoding=""utf-8""?>
                 <configuration>
-                    < trustedSigners>
+                    <trustedSigners>
                         <author name = ""{authorName}"">
-                                < certificate fingerprint = ""abcdefg"" hashAlgorithm = ""SHA256"" allowUntrustedRoot = ""false""/>
-                                < certificate fingerprint = ""{certFingerprint}"" hashAlgorithm = ""SHA256"" allowUntrustedRoot = ""{allowUntruestedRootValue}""/>
+                                <certificate fingerprint = ""abcdefg"" hashAlgorithm = ""SHA256"" allowUntrustedRoot = ""false""/>
+                                <certificate fingerprint = ""{certFingerprint}"" hashAlgorithm = ""SHA256"" allowUntrustedRoot = ""{allowUntruestedRootValue}""/>
                         </author>
                     </trustedSigners>
                 </configuration>");
