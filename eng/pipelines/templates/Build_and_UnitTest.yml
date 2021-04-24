@@ -443,7 +443,7 @@ steps:
   displayName: Publish public Nuget packages to nuget-build
   inputs:
     command: push
-    packagesToPush: 'artifacts\nupkgs\*.nupkg;!artifacts\nupkgs\*.symbols.nupkg'
+    packagesToPush: 'artifacts\nupkgs\*.nupkg;!artifacts\nupkgs\*.snupkg'
     nuGetFeedType: external
     allowPackageConflicts: true
     publishFeedCredentials : nuget-build-dnceng-public-feed
