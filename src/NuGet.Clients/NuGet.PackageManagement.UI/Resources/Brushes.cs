@@ -2,10 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+using System.Security;
 using System.Windows;
+using Microsoft.VisualStudio.Experimentation;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
 
@@ -168,27 +167,33 @@ namespace NuGet.PackageManagement.UI
 
         public static object TabHoverBrushKey { get; private set; } = SystemColors.HotTrackBrushKey;
 
+        public static object ListItemBackgroundSelectedColorKey { get; private set; } = SystemColors.HighlightColorKey;
+
+        public static object ListItemTextSelectedColorKey { get; private set; } = SystemColors.HighlightTextColorKey;
+
         public static void LoadVsBrushes()
         {
+            bool isBgColorFlightEnabled = IsBackgroundColorFlightEnabled();
+
             FocusVisualStyleBrushKey = VsBrushes.ToolWindowTextKey;
             ActiveBorderKey = VsBrushes.ActiveBorderKey;
             BorderBrush = VsBrushes.BrandedUIBorderKey;
             ComboBoxBorderKey = VsBrushes.ComboBoxBorderKey;
             ControlLinkTextHoverKey = VsBrushes.ControlLinkTextHoverKey;
             ControlLinkTextKey = VsBrushes.ControlLinkTextKey;
-            DetailPaneBackground = CommonDocumentColors.PageBrushKey;
-            HeaderBackground = CommonDocumentColors.PageBrushKey;
+            DetailPaneBackground = isBgColorFlightEnabled ? CommonDocumentColors.PageBrushKey : VsBrushes.BrandedUIBackgroundKey;
+            HeaderBackground = isBgColorFlightEnabled ? CommonDocumentColors.PageBrushKey : VsBrushes.BrandedUIBackgroundKey;
             InfoBackgroundKey = VsBrushes.InfoBackgroundKey;
             InfoTextKey = VsBrushes.InfoTextKey;
-            LegalMessageBackground = CommonDocumentColors.PageBrushKey;
-            ListPaneBackground = CommonDocumentColors.PageBrushKey;
+            LegalMessageBackground = isBgColorFlightEnabled ? CommonDocumentColors.PageBrushKey : VsBrushes.BrandedUIBackgroundKey;
+            ListPaneBackground = isBgColorFlightEnabled ? CommonDocumentColors.PageBrushKey : VsBrushes.BrandedUIBackgroundKey;
             SplitterBackgroundKey = VsBrushes.CommandShelfBackgroundGradientKey;
             ToolWindowBorderKey = VsBrushes.ToolWindowBorderKey;
             ToolWindowButtonDownBorderKey = VsBrushes.ToolWindowButtonDownBorderKey;
             ToolWindowButtonDownKey = VsBrushes.ToolWindowButtonDownKey;
             ToolWindowButtonHoverActiveBorderKey = VsBrushes.ToolWindowButtonHoverActiveBorderKey;
             ToolWindowButtonHoverActiveKey = VsBrushes.ToolWindowButtonHoverActiveKey;
-            UIText = CommonDocumentColors.PageTextBrushKey;
+            UIText = isBgColorFlightEnabled ? CommonDocumentColors.PageTextBrushKey : VsBrushes.BrandedUITextKey;
             WindowTextKey = VsBrushes.WindowTextKey;
 
             HeaderColorsDefaultBrushKey = HeaderColors.DefaultBrushKey;
@@ -240,8 +245,8 @@ namespace NuGet.PackageManagement.UI
             ContentMouseOverTextBrushKey = CommonDocumentColors.ListItemTextHoverBrushKey;
             ContentInactiveSelectedBrushKey = CommonDocumentColors.ListItemBackgroundUnfocusedBrushKey;
             ContentInactiveSelectedTextBrushKey = CommonDocumentColors.ListItemTextUnfocusedBrushKey;
-            ContentSelectedBrushKey = CommonDocumentColors.ListItemBackgroundFocusedBrushKey;
-            ContentSelectedTextBrushKey = CommonDocumentColors.ListItemTextFocusedBrushKey;
+            ContentSelectedBrushKey = CommonDocumentColors.ListItemBackgroundSelectedBrushKey;
+            ContentSelectedTextBrushKey = CommonDocumentColors.ListItemTextSelectedBrushKey;
 
             // Brushes/Colors for FilterLabel (Top Tabs)
             TabSelectedBrushKey = CommonDocumentColors.InnerTabTextFocusedBrushKey;
@@ -249,6 +254,28 @@ namespace NuGet.PackageManagement.UI
             TabHoverBrushKey = CommonDocumentColors.InnerTabInactiveHoverTextBrushKey;
             TabPopupBrushKey = CommonControlsColors.ButtonPressedBrushKey;
             TabPopupTextBrushKey = CommonControlsColors.ButtonPressedTextBrushKey;
+
+            // Mapping color keys directly for use to create brushes using these colors
+            ListItemBackgroundSelectedColorKey = CommonDocumentColors.ListItemBackgroundSelectedColorKey;
+            ListItemTextSelectedColorKey = CommonDocumentColors.ListItemTextSelectedColorKey;
+        }
+
+        private static bool IsBackgroundColorFlightEnabled() =>
+            ExperimentationService.Default.IsCachedFlightEnabled(ExperimentationConstants.FlightFlags.PackageManagerBackgroundColor)
+            || IsForceBackgroundColorFlightEnabled();
+
+        private static bool IsForceBackgroundColorFlightEnabled()
+        {
+            var forceFlightEnabled = false;
+            try
+            {
+                forceFlightEnabled = Environment.GetEnvironmentVariable(ExperimentationConstants.EnvironmentVariables.PackageManagerBackgroundColor) == "1";
+            }
+            catch (SecurityException)
+            {
+                // Don't force the flight to be enabled if we are not able to read the environment variable
+            }
+            return forceFlightEnabled;
         }
     }
 }
