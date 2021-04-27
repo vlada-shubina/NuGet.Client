@@ -8,7 +8,7 @@ namespace NuGet.Resolver
     /// <summary>
     /// Input validation exception
     /// </summary>
-    [SerializableAttribute]
+    [Serializable]
     public class NuGetResolverInputException : NuGetResolverException
     {
         public NuGetResolverInputException(string message)

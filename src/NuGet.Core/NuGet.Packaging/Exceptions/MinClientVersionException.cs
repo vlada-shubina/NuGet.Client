@@ -10,7 +10,7 @@ namespace NuGet.Packaging
     /// <summary>
     /// Custom exception type for a package that has a higher minClientVersion than the current client.
     /// </summary>
-    [SerializableAttribute]
+    [Serializable]
     public class MinClientVersionException : PackagingException, ILogMessageException
     {
         public MinClientVersionException(string message)

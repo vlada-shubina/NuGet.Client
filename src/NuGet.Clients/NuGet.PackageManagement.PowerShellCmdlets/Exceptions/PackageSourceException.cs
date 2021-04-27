@@ -5,7 +5,7 @@ using System;
 
 namespace NuGet.PackageManagement.PowerShellCmdlets
 {
-    [SerializableAttribute]
+    [Serializable]
     public class PackageSourceException : Exception
     {
         public PackageSourceException(string message)

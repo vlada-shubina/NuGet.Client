@@ -6,7 +6,7 @@ using NuGet.Common;
 
 namespace NuGet.Packaging.Core
 {
-    [SerializableAttribute]
+    [Serializable]
     public class PackagingException : Exception, ILogMessageException
     {
         private readonly IPackLogMessage _logMessage;

@@ -4,7 +4,7 @@ using System;
 
 namespace NuGet.Packaging.Licenses
 {
-    [SerializableAttribute]
+    [Serializable]
     public class NuGetLicenseExpressionParsingException : Exception
     {
         public NuGetLicenseExpressionParsingException(string message)

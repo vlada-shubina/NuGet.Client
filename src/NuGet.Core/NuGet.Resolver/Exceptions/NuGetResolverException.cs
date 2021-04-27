@@ -5,7 +5,7 @@ using System;
 
 namespace NuGet.Resolver
 {
-    [SerializableAttribute]
+    [Serializable]
     public class NuGetResolverException : Exception
     {
         public NuGetResolverException(string message)

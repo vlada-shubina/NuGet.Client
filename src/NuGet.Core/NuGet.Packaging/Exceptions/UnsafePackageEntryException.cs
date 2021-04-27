@@ -7,7 +7,7 @@ using NuGet.Packaging.Core;
 
 namespace NuGet.Packaging
 {
-    [SerializableAttribute]
+    [Serializable]
     public class UnsafePackageEntryException : PackagingException, ILogMessageException
     {
         public UnsafePackageEntryException(string message) :

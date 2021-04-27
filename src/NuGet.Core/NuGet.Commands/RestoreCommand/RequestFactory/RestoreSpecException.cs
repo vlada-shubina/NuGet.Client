@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Security.Permissions;
 using System.Threading.Tasks;
 
 namespace NuGet.Commands
@@ -12,7 +14,7 @@ namespace NuGet.Commands
     /// <summary>
     /// DG v2 related validation error.
     /// </summary>
-    [SerializableAttribute]
+    [Serializable]
     public class RestoreSpecException : Exception
     {
         public IEnumerable<string> Files { get; }
@@ -23,9 +25,33 @@ namespace NuGet.Commands
             Files = files;
         }
 
+        // This protected constructor is used for deserialization.
+        protected RestoreSpecException(SerializationInfo info, StreamingContext context)
+        : base(info, context)
+        {
+            List<string> filesList = (List<string>)info.GetValue("RestoreSpecException.Files", typeof(List<string>));
+            Files = filesList.AsEnumerable();
+        }
+
         public static RestoreSpecException Create(string message, IEnumerable<string> files)
         {
             return Create(message, files, innerException: null);
+        }
+
+        // GetObjectData performs a custom serialization.
+        [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            if (info == null)
+            {
+                throw new ArgumentNullException(nameof(info));
+            }
+
+            //Convert the Files into List<string> type, so it's serializable.
+            List<string> filesList = Files.ToList();
+
+            info.AddValue("RestoreSpecException.Files", filesList, filesList.GetType());
+            base.GetObjectData(info, context);
         }
 
         public static RestoreSpecException Create(string message, IEnumerable<string> files, Exception innerException)

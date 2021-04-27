@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 
 namespace NuGet.ProjectModel
 {
-    [SerializableAttribute]
+    [Serializable]
     public class FileFormatException : Exception
     {
         public FileFormatException(string message)

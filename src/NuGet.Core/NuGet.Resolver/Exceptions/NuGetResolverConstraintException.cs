@@ -8,7 +8,7 @@ namespace NuGet.Resolver
     /// <summary>
     /// Constraint exception. Thrown when a solution cannot be found.
     /// </summary>
-    [SerializableAttribute]
+    [Serializable]
     public class NuGetResolverConstraintException : NuGetResolverException
     {
         public NuGetResolverConstraintException(string message)

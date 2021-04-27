@@ -1,0 +1,3 @@
+NuGet.Commands.RestoreSpecException.RestoreSpecException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) -> void
+override NuGet.Commands.RestoreCommandException.GetObjectData(SerializationInfo info, StreamingContext context) -> void
+override NuGet.Commands.RestoreSpecException.GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) -> void

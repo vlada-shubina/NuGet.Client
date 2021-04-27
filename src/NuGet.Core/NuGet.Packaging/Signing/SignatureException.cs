@@ -10,7 +10,7 @@ using NuGet.Shared;
 
 namespace NuGet.Packaging.Signing
 {
-    [SerializableAttribute]
+    [Serializable]
     public class SignatureException : PackagingException
     {
         /// <summary>

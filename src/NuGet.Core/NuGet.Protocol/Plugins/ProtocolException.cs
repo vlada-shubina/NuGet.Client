@@ -8,7 +8,7 @@ namespace NuGet.Protocol.Plugins
     /// <summary>
     /// A plugin  protocol exception.
     /// </summary>
-    [SerializableAttribute]
+    [Serializable]
     public sealed class ProtocolException : Exception
     {
         /// <summary>
