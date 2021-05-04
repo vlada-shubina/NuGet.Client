@@ -135,6 +135,7 @@ jobs:
     demands:
     - DotNetFramework
     - Allow_NuGet_E2E_Tests -equals true
+    - Agent.Name -equals DDNuGetW004
   strategy:
     matrix:
       Part1:
@@ -160,6 +161,7 @@ jobs:
     demands:
     - DotNetFramework
     - Allow_NuGet_Apex_Tests -equals true
+    - Agent.Name -equals DDNuGetW004
 
   steps:
   - template: Apex_Tests_On_Windows.yml
