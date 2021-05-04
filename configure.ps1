@@ -59,7 +59,7 @@ $ConfigureObject = @{
 
 Function New-BuildToolset {
     param(
-        [ValidateSet(15, 16)]
+        [ValidateSet(15, 16, 17)]
         [int]$ToolsetVersion
     )
     $CommonToolsVar = "Env:VS${ToolsetVersion}0COMNTOOLS"
