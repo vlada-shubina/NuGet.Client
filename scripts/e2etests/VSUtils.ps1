@@ -78,7 +78,7 @@ function KillRunningInstancesOfVS {
     Get-Process | ForEach-Object {
         if (-not [string]::IsNullOrEmpty($_.Path)) {
             $processPath = $_.Path | Out-String
-            if ($processPath.StartsWith("C:\Program Files (x86)\Microsoft Visual Studio", [System.StringComparison]::OrdinalIgnoreCase)) {
+            if ($processPath.StartsWith("C:\Program Files\Microsoft Visual Studio", [System.StringComparison]::OrdinalIgnoreCase)) {
                 Write-Host $processPath
                 Stop-Process $_ -ErrorAction SilentlyContinue -Force
                 if ($_.HasExited) {
