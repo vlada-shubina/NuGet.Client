@@ -118,8 +118,6 @@ namespace NuGet.PackageManagement.UI
 
         public bool IsSolution { get; set; }
 
-        public ObservableCollection<object> Items { get; } = new ObservableCollection<object>();
-
         /// <summary>
         /// Count of Items (excluding Loading indicator) that are currently shown after applying any UI filtering.
         /// </summary>
