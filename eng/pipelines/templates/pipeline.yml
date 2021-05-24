@@ -26,6 +26,27 @@ jobs:
   steps:
   - template: Initialize_Build.yml
 
+- job: Build_and_UnitTest_NonRTM
+  dependsOn: Initialize_Build
+  timeoutInMinutes: 170
+  variables:
+    BuildNumber: $[dependencies.Initialize_Build.outputs['updatebuildnumber.BuildNumber']]
+    FullVstsBuildNumber: $[dependencies.Initialize_Build.outputs['updatebuildnumber.FullVstsBuildNumber']]
+    VsTargetChannel: $[dependencies.Initialize_Build.outputs['updatebuildnumber.VsTargetChannel']]
+    VsTargetMajorVersion: $[dependencies.Initialize_Build.outputs['updatebuildnumber.VsTargetMajorVersion']]
+    SDKVersionForBuild: $[dependencies.Initialize_Build.outputs['getSDKVersionForBuild.SDKVersionForBuild']]
+    LocalizedLanguageCount: "13"
+    BuildRTM: "false"
+
+  pool:
+    name: VSEngSS-MicroBuild2019
+    demands:
+      - DotNetFramework
+      - msbuild
+
+  steps:
+  - template: Build_and_UnitTest.yml
+
 - job: Tests_On_Mac
   dependsOn:
   - Build_and_UnitTest_NonRTM
