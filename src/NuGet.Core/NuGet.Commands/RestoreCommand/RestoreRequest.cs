@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using NuGet.Common;
+using NuGet.Configuration;
 using NuGet.Frameworks;
 using NuGet.Packaging;
 using NuGet.Packaging.PackageExtraction;
@@ -27,6 +28,7 @@ namespace NuGet.Commands
             RestoreCommandProviders dependencyProviders,
             SourceCacheContext cacheContext,
             ClientPolicyContext clientPolicyContext,
+            PackageNamespacesConfiguration namespacesConfiguration,
             ILogger log)
         {
 
@@ -35,6 +37,7 @@ namespace NuGet.Commands
             Project = project ?? throw new ArgumentNullException(nameof(project));
             DependencyProviders = dependencyProviders ?? throw new ArgumentNullException(nameof(dependencyProviders));
             ClientPolicyContext = clientPolicyContext;
+            PackageNamespaces = namespacesConfiguration;
 
             ExternalProjects = new List<ExternalProjectReference>();
             CompatibilityProfiles = new HashSet<FrameworkRuntimePair>();
@@ -173,6 +176,8 @@ namespace NuGet.Commands
         public XmlDocFileSaveMode XmlDocFileSaveMode { get; set; } = PackageExtractionBehavior.XmlDocFileSaveMode;
 
         public ClientPolicyContext ClientPolicyContext { get; }
+
+        public PackageNamespacesConfiguration PackageNamespaces { get; }
 
         /// <remarks>
         /// This property should only be used to override the default verifier on tests.

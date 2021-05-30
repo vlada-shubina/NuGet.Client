@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NuGet.Common;
+using NuGet.Configuration;
 using NuGet.Frameworks;
 using NuGet.LibraryModel;
 using NuGet.Protocol.Core.Types;
@@ -34,6 +35,7 @@ namespace NuGet.DependencyResolver
         public IList<IDependencyProvider> ProjectLibraryProviders { get; }
         public IList<IRemoteDependencyProvider> LocalLibraryProviders { get; }
         public IList<IRemoteDependencyProvider> RemoteLibraryProviders { get; }
+        public PackageNamespacesConfiguration PackageNamespaces { get; set; }
 
         /// <summary>
         /// Packages lock file libraries to be used while generating restore graph.

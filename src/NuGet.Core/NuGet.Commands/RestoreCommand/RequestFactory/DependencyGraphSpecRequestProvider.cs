@@ -156,6 +156,7 @@ namespace NuGet.Commands
             var globalPath = GetPackagesPath(restoreArgs, projectPackageSpec);
             var settings = Settings.LoadImmutableSettingsGivenConfigPaths(projectPackageSpec.RestoreMetadata.ConfigFilePaths, settingsLoadingContext);
             var sources = restoreArgs.GetEffectiveSources(settings, projectPackageSpec.RestoreMetadata.Sources);
+            var namespaces = PackageNamespacesConfiguration.GetPackageNamespacesConfiguration(settings);
             var clientPolicyContext = ClientPolicyContext.GetClientPolicy(settings, restoreArgs.Log);
 
             var sharedCache = _providerCache.GetOrCreate(
@@ -175,6 +176,7 @@ namespace NuGet.Commands
                 sharedCache,
                 restoreArgs.CacheContext,
                 clientPolicyContext,
+                namespaces,
                 restoreArgs.Log)
             {
                 // Set properties from the restore metadata

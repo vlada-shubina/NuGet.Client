@@ -1,2 +1,4 @@
+NuGet.Commands.RestoreRequest.PackageNamespaces.get -> NuGet.Configuration.PackageNamespacesConfiguration
+NuGet.Commands.RestoreRequest.RestoreRequest(NuGet.ProjectModel.PackageSpec project, NuGet.Commands.RestoreCommandProviders dependencyProviders, NuGet.Protocol.Core.Types.SourceCacheContext cacheContext, NuGet.Packaging.Signing.ClientPolicyContext clientPolicyContext, NuGet.Configuration.PackageNamespacesConfiguration namespacesConfiguration, NuGet.Common.ILogger log) -> void
 NuGet.Commands.SignArgs.PackagePaths.get -> System.Collections.Generic.IReadOnlyList<string>
 NuGet.Commands.SignArgs.PackagePaths.set -> void

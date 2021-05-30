@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NuGet.Common;
+using NuGet.Configuration;
 using NuGet.Frameworks;
 using NuGet.LibraryModel;
 using NuGet.Protocol;
@@ -55,6 +56,7 @@ namespace NuGet.DependencyResolver
                     context.RemoteLibraryProviders,
                     context.LocalLibraryProviders,
                     context.ProjectLibraryProviders,
+                    context.PackageNamespaces,
                     context.LockFileLibraries,
                     currentCacheContext,
                     context.Logger,
@@ -142,6 +144,7 @@ namespace NuGet.DependencyResolver
             IEnumerable<IRemoteDependencyProvider> remoteProviders,
             IEnumerable<IRemoteDependencyProvider> localProviders,
             IEnumerable<IDependencyProvider> projectProviders,
+            PackageNamespacesConfiguration namespacesConfiguration,
             IDictionary<LockFileCacheKey, IList<LibraryIdentity>> lockFileLibraries,
             SourceCacheContext cacheContext,
             ILogger logger,
@@ -182,7 +185,7 @@ namespace NuGet.DependencyResolver
                 if (library != null)
                 {
                     // check for the exact library through local repositories
-                    var localMatch = await FindLibraryByVersionAsync(library, framework, localProviders, cacheContext, logger, cancellationToken);
+                    var localMatch = await FindLibraryByVersionAsync(library, framework, localProviders, namespacesConfiguration, cacheContext, logger, cancellationToken);
 
                     if (localMatch != null
                         && localMatch.Library.Version.Equals(library.Version))
@@ -191,7 +194,7 @@ namespace NuGet.DependencyResolver
                     }
 
                     // if not found in local repositories, then check the remote repositories
-                    var remoteMatch = await FindLibraryByVersionAsync(library, framework, remoteProviders, cacheContext, logger, cancellationToken);
+                    var remoteMatch = await FindLibraryByVersionAsync(library, framework, remoteProviders, namespacesConfiguration,cacheContext, logger, cancellationToken);
 
                     if (remoteMatch != null
                         && remoteMatch.Library.Version.Equals(library.Version))
@@ -206,7 +209,7 @@ namespace NuGet.DependencyResolver
                 return null;
             }
 
-            return await FindPackageLibraryMatchAsync(libraryRange, framework, remoteProviders, localProviders, cacheContext, logger, cancellationToken);
+            return await FindPackageLibraryMatchAsync(libraryRange, framework, remoteProviders, localProviders, namespacesConfiguration,cacheContext, logger, cancellationToken);
         }
 
 
@@ -217,6 +220,7 @@ namespace NuGet.DependencyResolver
         /// <param name="libraryRange">The library requested</param>
         /// <param name="remoteProviders">remote Providers (all sources, including file sources)</param>
         /// <param name="localProviders">local providers(gpf, fallback folders)</param>
+        /// <param name="namespacesConfiguration"></param>
         /// <param name="cacheContext">source caching context</param>
         /// <param name="logger">logger</param>
         /// <param name="cancellationToken">cancellation token</param>
@@ -226,16 +230,17 @@ namespace NuGet.DependencyResolver
             LibraryRange libraryRange,
             IEnumerable<IRemoteDependencyProvider> remoteProviders,
             IEnumerable<IRemoteDependencyProvider> localProviders,
+            PackageNamespacesConfiguration namespacesConfiguration,
             SourceCacheContext cacheContext,
             ILogger logger,
             CancellationToken cancellationToken)
         {
-            return cache.GetOrAdd(libraryRange, (cacheKey) => ResolvePackageLibraryMatchAsync(libraryRange, remoteProviders, localProviders, cacheContext, logger, cancellationToken));
+            return cache.GetOrAdd(libraryRange, (cacheKey) => ResolvePackageLibraryMatchAsync(libraryRange, remoteProviders, localProviders, namespacesConfiguration , cacheContext, logger, cancellationToken));
         }
 
-        private static async Task<Tuple<LibraryRange, RemoteMatch>> ResolvePackageLibraryMatchAsync(LibraryRange libraryRange, IEnumerable<IRemoteDependencyProvider> remoteProviders, IEnumerable<IRemoteDependencyProvider> localProviders, SourceCacheContext cacheContext, ILogger logger, CancellationToken cancellationToken)
+        private static async Task<Tuple<LibraryRange, RemoteMatch>> ResolvePackageLibraryMatchAsync(LibraryRange libraryRange, IEnumerable<IRemoteDependencyProvider> remoteProviders, IEnumerable<IRemoteDependencyProvider> localProviders, PackageNamespacesConfiguration namespacesConfiguration, SourceCacheContext cacheContext, ILogger logger, CancellationToken cancellationToken)
         {
-            var match = await FindPackageLibraryMatchAsync(libraryRange, NuGetFramework.AnyFramework, remoteProviders, localProviders, cacheContext, logger, cancellationToken);
+            var match = await FindPackageLibraryMatchAsync(libraryRange, NuGetFramework.AnyFramework, remoteProviders, localProviders, namespacesConfiguration ,cacheContext, logger, cancellationToken);
             if (match == null)
             {
                 match = CreateUnresolvedMatch(libraryRange);
@@ -243,7 +248,7 @@ namespace NuGet.DependencyResolver
             return new Tuple<LibraryRange, RemoteMatch>(libraryRange, match);
         }
 
-        private static async Task<RemoteMatch> FindPackageLibraryMatchAsync(LibraryRange libraryRange, NuGetFramework framework, IEnumerable<IRemoteDependencyProvider> remoteProviders, IEnumerable<IRemoteDependencyProvider> localProviders, SourceCacheContext cacheContext, ILogger logger, CancellationToken cancellationToken)
+        private static async Task<RemoteMatch> FindPackageLibraryMatchAsync(LibraryRange libraryRange, NuGetFramework framework, IEnumerable<IRemoteDependencyProvider> remoteProviders, IEnumerable<IRemoteDependencyProvider> localProviders, PackageNamespacesConfiguration namespacesConfiguration ,SourceCacheContext cacheContext, ILogger logger, CancellationToken cancellationToken)
         {
             // The resolution below is only for package types
             if (!libraryRange.TypeConstraintAllows(LibraryDependencyTarget.Package))
@@ -254,12 +259,12 @@ namespace NuGet.DependencyResolver
             if (libraryRange.VersionRange.IsFloating)
             {
                 // For snapshot dependencies, get the version remotely first.
-                var remoteMatch = await FindLibraryByVersionAsync(libraryRange, framework, remoteProviders, cacheContext, logger, cancellationToken);
+                var remoteMatch = await FindLibraryByVersionAsync(libraryRange, framework, remoteProviders, namespacesConfiguration, cacheContext, logger, cancellationToken);
                 if (remoteMatch != null)
                 {
                     // Try to see if the specific version found on the remote exists locally. This avoids any unnecessary
                     // remote access incase we already have it in the cache/local packages folder. 
-                    var localMatch = await FindLibraryByVersionAsync(remoteMatch.Library, framework, localProviders, cacheContext, logger, cancellationToken);
+                    var localMatch = await FindLibraryByVersionAsync(remoteMatch.Library, framework, localProviders,namespacesConfiguration, cacheContext, logger, cancellationToken);
 
                     if (localMatch != null
                         && localMatch.Library.Version.Equals(remoteMatch.Library.Version))
@@ -277,7 +282,7 @@ namespace NuGet.DependencyResolver
             else
             {
                 // Check for the specific version locally.
-                var localMatch = await FindLibraryByVersionAsync(libraryRange, framework, localProviders, cacheContext, logger, cancellationToken);
+                var localMatch = await FindLibraryByVersionAsync(libraryRange, framework, localProviders, namespacesConfiguration, cacheContext, logger, cancellationToken);
 
                 if (localMatch != null
                     && localMatch.Library.Version.Equals(libraryRange.VersionRange.MinVersion))
@@ -288,14 +293,14 @@ namespace NuGet.DependencyResolver
 
                 // Either we found a local match but it wasn't the exact version, or 
                 // we didn't find a local match.
-                var remoteMatch = await FindLibraryByVersionAsync(libraryRange, framework, remoteProviders, cacheContext, logger, cancellationToken);
+                var remoteMatch = await FindLibraryByVersionAsync(libraryRange, framework, remoteProviders, namespacesConfiguration, cacheContext, logger, cancellationToken);
 
                 if (remoteMatch != null
                     && localMatch == null)
                 {
                     // There wasn't any local match for the specified version but there was a remote match.
                     // See if that version exists locally.
-                    localMatch = await FindLibraryByVersionAsync(remoteMatch.Library, framework, remoteProviders, cacheContext, logger, cancellationToken);
+                    localMatch = await FindLibraryByVersionAsync(remoteMatch.Library, framework, remoteProviders, namespacesConfiguration, cacheContext, logger, cancellationToken);
                 }
 
                 if (localMatch != null
@@ -360,6 +365,7 @@ namespace NuGet.DependencyResolver
             LibraryRange libraryRange,
             NuGetFramework framework,
             IEnumerable<IRemoteDependencyProvider> providers,
+            PackageNamespacesConfiguration namespacesConfiguration,
             SourceCacheContext cacheContext,
             ILogger logger,
             CancellationToken token)
