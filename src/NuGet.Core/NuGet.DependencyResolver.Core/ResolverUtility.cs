@@ -382,7 +382,7 @@ namespace NuGet.DependencyResolver
                         cacheContext,
                         logger,
                         token));
-            }
+            }            
 
             // Try the non http sources first
             var nonHttpMatch = await FindLibraryFromSourcesAsync(
