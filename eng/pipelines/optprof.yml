@@ -33,7 +33,7 @@ stages:
     testLabPoolName: VS-Platform
     dartLabEnvironment: ${{parameters.DartLabEnvironment}}
     visualStudioSigning: Test
-    preSetSetupParametersStepList:
+    preTestMachineConfigurationStepList:
     - download: NuGet
       artifact: RunSettings
       displayName: Download NuGet RunSettings
