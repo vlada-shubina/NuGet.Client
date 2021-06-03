@@ -46,11 +46,6 @@ namespace NuGet.ContentModel
             }
         }
 
-        public IEnumerable<ContentItem> FindItems(PatternSet definition)
-        {
-            return FindItemsImplementation(definition, _assets);
-        }
-
         public IEnumerable<ContentItemGroup> FindItemGroups(PatternSet definition)
         {
             if (_assets.Count > 0)
