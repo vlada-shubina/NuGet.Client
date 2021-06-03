@@ -29,9 +29,7 @@ stages:
   parameters:
     displayName: NuGet Test Environment
     runSettingsURI: $(Pipeline.Workspace)\NuGet\RunSettings\NuGet.OptProfV2.runsettings
-    # NuGet.Client-Official build 6.0.0.83
-    # todo: get random directory programatically.
-    visualStudioBootstrapperURI: $(Pipeline.Workspace)\NuGet\VS15\4823303\ceef70ef-f96c-4235-9a50-e08017aa170f\vs_enterprise.exe
+    visualStudioBootstrapperURI: https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/NuGet-NuGet.Client-Trusted/dev-zivkan-dartlab/6.0.0.83;bootstrapper/4823303/ceef70ef-f96c-4235-9a50-e08017aa170f/vs_enterprise.exe
     testLabPoolName: VS-Platform
     dartLabEnvironment: ${{parameters.DartLabEnvironment}}
     visualStudioSigning: Test
@@ -39,13 +37,7 @@ stages:
     - download: NuGet
       artifact: RunSettings
       displayName: Download NuGet RunSettings
-    - download: NuGet
-      artifact: VS15
-      displayName: Download NuGet RunSettings
     preDeployAndRunTestsStepList:
     - download: NuGet
       artifact: RunSettings
-      displayName: Download NuGet RunSettings
-    - download: NuGet
-      artifact: VS15
       displayName: Download NuGet RunSettings
