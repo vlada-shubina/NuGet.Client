@@ -195,6 +195,9 @@ namespace NuGet
 
                 const string RestoreOutputCompletionMarker = "========== Finished ==========";
 
+                visualStudio.ObjectModel.Solution.WaitForIntellisenseStage(TimeSpan.FromMinutes(5));
+                visualStudio.ObjectModel.Shell.ToolWindows.OutputWindow.ToolWindow.Show();
+
                 // Wait for the assets file to be created.
                 Omni.Common.WaitFor.IsTrue(
                     () => File.Exists(assetsFile.FullName),
@@ -204,36 +207,31 @@ namespace NuGet
 
                 // Wait for the solution restore to complete.
                 Omni.Common.WaitFor.IsTrue(
-                    () =>
-                    {
-                        if (TryGetPackageManagerOutputWindowPane(visualStudio, out OutputWindowPaneTestExtension packageManagerOutputWindowPane))
-                        {
-                            var output = packageManagerOutputWindowPane.Text;
+                     () =>
+                     {
+                         if (TryGetPackageManagerOutputWindowPane(visualStudio, out OutputWindowPaneTestExtension packageManagerOutputWindowPane))
+                         {
+                             var output = packageManagerOutputWindowPane.Text;
 
-                            if (!string.IsNullOrEmpty(output))
-                            {
-                                output = output.TrimEnd('\r', '\n');
+                             if (!string.IsNullOrEmpty(output))
+                             {
+                                 output = output.TrimEnd('\r', '\n');
 
-                                return output.EndsWith(RestoreOutputCompletionMarker);
-                            }
-                        }
+                                 return output.Contains(RestoreOutputCompletionMarker);
+                             }
+                         }
 
-                        return false;
-                    },
-                    timeout,
-                    interval,
-                    "Solution restore did not complete according to the Package Manager output window pane.");
+                         return false;
+                     },
+                     timeout,
+                     interval,
+                     "Solution restore did not complete according to the Package Manager output window pane.");
             }
-        }
-
-        private static bool IsPackageManagerOutputWindowPane(OutputWindowPaneTestExtension outputWindowPane)
-        {
-            return outputWindowPane.Guid == _packageManagerOutputWindowPaneGuid;
         }
 
         private static bool TryGetPackageManagerOutputWindowPane(VisualStudioHost visualStudio, out OutputWindowPaneTestExtension packageManagerOutputWindowPane)
         {
-            packageManagerOutputWindowPane = visualStudio.ObjectModel.Shell.ToolWindows.OutputWindow.OutputPanes.FirstOrDefault(IsPackageManagerOutputWindowPane);
+            packageManagerOutputWindowPane = visualStudio.ObjectModel.Shell.ToolWindows.OutputWindow.GetOutputPane(_packageManagerOutputWindowPaneGuid);
 
             return packageManagerOutputWindowPane != null;
         }

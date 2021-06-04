@@ -30,9 +30,9 @@
 
   <ItemGroup Label="Test Stores">
     <!-- This represents the build drop that contains NuGet.OptProf.dll. -->
-    <TestStore Include="vstsdrop:$(TestDrop)" />
+    <!-- <TestStore Include="vstsdrop:$(TestDrop)" /> -->
     <!-- This represents the build drop that contains profiling inputs. -->
-    <TestStore Include="vstsdrop:$(ProfilingInputsDrop)" />
+    <!-- <TestStore Include="vstsdrop:$(ProfilingInputsDrop)" /> -->
   </ItemGroup>
 
   <ItemGroup Label="Test Containers">
