@@ -241,7 +241,7 @@ steps:
     PathtoPublish: "$(Build.Repository.LocalPath)"
     ArtifactName: "msbuild.binlog"
     ArtifactType: "Container"
-  condition: "and(succeeded(),eq(variables['BuildRTM'], 'false'))"
+  condition: always()
 
 - task: MSBuild@1
   displayName: "Ensure all Nupkgs and Symbols are created"
