@@ -149,6 +149,7 @@
                   VisualStudioVersion=$(VisualStudioVersion);
                   PackageOutputPath=$(NupkgOutputDirectory);
                   IncludeSymbols=true;
+                  SymbolPackageFormat=snupkg;
                   NoBuild=true;">
     </MSBuild>
   </Target>

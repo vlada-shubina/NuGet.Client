@@ -232,8 +232,16 @@ steps:
     solution: "build\\build.proj"
     msbuildVersion: "16.0"
     configuration: "$(BuildConfiguration)"
-    msbuildArguments: "/t:Pack /p:BuildRTM=$(BuildRTM) /p:ExcludeTestProjects=$(BuildRTM) /p:BuildNumber=$(BuildNumber)"
+    msbuildArguments: "/t:Pack /p:BuildRTM=$(BuildRTM) /p:ExcludeTestProjects=$(BuildRTM) /p:BuildNumber=$(BuildNumber)" /bl
     maximumCpuCount: true
+
+- task: PublishBuildArtifacts@1
+  displayName: "Publish binlog as artifact"
+  inputs:
+    PathtoPublish: "$(Build.Repository.LocalPath)"
+    ArtifactName: "msbuild.binlog"
+    ArtifactType: "Container"
+  condition: "and(succeeded(),eq(variables['BuildRTM'], 'false'))"
 
 - task: MSBuild@1
   displayName: "Ensure all Nupkgs and Symbols are created"
@@ -416,7 +424,7 @@ steps:
   displayName: Publish public Nuget packages to nuget-build
   inputs:
     command: push
-    packagesToPush: 'artifacts\nupkgs\*.nupkg;!artifacts\nupkgs\*.symbols.nupkg'
+    packagesToPush: 'artifacts\nupkgs\*.nupkg;!artifacts\nupkgs\*.snupkg'
     nuGetFeedType: external
     allowPackageConflicts: true
     publishFeedCredentials : nuget-build-dnceng-public-feed
