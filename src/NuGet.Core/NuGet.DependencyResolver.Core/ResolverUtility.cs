@@ -370,14 +370,17 @@ namespace NuGet.DependencyResolver
             ILogger logger,
             CancellationToken token)
         {
+
             HashSet<string> sources = namespacesConfiguration.Match(libraryRange.Name);
 
-            if(sources != null && sources.Count > 0)
+            if (sources != null && sources.Count > 0)
             {
-                providers = providers.Where(p => sources.Contains(p.Source.Source));
+                var providers1 = providers.Where(p => sources.Contains(p.Source.Name));
 
-                if (!providers.Any())
-                    throw new Exception("something is wrong with the configuration");
+                if (providers1 != null && providers1.Any())
+                {
+                    providers = providers1;
+                }
             }
 
             if (libraryRange.VersionRange.IsFloating)
