@@ -370,6 +370,16 @@ namespace NuGet.DependencyResolver
             ILogger logger,
             CancellationToken token)
         {
+            HashSet<string> sources = namespacesConfiguration.Match(libraryRange.Name);
+
+            if(sources != null && sources.Count > 0)
+            {
+                providers = providers.Where(p => sources.Contains(p.Source.Source));
+
+                if (!providers.Any())
+                    throw new Exception("something is wrong with the configuration");
+            }
+
             if (libraryRange.VersionRange.IsFloating)
             {
                 // Don't optimize the non http path for floating versions or we'll miss things
