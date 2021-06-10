@@ -35,4 +35,4 @@ jobs:
             # Get-ChildItem -Path $(D:)
             Get-ChildItem -Path $(Pipeline.Workspace)\VS15\RTM -recurse
             # Write-Host $(Build.Repository.LocalPath)
-            Write-Host "Hullo clouds"
+            Write-Host "Hello clouds"
