@@ -1,0 +1,38 @@
+resources:
+  pipelines:
+    - pipeline: nugetclientofficial
+      source: NuGet.Client-Official
+      trigger:
+        branches:
+          include:
+            - dev
+
+jobs:
+  - job: NuGetExe_Compatibility_Analysis
+    displayName: "NuGet.exe Compatibility Analysis"
+    pool:
+      vmImage: windows-latest
+
+    steps:
+      - task: DownloadPipelineArtifact@2
+        displayName: "Download VS-RTM"
+        inputs:
+          source: specific
+          project: 'devdiv'
+          pipeline: NuGet.Client-Official
+          artifact: "VS15-RTM"
+          path: $(Pipeline.Workspace)\VS15\RTM          
+
+      - task: PowerShell@2
+        displayName: 'Powershell'
+        inputs:
+          targetType: 'inline'
+          script: |
+            # Write your PowerShell commands here.
+            # Write-Host $(Build.SourceDirectory)
+            Write-Host $(Pipeline.Workspace)
+            # Get-ChildItem -Path $(Pipeline.Workspace) -recurse
+            # Get-ChildItem -Path $(D:)
+            Get-ChildItem -Path $(Pipeline.Workspace)\VS15\RTM -recurse
+            # Write-Host $(Build.Repository.LocalPath)
+            Write-Host "Hullo clouds"
