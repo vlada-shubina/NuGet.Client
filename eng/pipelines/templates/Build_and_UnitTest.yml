@@ -363,7 +363,7 @@ steps:
 - task: CopyFiles@2
   displayName: 'OptProfV2:  copy test binaries'
   inputs:
-    sourceFolder: 'test\NuGet.Tests.Apex\NuGet.OptProf\bin\16.0\release'
+    sourceFolder: 'test\NuGet.Tests.Apex\NuGet.OptProf\bin\$(BuildConfiguration)'
     Contents: '**'
     targetFolder: 'artifacts\RunSettings\NuGet.OptProf'
   condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'))"
