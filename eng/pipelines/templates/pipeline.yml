@@ -19,7 +19,7 @@ stages:
     dependsOn: Initialize_Build_SemanticVersion
     timeoutInMinutes: 10
     variables:
-      SemanticVersion: $[dependencies.Initialize_Build_SemanticVersion.outputs['setsemanticversion.SemanticVersion']]
+      SemanticVersion: $[dependencies.Initiailize.Initialize_Build_SemanticVersion.outputs['setsemanticversion.SemanticVersion']]
       BuildRevision: $[counter(format('{0}.{1}', variables['SemanticVersion'], variables['build.definitionname']), 1)]
 
     pool:
@@ -37,11 +37,11 @@ stages:
   - job: Build_and_UnitTest_NonRTM
     timeoutInMinutes: 170
     variables:
-      BuildNumber: $[dependencies.Initialize_Build.outputs['updatebuildnumber.BuildNumber']]
-      FullVstsBuildNumber: $[dependencies.Initialize_Build.outputs['updatebuildnumber.FullVstsBuildNumber']]
-      VsTargetChannel: $[dependencies.Initialize_Build.outputs['updatebuildnumber.VsTargetChannel']]
-      VsTargetMajorVersion: $[dependencies.Initialize_Build.outputs['updatebuildnumber.VsTargetMajorVersion']]
-      SDKVersionForBuild: $[dependencies.Initialize_Build.outputs['getSDKVersionForBuild.SDKVersionForBuild']]
+      BuildNumber: $[stageDependencies.Initialize.Initialize_Build.outputs['updatebuildnumber.BuildNumber']]
+      FullVstsBuildNumber: $[stageDependencies.Initialize.Initialize_Build.outputs['updatebuildnumber.FullVstsBuildNumber']]
+      VsTargetChannel: $[stageDependencies.Initialize.Initialize_Build.outputs['updatebuildnumber.VsTargetChannel']]
+      VsTargetMajorVersion: $[stageDependencies.Initialize.Initialize_Build.outputs['updatebuildnumber.VsTargetMajorVersion']]
+      SDKVersionForBuild: $[stageDependencies.Initialize.Initialize_Build.outputs['getSDKVersionForBuild.SDKVersionForBuild']]
       LocalizedLanguageCount: "13"
       BuildRTM: "false"
 
@@ -57,11 +57,11 @@ stages:
   - job: Build_and_UnitTest_RTM
     timeoutInMinutes: 170
     variables:
-      BuildNumber: $[dependencies.Initialize_Build.outputs['updatebuildnumber.BuildNumber']]
-      FullVstsBuildNumber: $[dependencies.Initialize_Build.outputs['updatebuildnumber.FullVstsBuildNumber']]
-      VsTargetChannel: $[dependencies.Initialize_Build.outputs['updatebuildnumber.VsTargetChannel']]
-      VsTargetMajorVersion: $[dependencies.Initialize_Build.outputs['updatebuildnumber.VsTargetMajorVersion']]
-      SDKVersionForBuild: $[dependencies.Initialize_Build.outputs['getSDKVersionForBuild.SDKVersionForBuild']]
+      BuildNumber: $[stageDependencies.Initiailize.Initialize_Build.outputs['updatebuildnumber.BuildNumber']]
+      FullVstsBuildNumber: $[stageDependencies.Initiailize.Initialize_Build.outputs['updatebuildnumber.FullVstsBuildNumber']]
+      VsTargetChannel: $[stageDependencies.Initiailize.Initialize_Build.outputs['updatebuildnumber.VsTargetChannel']]
+      VsTargetMajorVersion: $[stageDependencies.Initiailize.Initialize_Build.outputs['updatebuildnumber.VsTargetMajorVersion']]
+      SDKVersionForBuild: $[stageDependencies.Initiailize.Initialize_Build.outputs['getSDKVersionForBuild.SDKVersionForBuild']]
       LocalizedLanguageCount: "13"
       BuildRTM: "true"
 
@@ -77,9 +77,9 @@ stages:
   - job: Source_Build
     timeoutInMinutes: 120
     variables:
-      BuildNumber: $[dependencies.Initialize_Build.outputs['updatebuildnumber.BuildNumber']]
-      FullVstsBuildNumber: $[dependencies.Initialize_Build.outputs['updatebuildnumber.FullVstsBuildNumber']]
-      SDKVersionForBuild: $[dependencies.Initialize_Build.outputs['getSDKVersionForBuild.SDKVersionForBuild']]
+      BuildNumber: $[stageDependencies.Initiailize.Initialize_Build.outputs['updatebuildnumber.BuildNumber']]
+      FullVstsBuildNumber: $[stageDependencies.Initiailize.Initialize_Build.outputs['updatebuildnumber.FullVstsBuildNumber']]
+      SDKVersionForBuild: $[stageDependencies.Initiailize.Initialize_Build.outputs['getSDKVersionForBuild.SDKVersionForBuild']]
       BuildRTM: "false"
     pool:
       vmImage: ubuntu-latest
@@ -93,9 +93,9 @@ stages:
   - job: Functional_Tests_On_Windows
     timeoutInMinutes: 120
     variables:
-      BuildNumber: $[dependencies.Initialize_Build.outputs['updatebuildnumber.BuildNumber']]
-      FullVstsBuildNumber: $[dependencies.Initialize_Build.outputs['updatebuildnumber.FullVstsBuildNumber']]
-      SDKVersionForBuild: $[dependencies.Initialize_Build.outputs['getSDKVersionForBuild.SDKVersionForBuild']]
+      BuildNumber: $[stageDependencies.Initiailize.Initialize_Build.outputs['updatebuildnumber.BuildNumber']]
+      FullVstsBuildNumber: $[stageDependencies.Initiailize.Initialize_Build.outputs['updatebuildnumber.FullVstsBuildNumber']]
+      SDKVersionForBuild: $[stageDependencies.Initiailize.Initialize_Build.outputs['getSDKVersionForBuild.SDKVersionForBuild']]
     condition: "and(succeeded(),eq(variables['RunFunctionalTestsOnWindows'], 'true')) "
     pool:
       name: VSEngSS-MicroBuild2019
@@ -115,8 +115,8 @@ stages:
   - job: Tests_On_Linux
     timeoutInMinutes: 45
     variables:
-      FULLVSTSBUILDNUMBER: $[dependencies.Initialize_Build.outputs['updatebuildnumber.FullVstsBuildNumber']]
-      SDKVersionForBuild: $[dependencies.Initialize_Build.outputs['getSDKVersionForBuild.SDKVersionForBuild']]
+      FULLVSTSBUILDNUMBER: $[stageDependencies.Initiailize.Initialize_Build.outputs['updatebuildnumber.FullVstsBuildNumber']]
+      SDKVersionForBuild: $[stageDependencies.Initiailize.Initialize_Build.outputs['getSDKVersionForBuild.SDKVersionForBuild']]
       MSBUILDDISABLENODEREUSE: 1
     condition: "and(succeeded(),eq(variables['RunTestsOnLinux'], 'true')) "
     pool:
@@ -132,8 +132,8 @@ stages:
   - job: Tests_On_Mac
     timeoutInMinutes: 90
     variables:
-      FULLVSTSBUILDNUMBER: $[dependencies.Initialize_Build.outputs['updatebuildnumber.FullVstsBuildNumber']]
-      SDKVersionForBuild: $[dependencies.Initialize_Build.outputs['getSDKVersionForBuild.SDKVersionForBuild']]
+      FULLVSTSBUILDNUMBER: $[stageDependencies.Initiailize.Initialize_Build.outputs['updatebuildnumber.FullVstsBuildNumber']]
+      SDKVersionForBuild: $[stageDependencies.Initiailize.Initialize_Build.outputs['getSDKVersionForBuild.SDKVersionForBuild']]
     condition: "and(succeeded(),eq(variables['RunTestsOnMac'], 'true')) "
     pool:
       vmImage: macos-latest
@@ -147,8 +147,8 @@ stages:
   - job: End_To_End_Tests_On_Windows
     timeoutInMinutes: 100
     variables:
-      FullVstsBuildNumber: $[dependencies.Initialize_Build.outputs['updatebuildnumber.FullVstsBuildNumber']]
-      SDKVersionForBuild: $[dependencies.Initialize_Build.outputs['getSDKVersionForBuild.SDKVersionForBuild']]
+      FullVstsBuildNumber: $[stageDependencies.Initiailize.Initialize_Build.outputs['updatebuildnumber.FullVstsBuildNumber']]
+      SDKVersionForBuild: $[stageDependencies.Initiailize.Initialize_Build.outputs['getSDKVersionForBuild.SDKVersionForBuild']]
     condition: "and(succeeded(),eq(variables['RunEndToEndTests'], 'true')) "
     pool:
       name: DDNuGet-Windows
@@ -168,9 +168,9 @@ stages:
   - job: Apex_Tests_On_Windows
     timeoutInMinutes: 150
     variables:
-      BuildNumber: $[dependencies.Initialize_Build.outputs['updatebuildnumber.BuildNumber']]
-      FullVstsBuildNumber: $[dependencies.Initialize_Build.outputs['updatebuildnumber.FullVstsBuildNumber']]
-      SDKVersionForBuild: $[dependencies.Initialize_Build.outputs['getSDKVersionForBuild.SDKVersionForBuild']]
+      BuildNumber: $[stageDependencies.Initiailize.Initialize_Build.outputs['updatebuildnumber.BuildNumber']]
+      FullVstsBuildNumber: $[stageDependencies.Initiailize.Initialize_Build.outputs['updatebuildnumber.FullVstsBuildNumber']]
+      SDKVersionForBuild: $[stageDependencies.Initiailize.Initialize_Build.outputs['getSDKVersionForBuild.SDKVersionForBuild']]
     condition: "and(succeeded(),eq(variables['RunApexTests'], 'true')) "
     pool:
       name: DDNuGet-Windows
