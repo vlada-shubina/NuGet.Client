@@ -1,6 +1,26 @@
 variables:
   DOTNET_NOLOGO: 1
 
+parameters:
+- name: DartLabEnvironment
+  displayName: DartLab Environment
+  type: string
+  default: Production
+  values:
+  - Production
+  - Staging
+
+resources:
+  pipelines:
+  - pipeline: DartLab
+    source: DartLab
+    branch: main
+  repositories:
+  - repository: DartLabTemplates
+    type: git
+    name: DartLab.Templates
+    ref: refs/heads/main
+
 stages:
 - stage: Initialize
   jobs:
@@ -19,7 +39,7 @@ stages:
     dependsOn: Initialize_Build_SemanticVersion
     timeoutInMinutes: 10
     variables:
-      SemanticVersion: $[dependencies.Initiailize.Initialize_Build_SemanticVersion.outputs['setsemanticversion.SemanticVersion']]
+      SemanticVersion: $[dependencies.Initialize_Build_SemanticVersion.outputs['setsemanticversion.SemanticVersion']]
       BuildRevision: $[counter(format('{0}.{1}', variables['SemanticVersion'], variables['build.definitionname']), 1)]
 
     pool:
@@ -180,3 +200,21 @@ stages:
 
     steps:
     - template: Apex_Tests_On_Windows.yml
+
+- template: stages\visual-studio\single-runsettings.yml@DartLabTemplates
+  parameters:
+    displayName: OptProf Test Validation (no training)
+    dependsOn: Build
+    runSettingsURI: $(Pipeline.Workspace)\RunSettings\NuGet.OptProfV2.runsettings
+    visualStudioBootstrapperURI: $[stageDependencies.Build.Build_and_UnitTest_NonRTM.outputs['bootstrapperUrl']]
+    testLabPoolName: VS-Platform
+    dartLabEnvironment: ${{parameters.DartLabEnvironment}}
+    visualStudioSigning: Test
+    preTestMachineConfigurationStepList:
+    - download: current
+      artifact: RunSettings
+      displayName: Download NuGet RunSettings
+    preDeployAndRunTestsStepList:
+    - download: current
+      artifact: RunSettings
+      displayName: Download NuGet RunSettings

@@ -309,14 +309,14 @@ steps:
   inputs:
     command: 'custom'
     arguments: 'sources add -Name VS -Source $(VsPackageFeedUrl) -UserName $(VsPackageFeedUsername) -Password $(VsPackageFeedPassword) -ConfigFile $(System.DefaultWorkingDirectory)\NuGet.config'
-  condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'), eq(variables['IsOfficialBuild'], 'true'))"
+  condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'))"
 
 - task: NuGetCommand@2
   displayName: 'OptProfV2:  install the NuGet package for building .runsettingsproj file'
   inputs:
     command: 'custom'
     arguments: 'install Microsoft.DevDiv.Validation.TestPlatform.Settings.Tasks -Version 1.0.655 -Source $(VsPackageFeedUrl) -ConfigFile $(System.DefaultWorkingDirectory)\NuGet.config -OutputDirectory $(System.DefaultWorkingDirectory)\packages'
-  condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'), eq(variables['IsOfficialBuild'], 'true'))"
+  condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'))"
 
 - task: MicroBuildBuildVSBootstrapper@2
   displayName: 'OptProfV2:  build a Visual Studio bootstrapper'
@@ -326,7 +326,7 @@ steps:
     manifests: '$(Build.Repository.LocalPath)\artifacts\VS15\Microsoft.VisualStudio.NuGet.Core.vsman'
     outputFolder: '$(Build.Repository.LocalPath)\artifacts\VS15'
   continueOnError: true
-  condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'), eq(variables['IsOfficialBuild'], 'true'))"
+  condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'))"
 
 - task: PublishBuildArtifacts@1
   displayName: 'OptProfV2:  publish BootstrapperInfo.json as a build artifact'
@@ -334,14 +334,31 @@ steps:
     PathtoPublish: $(Build.StagingDirectory)\MicroBuild\Output
     ArtifactName: MicroBuildOutputs
     ArtifactType: Container
-  condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'), eq(variables['IsOfficialBuild'], 'true'))"
+  condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'))"
+
+- task: PowerShell@1
+  displayName: "Set Bootstrapper URL variable"
+  name: "setsemanticversion"
+  inputs:
+    scriptType: "inlineScript"
+    inlineScript: |
+      try {
+        $json = Get-Content "${env:Build_StagingDirectory}\MicroBuild\Output\Bootstrapperinfo.json" | ConvertFrom-Json
+        $bootstrapperUrl = $json[0].bootstrapperUrl;
+        Write-Host "Bootstrapper URL: $bootstrapperUrl"
+        Write-Host "##vso[task.setvariable variable=bootstrapperUrl;isOutput=true]$bootstrapperUrl"
+      } catch {
+        Write-Host "##vso[task.LogIssue type=error;]Unable to set bootstrapperUrl: $_"
+        exit 1
+      }
+  condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'))"
 
 - task: MSBuild@1
   displayName: 'OptProfV2:  generate a .runsettings file'
   inputs:
     solution: 'build\NuGet.OptProfV2.runsettingsproj'
     msbuildArguments: '/p:OutputPath="$(Build.Repository.LocalPath)\artifacts\RunSettings" /p:TestDrop="RunSettings/$(System.TeamProject)/$(Build.Repository.Name)/$(Build.SourceBranchName)/$(Build.BuildId)" /p:ProfilingInputsDrop="ProfilingInputs/$(System.TeamProject)/$(Build.Repository.Name)/$(Build.SourceBranchName)/$(Build.BuildId)"'
-  condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'), eq(variables['IsOfficialBuild'], 'true'))"
+  condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'))"
 
 - task: CopyFiles@2
   displayName: 'OptProfV2:  copy test binaries'
@@ -349,7 +366,7 @@ steps:
     sourceFolder: 'test\NuGet.Tests.Apex\NuGet.OptProf\bin\16.0\release'
     Contents: '**'
     targetFolder: 'artifacts\RunSettings\NuGet.OptProf'
-  condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'), eq(variables['IsOfficialBuild'], 'true'))"
+  condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'))"
 
 - task: artifactDropTask@0
   displayName: 'OptProfV2:  publish the .runsettings file to artifact services'
@@ -367,7 +384,7 @@ steps:
   inputs:
     targetPath: "$(Build.Repository.LocalPath)\\artifacts\\RunSettings\\"
     artifactName: "RunSettings"
-  condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'), eq(variables['IsOfficialBuild'], 'true'))"
+  condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'))"
 
 - task: artifactDropTask@0
   displayName: 'OptProfV2:  publish profiling inputs to artifact services'
