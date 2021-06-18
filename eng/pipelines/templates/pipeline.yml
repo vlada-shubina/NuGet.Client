@@ -206,7 +206,7 @@ stages:
     displayName: OptProf Test Validation (no training)
     dependsOn: Build
     variables:
-      bootstrapperUrl: $[stageDependencies.Build.Build_and_UnitTest_NonRTM.outputs['bootstrapperUrl']]
+    - bootstrapperUrl: $[stageDependencies.Build.Build_and_UnitTest_NonRTM.outputs['bootstrapperUrl']]
     runSettingsURI: $(Pipeline.Workspace)\RunSettings\NuGet.OptProfV2.runsettings
     visualStudioBootstrapperURI: $(bootstrapperUrl)
     testLabPoolName: VS-Platform
