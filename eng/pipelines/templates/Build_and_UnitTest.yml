@@ -377,7 +377,7 @@ steps:
     toLowerCase: false
     usePat: true
     dropMetadataContainerName: 'DropMetadata-RunSettings'
-  condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'), eq(variables['IsOfficialBuild'], 'true'))"
+  condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'))"
 
 - task: PublishPipelineArtifact@1
   displayName: "Publish localizationArtifacts artifact"
@@ -395,7 +395,7 @@ steps:
     toLowerCase: false
     usePat: true
     dropMetadataContainerName: 'DropMetadata-ProfilingInputs'
-  condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'), eq(variables['IsOfficialBuild'], 'true'))"
+  condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'))"
 
 - task: PublishBuildArtifacts@1
   displayName: "Publish NuGet.exe VSIX and EndToEnd.zip as artifact"

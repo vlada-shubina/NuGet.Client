@@ -14,7 +14,7 @@ parameters:
 resources:
   pipelines:
   - pipeline: NuGet
-    source: NuGet.Client-Official
+    source: NuGet.Client-PrivateDev
   - pipeline: DartLab
     source: DartLab
     branch: main
@@ -25,11 +25,42 @@ resources:
     ref: refs/heads/main
 
 stages:
+- name: GetVSBootstrapperUri
+  displayName: Get VS Bootstrapper URI
+  pool:
+    vmImage: windows-latest
+  jobs:
+  - job: GetFromBuildArtifact
+    steps:
+    - download: NuGet
+      artifact: MicroBuildOutputs
+      displayName: Download BootstrapperInfo.json
+    - task: PowerShell@1
+      displayName: "Set Bootstrapper URL variable"
+      name: "vsbootstrapper"
+      inputs:
+        scriptType: "inlineScript"
+        inlineScript: |
+          try {
+            $json = Get-Content "${env:Build_StagingDirectory}\NuGet\MicroBuildOutputs\BootstrapperInfo.json" | ConvertFrom-Json
+            $bootstrapperUrl = $json[0].bootstrapperUrl;
+            Write-Host "Bootstrapper URL: $bootstrapperUrl"
+            Write-Host "##vso[task.setvariable variable=bootstrapperUrl;isOutput=true]$bootstrapperUrl"
+          } catch {
+            Write-Host "##vso[task.LogIssue type=error;]Unable to set bootstrapperUrl: $_"
+            exit 1
+          }
+
 - template: stages\visual-studio\single-runsettings.yml@DartLabTemplates
   parameters:
-    displayName: NuGet Test Environment
+    name: RunOnDartlab
+    displayName: Run NuGet.OptProf.dll
+    dependsOn: GetVSBootstrapperUri
+    variables:
+    - name: bootstrapperUrl
+      value: $[stageDependencies.GetVSBootstrapperUri.GetFromBuildArtifact.outputs['vsbootstrapper.bootstrapperUrl']]
     runSettingsURI: $(Pipeline.Workspace)\NuGet\RunSettings\NuGet.OptProfV2.runsettings
-    visualStudioBootstrapperURI: https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/NuGet-NuGet.Client-Trusted/dev-zivkan-dartlab/6.0.0.83;bootstrapper/4823303/ceef70ef-f96c-4235-9a50-e08017aa170f/vs_enterprise.exe
+    visualStudioBootstrapperURI: $(bootstrapperUrl)
     testLabPoolName: VS-Platform
     dartLabEnvironment: ${{parameters.DartLabEnvironment}}
     visualStudioSigning: Test
