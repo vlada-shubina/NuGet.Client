@@ -357,7 +357,7 @@ steps:
   displayName: 'OptProfV2:  generate a .runsettings file'
   inputs:
     solution: 'build\NuGet.OptProfV2.runsettingsproj'
-    msbuildArguments: '/p:OutputPath="$(Build.Repository.LocalPath)\artifacts\RunSettings" /p:TestDrop="RunSettings/$(System.TeamProject)/$(Build.Repository.Name)/$(Build.SourceBranchName)/$(Build.BuildId)" /p:ProfilingInputsDrop="ProfilingInputs/$(System.TeamProject)/$(Build.Repository.Name)/$(Build.SourceBranchName)/$(Build.BuildId)"'
+    msbuildArguments: '/p:OutputPath="$(Build.Repository.LocalPath)\artifacts\RunSettings" /p:TestDrop="RunSettings/$(System.TeamProject)/$(Build.Repository.Name)/$(Build.SourceBranchName)/$(Build.BuildId)" /p:ProfilingInputsDrop="ProfilingInputs/$(System.TeamProject)/$(Build.Repository.Name)/$(Build.SourceBranchName)/$(Build.BuildId)" /p:IncludeProfilingInputs=$(IsOfficialBuild)'
   condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'))"
 
 - task: CopyFiles@2
@@ -395,7 +395,7 @@ steps:
     toLowerCase: false
     usePat: true
     dropMetadataContainerName: 'DropMetadata-ProfilingInputs'
-  condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'))"
+  condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'), eq(variables['IsOfficialBuild'], 'true'))"
 
 - task: PublishBuildArtifacts@1
   displayName: "Publish NuGet.exe VSIX and EndToEnd.zip as artifact"
