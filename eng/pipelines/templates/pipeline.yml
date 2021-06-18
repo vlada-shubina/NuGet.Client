@@ -205,8 +205,10 @@ stages:
   parameters:
     displayName: OptProf Test Validation (no training)
     dependsOn: Build
+    variables:
+      bootstrapperUrl: $[stageDependencies.Build.Build_and_UnitTest_NonRTM.outputs['bootstrapperUrl']]
     runSettingsURI: $(Pipeline.Workspace)\RunSettings\NuGet.OptProfV2.runsettings
-    visualStudioBootstrapperURI: $[stageDependencies.Build.Build_and_UnitTest_NonRTM.outputs['bootstrapperUrl']]
+    visualStudioBootstrapperURI: $(bootstrapperUrl)
     testLabPoolName: VS-Platform
     dartLabEnvironment: ${{parameters.DartLabEnvironment}}
     visualStudioSigning: Test
