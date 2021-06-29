@@ -13,6 +13,10 @@
   </ItemGroup>
   
   <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.13.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <ProjectReference Include="..\NuGet.XPlat.FuncTest\NuGet.XPlat.FuncTest.csproj" />
     <ProjectReference Include="$(TestUtilitiesDirectory)Test.Utility\Test.Utility.csproj" />
     <ProjectReference Include="$(NuGetCoreSrcDirectory)NuGet.Build.Tasks.Pack\NuGet.Build.Tasks.Pack.csproj" />
