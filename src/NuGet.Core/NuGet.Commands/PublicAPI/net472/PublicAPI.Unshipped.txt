@@ -1,3 +1,8 @@
+NuGet.Commands.RestoreCommandException.RestoreCommandException(NuGet.Common.RestoreLogMessage logMessage) -> void
+NuGet.Commands.RestoreSpecException.Files.get -> System.Collections.Generic.List<string>
+NuGet.Commands.RestoreSpecException.RestoreSpecException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) -> void
 NuGet.Commands.SignArgs.PackagePaths.get -> System.Collections.Generic.IReadOnlyList<string>
 NuGet.Commands.SignArgs.PackagePaths.set -> void
+override NuGet.Commands.RestoreCommandException.GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) -> void
+override NuGet.Commands.RestoreSpecException.GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) -> void
 static NuGet.Commands.MSBuildProjectFrameworkUtility.GetProjectFramework(string projectFilePath, string targetFrameworkMoniker, string targetPlatformMoniker, string targetPlatformMinVersion, string clrSupport) -> NuGet.Frameworks.NuGetFramework

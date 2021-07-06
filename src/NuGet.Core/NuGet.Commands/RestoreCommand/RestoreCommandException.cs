@@ -12,9 +12,9 @@ namespace NuGet.Commands
     [SerializableAttribute]
     public class RestoreCommandException : Exception, ILogMessageException
     {
-        private readonly IRestoreLogMessage _logMessage;
+        private readonly RestoreLogMessage _logMessage;
 
-        public RestoreCommandException(IRestoreLogMessage logMessage)
+        public RestoreCommandException(RestoreLogMessage logMessage)
             : base(logMessage?.Message)
         {
             _logMessage = logMessage ?? throw new ArgumentNullException(nameof(logMessage));
