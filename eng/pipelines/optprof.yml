@@ -27,7 +27,7 @@ resources:
 
 stages:
 - stage: Build
-  displayName: Get VS Bootstrapper URI
+  displayName: Build VS Bootstrapper and test binaries
   pool:
     vmImage: windows-latest
   jobs:
@@ -63,6 +63,9 @@ stages:
         scriptName: "$(Build.Repository.LocalPath)\\scripts\\cibuild\\ConfigureVstsBuild.ps1"
         arguments: "-BuildRTM false"
       displayName: "Configure VSTS CI Environment"
+
+    - task: MicroBuildLocalizationPlugin@1
+      displayName: "Install Localization Plugin"
 
     # - task: MicroBuildSigningPlugin@1
     #   inputs:
@@ -135,6 +138,13 @@ stages:
         msbuildArguments: "/t:BuildNoVSIX /p:BuildRTM=false /p:BuildNumber=12345 /p:SkipILMergeOfNuGetExe=true /p:GitRepositoryRemoteName=github /p:IncludeApex=true"
         maximumCpuCount: true
 
+    - task: MSBuild@1
+      displayName: "Localize Assemblies"
+      inputs:
+        solution: "build\\loc.proj"
+        configuration: "$(BuildConfiguration)"
+        msbuildArguments: "/t:AfterBuild"
+
     # - task: MSBuild@1
     #   displayName: "Sign Assemblies"
     #   inputs:
@@ -148,7 +158,7 @@ stages:
       inputs:
         solution: "build\\build.proj"
         configuration: "$(BuildConfiguration)"
-        msbuildArguments: "/t:BuildVSIX /p:BuildRTM=false /p:ExcludeTestProjects=false"
+        msbuildArguments: "/t:BuildVSIX /p:BuildRTM=false /p:ExcludeTestProjects=false  /p:IsCIBuild=true"
         maximumCpuCount: true
 
     - task: MSBuild@1
