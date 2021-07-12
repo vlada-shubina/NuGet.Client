@@ -137,13 +137,13 @@ function Test-PackageNamespaceInstall-WithSingleFeed
     </packageNamespaces>
 </configuration>
 "@
-  
+
     try {
         # We have to create config file before creating solution, otherwise it's not effective for new solutions.
         $settingFileContent -f $repoDirectory | Out-File -Encoding "UTF8" $nugetConfigPath
-    
+
         $p = New-ConsoleApplication
-    
+
         $projectDirectoryPath = $p.Properties.Item("FullPath").Value
         $packagesConfigPath = Join-Path $projectDirectoryPath 'packages.config'
         $projectDirectoryPath = $p.Properties.Item("FullPath").Value
@@ -151,12 +151,12 @@ function Test-PackageNamespaceInstall-WithSingleFeed
 
         # Act
         $p | Install-Package SolutionLevelPkg -version 1.0.0
-    
+
         # Assert
         $packagesFolder = Join-Path $solutionDirectory "packages"
         $solutionLevelPkgNupkgFolder = Join-Path $packagesFolder "SolutionLevelPkg.1.0.0"
         Assert-PathExists(Join-Path $solutionLevelPkgNupkgFolder "SolutionLevelPkg.1.0.0.nupkg")
-        
+
         $errorlist = Get-Errors
         Assert-AreEqual 0 $errorlist.Count
     }
