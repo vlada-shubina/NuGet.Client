@@ -10,20 +10,20 @@ using NuGet.Common;
 using NuGet.Configuration;
 using NuGet.LibraryModel;
 using NuGet.Protocol.Core.Types;
-using NuGet.Shared;
 
 namespace NuGet.DependencyResolver
 {
     public class RemoteWalkContext
     {
-        public RemoteWalkContext(SourceCacheContext cacheContext, PackageNamespacesConfiguration packageNamespaces, ILogger logger)
+        public RemoteWalkContext(SourceCacheContext cacheContext, IReadOnlyList<IRemoteDependencyProvider> remoteDependencyProviders,
+            PackageNamespacesConfiguration packageNamespaces, ILogger logger)
         {
             CacheContext = cacheContext ?? throw new ArgumentNullException(nameof(cacheContext));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             ProjectLibraryProviders = new List<IDependencyProvider>();
             LocalLibraryProviders = new List<IRemoteDependencyProvider>();
-            RemoteLibraryProviders = new List<IRemoteDependencyProvider>();
+            RemoteLibraryProviders = remoteDependencyProviders ?? new List<IRemoteDependencyProvider>();
             PackageNamespaces = packageNamespaces ?? throw new ArgumentNullException(nameof(packageNamespaces));
 
             FindLibraryEntryCache = new ConcurrentDictionary<LibraryRangeCacheKey, Task<GraphItem<RemoteResolveResult>>>();
@@ -35,7 +35,7 @@ namespace NuGet.DependencyResolver
         public ILogger Logger { get; }
         public IList<IDependencyProvider> ProjectLibraryProviders { get; }
         public IList<IRemoteDependencyProvider> LocalLibraryProviders { get; }
-        public IList<IRemoteDependencyProvider> RemoteLibraryProviders { get; }
+        private IReadOnlyList<IRemoteDependencyProvider> RemoteLibraryProviders { get; }
         public PackageNamespacesConfiguration PackageNamespaces { get; }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace NuGet.DependencyResolver
         /// </summary>
         /// <param name="libraryRange"></param>
         /// <returns>Returns a subset of sources when namespaces are configured otherwise returns all the sources</returns>
-        public IList<IRemoteDependencyProvider> FilterDependencyProvidersForLibrary(LibraryRange libraryRange)
+        public IReadOnlyList<IRemoteDependencyProvider> FilterDependencyProvidersForLibrary(LibraryRange libraryRange)
         {
             if (libraryRange == default)
                 throw new ArgumentNullException(nameof(libraryRange));
@@ -73,7 +73,7 @@ namespace NuGet.DependencyResolver
                     return Array.Empty<IRemoteDependencyProvider>();
                 }
 
-                return RemoteLibraryProviders.Where(p => sources.Contains(p.Source.Name)).AsList();
+                return RemoteLibraryProviders.Where(p => sources.Contains(p.Source.Name)).ToList();
             }
             return RemoteLibraryProviders;
         }

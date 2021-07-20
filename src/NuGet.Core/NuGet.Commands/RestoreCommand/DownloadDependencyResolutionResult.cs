@@ -6,30 +6,31 @@ using System.Collections.Generic;
 using NuGet.DependencyResolver;
 using NuGet.Frameworks;
 using NuGet.LibraryModel;
+using NuGet.Shared;
 
 namespace NuGet.Commands
 {
-    public class DownloadDependencyResolutionResult
+    internal class DownloadDependencyResolutionResult
     {
         /// <summary>
         /// The framework for which the resolution happened.
         /// </summary>
-        public NuGetFramework Framework { get; }
+        internal NuGetFramework Framework { get; }
 
         /// <summary>
         /// A list of library ranges and the dependencies.
         /// </summary>
-        public IList<Tuple<LibraryRange, RemoteMatch>> Dependencies { get; }
+        internal IList<Tuple<LibraryRange, RemoteMatch>> Dependencies { get; }
 
         /// <summary>
         /// The set of matches that are being installed.
         /// </summary>
-        public ISet<RemoteMatch> Install { get; }
+        internal ISet<RemoteMatch> Install { get; }
 
         /// <summary>
         /// A set of unresolved library ranges.
         /// </summary>
-        public ISet<LibraryRange> Unresolved { get; }
+        internal ISet<LibraryRange> Unresolved { get; }
 
 
         private DownloadDependencyResolutionResult(NuGetFramework framework, IList<Tuple<LibraryRange, RemoteMatch>> dependencies, ISet<RemoteMatch> install, ISet<LibraryRange> unresolved)
@@ -40,7 +41,7 @@ namespace NuGet.Commands
             Unresolved = unresolved ?? throw new ArgumentNullException(nameof(unresolved));
         }
 
-        public static DownloadDependencyResolutionResult Create(NuGetFramework framework, IList<Tuple<LibraryRange, RemoteMatch>> dependencies, IList<IRemoteDependencyProvider> remoteDependencyProviders)
+        public static DownloadDependencyResolutionResult Create(NuGetFramework framework, IList<Tuple<LibraryRange, RemoteMatch>> dependencies, RemoteWalkContext context)
         {
             var install = new HashSet<RemoteMatch>();
             var unresolved = new HashSet<LibraryRange>();
@@ -54,8 +55,8 @@ namespace NuGet.Commands
                 else if (LibraryType.Package == dependency.Item2.Library.Type)
                 {
 
-                    var isRemote = remoteDependencyProviders.Contains(dependency.Item2.Provider);
-                    if (isRemote)
+                    var isRemote = context?.FilterDependencyProvidersForLibrary(dependency.Item1).AsList().Contains(dependency.Item2.Provider);
+                    if (isRemote == true)
                     {
                         install.Add(dependency.Item2);
                     }

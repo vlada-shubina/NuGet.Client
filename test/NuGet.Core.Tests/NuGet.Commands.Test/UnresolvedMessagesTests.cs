@@ -444,9 +444,9 @@ namespace NuGet.Commands.Test
             var token = CancellationToken.None;
             var logger = new TestLogger();
             var provider = GetProvider("http://nuget.org/a/", versions);
-            var cacheContext = new Mock<SourceCacheContext>();
-            var remoteWalkContext = new RemoteWalkContext(cacheContext.Object, PackageNamespacesConfiguration.GetPackageNamespacesConfiguration(NullSettings.Instance), NullLogger.Instance);
+            var cacheContext = new Mock<SourceCacheContext>();            
             var remoteLibraryProviders = new List<IRemoteDependencyProvider>() { provider.Object };
+            var remoteWalkContext = new RemoteWalkContext(cacheContext.Object, remoteLibraryProviders, PackageNamespacesConfiguration.GetPackageNamespacesConfiguration(NullSettings.Instance), NullLogger.Instance);
             var targetGraphName = "abc";
 
             var message = await UnresolvedMessages.GetMessageAsync(targetGraphName, range, remoteLibraryProviders, cacheContext.Object, logger, token);

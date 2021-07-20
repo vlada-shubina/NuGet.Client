@@ -43,7 +43,7 @@ namespace NuGet.DependencyResolver
             GraphItem<RemoteResolveResult> graphItem = null;
             var currentCacheContext = context.CacheContext;
 
-            IList<IRemoteDependencyProvider> remoteDependencyProviders = context.FilterDependencyProvidersForLibrary(libraryRange);
+            IReadOnlyList<IRemoteDependencyProvider> remoteDependencyProviders = context.FilterDependencyProvidersForLibrary(libraryRange);
             LogSourcesIfPackageNamespacesAreEnabled(libraryRange.Name, context, remoteDependencyProviders);
 
             // Try up to two times to get the package. The second
@@ -233,7 +233,7 @@ namespace NuGet.DependencyResolver
 
         private static async Task<Tuple<LibraryRange, RemoteMatch>> ResolvePackageLibraryMatchAsync(LibraryRange libraryRange, RemoteWalkContext remoteWalkContext, CancellationToken cancellationToken)
         {
-            IList<IRemoteDependencyProvider> remoteDependencyProviders = remoteWalkContext.FilterDependencyProvidersForLibrary(libraryRange);
+            IReadOnlyList<IRemoteDependencyProvider> remoteDependencyProviders = remoteWalkContext.FilterDependencyProvidersForLibrary(libraryRange);
             LogSourcesIfPackageNamespacesAreEnabled(libraryRange.Name, remoteWalkContext, remoteDependencyProviders);
 
             var match = await FindPackageLibraryMatchAsync(libraryRange, NuGetFramework.AnyFramework, remoteDependencyProviders, remoteWalkContext.LocalLibraryProviders, remoteWalkContext.CacheContext, remoteWalkContext.Logger, cancellationToken);
@@ -503,7 +503,7 @@ namespace NuGet.DependencyResolver
             };
         }
 
-        private static void LogSourcesIfPackageNamespacesAreEnabled(string packageName, RemoteWalkContext context, IList<IRemoteDependencyProvider> remoteDependencyProviders)
+        private static void LogSourcesIfPackageNamespacesAreEnabled(string packageName, RemoteWalkContext context, IReadOnlyList<IRemoteDependencyProvider> remoteDependencyProviders)
         {
             if (context.PackageNamespaces?.AreNamespacesEnabled == true)
             {

@@ -237,11 +237,6 @@ NuGet.Commands.DisableSourceArgs.DisableSourceArgs() -> void
 NuGet.Commands.DisableSourceArgs.Name.get -> string
 NuGet.Commands.DisableSourceArgs.Name.set -> void
 NuGet.Commands.DisableSourceRunner
-NuGet.Commands.DownloadDependencyResolutionResult
-NuGet.Commands.DownloadDependencyResolutionResult.Dependencies.get -> System.Collections.Generic.IList<System.Tuple<NuGet.LibraryModel.LibraryRange, NuGet.DependencyResolver.RemoteMatch>>
-NuGet.Commands.DownloadDependencyResolutionResult.Framework.get -> NuGet.Frameworks.NuGetFramework
-NuGet.Commands.DownloadDependencyResolutionResult.Install.get -> System.Collections.Generic.ISet<NuGet.DependencyResolver.RemoteMatch>
-NuGet.Commands.DownloadDependencyResolutionResult.Unresolved.get -> System.Collections.Generic.ISet<NuGet.LibraryModel.LibraryRange>
 NuGet.Commands.EnableSourceArgs
 NuGet.Commands.EnableSourceArgs.Configfile.get -> string
 NuGet.Commands.EnableSourceArgs.Configfile.set -> void
@@ -1072,7 +1067,6 @@ static NuGet.Commands.DiagnosticUtility.FormatIdentity(NuGet.LibraryModel.Librar
 static NuGet.Commands.DiagnosticUtility.GetMultiLineMessage(System.Collections.Generic.IEnumerable<string> lines) -> string
 static NuGet.Commands.DiagnosticUtility.MergeOnTargetGraph(System.Collections.Generic.IEnumerable<NuGet.Common.RestoreLogMessage> messages) -> System.Collections.Generic.IEnumerable<NuGet.Common.RestoreLogMessage>
 static NuGet.Commands.DisableSourceRunner.Run(NuGet.Commands.DisableSourceArgs args, System.Func<NuGet.Common.ILogger> getLogger) -> void
-static NuGet.Commands.DownloadDependencyResolutionResult.Create(NuGet.Frameworks.NuGetFramework framework, System.Collections.Generic.IList<System.Tuple<NuGet.LibraryModel.LibraryRange, NuGet.DependencyResolver.RemoteMatch>> dependencies, System.Collections.Generic.IList<NuGet.DependencyResolver.IRemoteDependencyProvider> remoteDependencyProviders) -> NuGet.Commands.DownloadDependencyResolutionResult
 static NuGet.Commands.EnableSourceRunner.Run(NuGet.Commands.EnableSourceArgs args, System.Func<NuGet.Common.ILogger> getLogger) -> void
 static NuGet.Commands.IndexedRestoreTargetGraph.Create(NuGet.Commands.IRestoreTargetGraph graph) -> NuGet.Commands.IndexedRestoreTargetGraph
 static NuGet.Commands.ListClientCertRunner.Run(NuGet.Commands.ListClientCertArgs args, System.Func<NuGet.Common.ILogger> getLogger) -> void

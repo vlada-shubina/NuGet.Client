@@ -39,9 +39,12 @@ namespace NuGet.DependencyResolver.Core.Tests
                 Version = new NuGetVersion("1.0.0")
             });
 
-            var context = new TestRemoteWalkContext();
-            context.RemoteLibraryProviders.Add(slowProvider);
-            context.RemoteLibraryProviders.Add(fastProvider);
+            var remoteLibraryProviders = new List<IRemoteDependencyProvider>
+            {
+                slowProvider,
+                fastProvider
+            };
+            var context = new TestRemoteWalkContext(remoteLibraryProviders);
 
             var walker = new RemoteDependencyWalker(context);
             var result = await walker.WalkAsync(new LibraryRange
@@ -79,9 +82,12 @@ namespace NuGet.DependencyResolver.Core.Tests
                 Version = new NuGetVersion("1.1.0")
             });
 
-            var context = new TestRemoteWalkContext();
-            context.RemoteLibraryProviders.Add(slowProvider);
-            context.RemoteLibraryProviders.Add(fastProvider);
+            var remoteLibraryProviders = new List<IRemoteDependencyProvider>
+            {
+                slowProvider,
+                fastProvider
+            };
+            var context = new TestRemoteWalkContext(remoteLibraryProviders);
 
             var walker = new RemoteDependencyWalker(context);
             var result = await walker.WalkAsync(new LibraryRange

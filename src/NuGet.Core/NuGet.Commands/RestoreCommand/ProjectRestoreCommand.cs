@@ -221,14 +221,14 @@ namespace NuGet.Commands
             return null;
         }
 
-        private async Task<DownloadDependencyResolutionResult> ResolveDownloadDependenciesAsync(RemoteWalkContext context, ConcurrentDictionary<LibraryRange, Task<Tuple<LibraryRange, RemoteMatch>>> downloadDependenciesCache, TargetFrameworkInformation targetFrameworkInformation, CancellationToken token)
+        private static async Task<DownloadDependencyResolutionResult> ResolveDownloadDependenciesAsync(RemoteWalkContext context, ConcurrentDictionary<LibraryRange, Task<Tuple<LibraryRange, RemoteMatch>>> downloadDependenciesCache, TargetFrameworkInformation targetFrameworkInformation, CancellationToken token)
         {
             var packageDownloadTasks = targetFrameworkInformation.DownloadDependencies.Select(downloadDependency =>
             ResolverUtility.FindPackageLibraryMatchCachedAsync(downloadDependenciesCache, downloadDependency, context, token));
 
             var packageDownloadMatches = await Task.WhenAll(packageDownloadTasks);
 
-            return DownloadDependencyResolutionResult.Create(targetFrameworkInformation.FrameworkName, packageDownloadMatches, context.RemoteLibraryProviders);
+            return DownloadDependencyResolutionResult.Create(targetFrameworkInformation.FrameworkName, packageDownloadMatches, context);
         }
 
         private Task<RestoreTargetGraph> WalkDependenciesAsync(LibraryRange projectRange,

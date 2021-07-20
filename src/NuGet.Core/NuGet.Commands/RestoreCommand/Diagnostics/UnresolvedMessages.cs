@@ -13,6 +13,7 @@ using NuGet.Configuration;
 using NuGet.DependencyResolver;
 using NuGet.LibraryModel;
 using NuGet.Protocol.Core.Types;
+using NuGet.Shared;
 using NuGet.Versioning;
 
 namespace NuGet.Commands
@@ -60,7 +61,7 @@ namespace NuGet.Commands
         /// </summary>
         internal static async Task<RestoreLogMessage> GetMessageAsync(string targetGraphName,
             LibraryRange unresolved,
-            IList<IRemoteDependencyProvider> remoteLibraryProviders,
+            IReadOnlyList<IRemoteDependencyProvider> remoteLibraryProviders,
             SourceCacheContext sourceCacheContext,
             ILogger logger,
             CancellationToken token)
@@ -201,7 +202,7 @@ namespace NuGet.Commands
         internal static async Task<List<KeyValuePair<PackageSource, SortedSet<NuGetVersion>>>> GetSourceInfosForIdAsync(
             string id,
             VersionRange range,
-            IList<IRemoteDependencyProvider> remoteLibraryProviders,
+            IReadOnlyList<IRemoteDependencyProvider> remoteLibraryProviders,
             SourceCacheContext sourceCacheContext,
             ILogger logger,
             CancellationToken token)

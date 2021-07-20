@@ -18,7 +18,7 @@ namespace NuGet.DependencyResolver.Core.Tests
         [Fact]
         public void FilterDependencyProvidersForLibrary_WhenLibraryRangeIsNull_Throws()
         {
-            var context = new TestRemoteWalkContext();
+            var context = new TestRemoteWalkContext(remoteLibraryProviders: null);
 
             Assert.Throws<ArgumentNullException>(() => context.FilterDependencyProvidersForLibrary(libraryRange: null));
         }
@@ -26,22 +26,23 @@ namespace NuGet.DependencyResolver.Core.Tests
         [Fact]
         public void FilterDependencyProvidersForLibrary_WhenPackageNamespacesAreNotConfiguredReturnsAllProviders_Success()
         {
-            var context = new TestRemoteWalkContext();
+            var remoteLibraryProviders = new List<IRemoteDependencyProvider>();
 
             // Source1
             var remoteProvider1 = CreateRemoteDependencyProvider("Source1");
-            context.RemoteLibraryProviders.Add(remoteProvider1.Object);
+            remoteLibraryProviders.Add(remoteProvider1.Object);
 
             // Source2
             var remoteProvider2 = CreateRemoteDependencyProvider("Source2");
-            context.RemoteLibraryProviders.Add(remoteProvider2.Object);
+            remoteLibraryProviders.Add(remoteProvider2.Object);
 
             var libraryRange = new LibraryRange("packageA", Versioning.VersionRange.None, LibraryDependencyTarget.Package);
+            var context = new TestRemoteWalkContext(remoteLibraryProviders);
 
-            IList<IRemoteDependencyProvider> providers = context.FilterDependencyProvidersForLibrary(libraryRange);
+            IReadOnlyList<IRemoteDependencyProvider> providers = context.FilterDependencyProvidersForLibrary(libraryRange);
 
             Assert.Equal(2, providers.Count);
-            Assert.Equal(context.RemoteLibraryProviders, providers);
+            Assert.Equal(remoteLibraryProviders, providers);
         }
 
         [Fact]
@@ -52,20 +53,20 @@ namespace NuGet.DependencyResolver.Core.Tests
             namespaces.Add("Source1", new List<string>() { "x" });
             namespaces.Add("Source2", new List<string>() { "y" });
             PackageNamespacesConfiguration namespacesConfiguration = new(namespaces);
-
-            var context = new TestRemoteWalkContext(namespacesConfiguration, NullLogger.Instance);
+            var remoteLibraryProviders = new List<IRemoteDependencyProvider>();
 
             // Source1
             var remoteProvider1 = CreateRemoteDependencyProvider("Source1");
-            context.RemoteLibraryProviders.Add(remoteProvider1.Object);
+            remoteLibraryProviders.Add(remoteProvider1.Object);
 
             // Source2
             var remoteProvider2 = CreateRemoteDependencyProvider("Source2");
-            context.RemoteLibraryProviders.Add(remoteProvider2.Object);
+            remoteLibraryProviders.Add(remoteProvider2.Object);
 
             var libraryRange = new LibraryRange("x", Versioning.VersionRange.None, LibraryDependencyTarget.Package);
+            var context = new TestRemoteWalkContext(remoteLibraryProviders, namespacesConfiguration, NullLogger.Instance);
 
-            IList<IRemoteDependencyProvider> providers = context.FilterDependencyProvidersForLibrary(libraryRange);
+            IReadOnlyList<IRemoteDependencyProvider> providers = context.FilterDependencyProvidersForLibrary(libraryRange);
 
             Assert.Equal(1, providers.Count);
             Assert.Equal("Source1", providers[0].Source.Name);
@@ -81,20 +82,20 @@ namespace NuGet.DependencyResolver.Core.Tests
             namespaces.Add("Source1", new List<string>() { "y" });
             namespaces.Add("Source2", new List<string>() { "z" });
             PackageNamespacesConfiguration namespacesConfiguration = new(namespaces);
-
-            var context = new TestRemoteWalkContext(namespacesConfiguration, logger);
+            var remoteLibraryProviders = new List<IRemoteDependencyProvider>();
 
             // Source1
             var remoteProvider1 = CreateRemoteDependencyProvider("Source1");
-            context.RemoteLibraryProviders.Add(remoteProvider1.Object);
+            remoteLibraryProviders.Add(remoteProvider1.Object);
 
             // Source2
             var remoteProvider2 = CreateRemoteDependencyProvider("Source2");
-            context.RemoteLibraryProviders.Add(remoteProvider2.Object);
+            remoteLibraryProviders.Add(remoteProvider2.Object);
 
             var libraryRange = new LibraryRange("x", Versioning.VersionRange.None, LibraryDependencyTarget.Package);
+            var context = new TestRemoteWalkContext(remoteLibraryProviders, namespacesConfiguration, logger);
 
-            IList<IRemoteDependencyProvider> providers = context.FilterDependencyProvidersForLibrary(libraryRange);
+            IReadOnlyList<IRemoteDependencyProvider> providers = context.FilterDependencyProvidersForLibrary(libraryRange);
 
             Assert.Empty(providers);
         }

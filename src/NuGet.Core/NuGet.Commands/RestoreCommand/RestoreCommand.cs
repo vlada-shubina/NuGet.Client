@@ -1165,17 +1165,13 @@ namespace NuGet.Commands
         {
             var context = new RemoteWalkContext(
                 request.CacheContext,
+                request.DependencyProviders.RemoteProviders,
                 request.PackageNameSpaces,
                 logger);
 
             foreach (var provider in request.DependencyProviders.LocalProviders)
             {
                 context.LocalLibraryProviders.Add(provider);
-            }
-
-            foreach (var provider in request.DependencyProviders.RemoteProviders)
-            {
-                context.RemoteLibraryProviders.Add(provider);
             }
 
             // Determine if the targets and props files should be written out.

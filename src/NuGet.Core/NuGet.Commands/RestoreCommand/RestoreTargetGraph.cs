@@ -166,7 +166,7 @@ namespace NuGet.Commands
                     // If the package came from a remote library provider, it needs to be installed locally
                     // Rejected nodes are included here to avoid downloading them from remote sources
                     // each time the lock file is generated.
-                    var isRemote = context.RemoteLibraryProviders.Contains(node.Item.Data.Match.Provider);
+                    var isRemote = context.FilterDependencyProvidersForLibrary(node.Key).Contains(node.Item.Data.Match.Provider);
                     if (isRemote)
                     {
                         install.Add(node.Item.Data.Match);
