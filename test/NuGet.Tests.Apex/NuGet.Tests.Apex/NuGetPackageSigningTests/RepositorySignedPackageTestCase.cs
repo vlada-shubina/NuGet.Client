@@ -25,7 +25,7 @@ namespace NuGet.Tests.Apex
             _fixture = apexSigningFixture;
         }
 
-        [CIOnlyNuGetWpfTheory]
+        [CIOnlyNuGetWpfTheory(Timeout = 1000)]
         [MemberData(nameof(GetPackagesConfigTemplates))]
         public async Task InstallFromPMCForPC_SucceedAsync(ProjectTemplate projectTemplate)
         {
@@ -46,7 +46,7 @@ namespace NuGet.Tests.Apex
             }
         }
 
-        [CIOnlyNuGetWpfTheory]
+        [CIOnlyNuGetWpfTheory(Timeout = 1000)]
         [MemberData(nameof(GetPackagesConfigTemplates))]
         public async Task UninstallFromPMCForPC_SucceedAsync(ProjectTemplate projectTemplate)
         {
@@ -68,7 +68,7 @@ namespace NuGet.Tests.Apex
             }
         }
 
-        [CIOnlyNuGetWpfTheory]
+        [CIOnlyNuGetWpfTheory(Timeout = 1000)]
         [MemberData(nameof(GetPackagesConfigTemplates))]
         public async Task UpdateUnsignedToSignedVersionFromPMCForPC_SucceedAsync(ProjectTemplate projectTemplate)
         {
@@ -92,7 +92,7 @@ namespace NuGet.Tests.Apex
             }
         }
 
-        [CIOnlyNuGetWpfTheory]
+        [CIOnlyNuGetWpfTheory(Timeout = 1000)]
         [MemberData(nameof(GetPackagesConfigTemplates))]
         public async Task WithExpiredCertificate_InstallFromPMCForPC_WarnAsync(ProjectTemplate projectTemplate)
         {
@@ -122,7 +122,7 @@ namespace NuGet.Tests.Apex
             }
         }
 
-        [CIOnlyNuGetWpfTheory]
+        [CIOnlyNuGetWpfTheory(Timeout = 1000)]
         [MemberData(nameof(GetPackagesConfigTemplates))]
         public async Task Tampered_InstallFromPMCForPC_FailAsync(ProjectTemplate projectTemplate)
         {
