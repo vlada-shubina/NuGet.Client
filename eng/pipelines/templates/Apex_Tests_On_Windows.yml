@@ -61,37 +61,71 @@ steps:
     command: "custom"
     arguments: "sources add -Name ApexFeed -Source $(ApexPackageFeedUrl) -UserName $(ApexPackageFeedUsername) -Password $(ApexPackageFeedPassword) -ConfigFile $(System.DefaultWorkingDirectory)\\NuGet.config"
 
-- task: MSBuild@1
+# - task: MSBuild@1
+#   displayName: "Restore Apex Tests"
+#   inputs:
+#     solution: "build\\build.proj"
+#     configuration: "$(BuildConfiguration)"
+#     # Set MSBuildEnableWorkloadResolver to work around https://github.com/dotnet/sdk/issues/17461
+#     msbuildArguments: "/t:RestoreApex /p:BuildNumber=$(BuildNumber) /p:MSBuildEnableWorkloadResolver=false"
+- task: PowerShell@1
   displayName: "Restore Apex Tests"
   inputs:
-    solution: "build\\build.proj"
-    configuration: "$(BuildConfiguration)"
-    # Set MSBuildEnableWorkloadResolver to work around https://github.com/dotnet/sdk/issues/17461
-    msbuildArguments: "/t:RestoreApex /p:BuildNumber=$(BuildNumber) /p:MSBuildEnableWorkloadResolver=false"
+    scriptType: "inlineScript"
+    inlineScript: |
+      dotnet restore $(Build.Repository.LocalPath)\\test\\NuGet.Tests.Apex\\NuGet.Console.TestContract\\NuGet.Console.TestContract.csproj -v d
+      dotnet restore $(Build.Repository.LocalPath)\\test\\NuGet.Tests.Apex\\NuGet.PackageManagement.UI.TestContract\\NuGet.PackageManagement.UI.TestContract.csproj -v d
+      dotnet restore $(Build.Repository.LocalPath)\\test\\NuGet.Tests.Apex\\NuGet.Tests.Apex\\NuGet.Tests.Apex.csproj -v d
 
-- task: MSBuild@1
+- task: PowerShell@1
+  displayName: "Build Apex Tests"
+  inputs:
+    scriptType: "inlineScript"
+    inlineScript: |
+      dotnet build $(Build.Repository.LocalPath)\\test\\NuGet.Tests.Apex\\NuGet.Tests.Apex\\NuGet.Tests.Apex.csproj -v d
+
+# - task: MSBuild@1
+#   displayName: "Run Apex Tests (continue on error)"
+#   timeoutInMinutes: 120
+#   continueOnError: "true"
+#   inputs:
+#     solution: "build\\build.proj"
+#     configuration: "$(BuildConfiguration)"
+#     # Set MSBuildEnableWorkloadResolver to work around https://github.com/dotnet/sdk/issues/17461
+#     msbuildArguments: "/t:ApexTestsStandalone /p:TestResultOutputFormat=xml /p:BuildNumber=$(BuildNumber) /p:MSBuildEnableWorkloadResolver=false"
+#     maximumCpuCount: true
+#   condition: "and(succeeded(), eq(variables['IsOfficialBuild'], 'true'))"
+
+# - task: MSBuild@1
+#   displayName: "Run Apex Tests (stop on error)"
+#   timeoutInMinutes: 120
+#   continueOnError: "false"
+#   inputs:
+#     solution: "build\\build.proj"
+#     configuration: "$(BuildConfiguration)"
+#     # Set MSBuildEnableWorkloadResolver to work around https://github.com/dotnet/sdk/issues/17461
+#     msbuildArguments: "/t:ApexTestsStandalone /p:TestResultOutputFormat=xml /p:BuildNumber=$(BuildNumber) /p:MSBuildEnableWorkloadResolver=false"
+#     maximumCpuCount: true
+#   condition: "and(succeeded(), not(eq(variables['IsOfficialBuild'], 'true')))"
+- task: PowerShell@1
   displayName: "Run Apex Tests (continue on error)"
   timeoutInMinutes: 120
   continueOnError: "true"
   inputs:
-    solution: "build\\build.proj"
-    configuration: "$(BuildConfiguration)"
-    # Set MSBuildEnableWorkloadResolver to work around https://github.com/dotnet/sdk/issues/17461
-    msbuildArguments: "/t:ApexTestsStandalone /p:TestResultOutputFormat=xml /p:BuildNumber=$(BuildNumber) /p:MSBuildEnableWorkloadResolver=false"
-    maximumCpuCount: true
-  condition: "and(succeeded(), eq(variables['IsOfficialBuild'], 'true'))"
+    scriptType: "inlineScript"
+    inlineScript: |
+      dotnet test $(Build.Repository.LocalPath)\\test\\NuGet.Tests.Apex\\NuGet.Tests.Apex\\NuGet.Tests.Apex.csproj --test-adapter-path:$(Build.Repository.LocalPath)\\packages\\xunitxml.testlogger\\2.0.0\\build\\_common --logger:"xunit;LogFileName=ApexTests-vsts.xml" --logger:"console;verbosity=detailed" --settings:$(Build.Repository.LocalPath)\\build\\xunit.runsettings
+    condition: "and(succeeded(), eq(variables['IsOfficialBuild'], 'true'))"
 
-- task: MSBuild@1
+- task: PowerShell@1
   displayName: "Run Apex Tests (stop on error)"
   timeoutInMinutes: 120
   continueOnError: "false"
   inputs:
-    solution: "build\\build.proj"
-    configuration: "$(BuildConfiguration)"
-    # Set MSBuildEnableWorkloadResolver to work around https://github.com/dotnet/sdk/issues/17461
-    msbuildArguments: "/t:ApexTestsStandalone /p:TestResultOutputFormat=xml /p:BuildNumber=$(BuildNumber) /p:MSBuildEnableWorkloadResolver=false"
-    maximumCpuCount: true
-  condition: "and(succeeded(), not(eq(variables['IsOfficialBuild'], 'true')))"
+    scriptType: "inlineScript"
+    inlineScript: |
+      dotnet test $(Build.Repository.LocalPath)\\test\\NuGet.Tests.Apex\\NuGet.Tests.Apex\\NuGet.Tests.Apex.csproj --test-adapter-path:$(Build.Repository.LocalPath)\\packages\\xunitxml.testlogger\\2.0.0\\build\\_common --logger:"xunit;LogFileName=ApexTests-vsts.xml" --logger:"console;verbosity=detailed" --settings:$(Build.Repository.LocalPath)\\build\\xunit.runsettings
+    condition: "and(succeeded(), not(eq(variables['IsOfficialBuild'], 'true')))"
 
 - task: PublishTestResults@2
   displayName: "Publish Test Results"
