@@ -412,10 +412,10 @@
     </PropertyGroup>
 
     <!-- Desktop -->
-    <Message Text="Running $(DesktopTestCommand)"
+    <Message Text="Running $(VSTestCommand)"
           Condition=" '$(SkipDesktopAssemblies)' != 'true' AND '$(DesktopInputTestAssemblies)' != '' "/>
 
-    <Exec Command="$(DesktopTestCommand)"
+    <Exec Command="$(VSTestCommand)"
           ContinueOnError="true"
           EnvironmentVariables="VisualStudio.InstallationUnderTest.Path=$(VSINSTALLDIR)"
           Condition=" '$(SkipDesktopAssemblies)' != 'true' AND '$(DesktopInputTestAssemblies)' != '' ">
