@@ -77,7 +77,6 @@ steps:
     # Set MSBuildEnableWorkloadResolver to work around https://github.com/dotnet/sdk/issues/17461
     msbuildArguments: "/t:ApexTestsStandalone /p:TestResultOutputFormat=xml /p:BuildNumber=$(BuildNumber) /p:MSBuildEnableWorkloadResolver=false"
     maximumCpuCount: true
-  condition: "and(succeeded(), eq(variables['IsOfficialBuild'], 'true'))"
 
 # - task: MSBuild@1
 #   displayName: "Run Apex Tests (continue on error)"
@@ -109,7 +108,7 @@ steps:
   inputs:
     scriptType: "inlineScript"
     inlineScript: |
-      dotnet test $(Build.Repository.LocalPath)\test\NuGet.Tests.Apex\NuGet.Tests.Apex\bin\$(BuildConfiguration)\NuGet.Tests.Apex.dll --test-adapter-path:$(Build.Repository.LocalPath)\\packages\\xunitxml.testlogger\\2.0.0\\build\\_common --logger:"xunit;LogFileName=ApexTests-vsts.xml" --logger:"console;verbosity=detailed" --settings:$(Build.Repository.LocalPath)\\build\\xunit.runsettings
+      dotnet test $(Build.Repository.LocalPath)\test\NuGet.Tests.Apex\NuGet.Tests.Apex\bin\$(BuildConfiguration)\NuGet.Tests.Apex.dll --test-adapter-path:$(Build.Repository.LocalPath)\packages\xunitxml.testlogger\2.0.0\build\_common --logger:"xunit;LogFileName=ApexTests-vsts.xml" --logger:"console;verbosity=detailed"
     condition: "and(succeeded(), eq(variables['IsOfficialBuild'], 'true'))"
 
 - task: PowerShell@1
@@ -119,7 +118,7 @@ steps:
   inputs:
     scriptType: "inlineScript"
     inlineScript: |
-      dotnet test $(Build.Repository.LocalPath)\test\NuGet.Tests.Apex\NuGet.Tests.Apex\bin\$(BuildConfiguration)\NuGet.Tests.Apex.dll --test-adapter-path:$(Build.Repository.LocalPath)\\packages\\xunitxml.testlogger\\2.0.0\\build\\_common --logger:"xunit;LogFileName=ApexTests-vsts.xml" --logger:"console;verbosity=detailed" --settings:$(Build.Repository.LocalPath)\\build\\xunit.runsettings
+      dotnet test $(Build.Repository.LocalPath)\test\NuGet.Tests.Apex\NuGet.Tests.Apex\bin\$(BuildConfiguration)\NuGet.Tests.Apex.dll --test-adapter-path:$(Build.Repository.LocalPath)\packages\xunitxml.testlogger\2.0.0\build\_common --logger:"xunit;LogFileName=ApexTests-vsts.xml" --logger:"console;verbosity=detailed"
     condition: "and(succeeded(), not(eq(variables['IsOfficialBuild'], 'true')))"
 
 - task: PublishTestResults@2
