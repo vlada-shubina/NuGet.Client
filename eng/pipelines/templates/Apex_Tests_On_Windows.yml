@@ -75,7 +75,7 @@ steps:
     solution: "$(Build.Repository.LocalPath)\\test\\NuGet.Tests.Apex\\NuGet.Tests.Apex\\NuGet.Tests.Apex.csproj"
     configuration: "$(BuildConfiguration)"
     # Set MSBuildEnableWorkloadResolver to work around https://github.com/dotnet/sdk/issues/17461
-    msbuildArguments: "/t:ApexTestsStandalone /p:TestResultOutputFormat=xml /p:BuildNumber=$(BuildNumber) /p:MSBuildEnableWorkloadResolver=false"
+    msbuildArguments: "-t:build"
     maximumCpuCount: true
 
 # - task: MSBuild@1
