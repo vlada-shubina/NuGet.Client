@@ -1,4 +1,4 @@
-<Project>
+﻿<Project>
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), 'README.md'))\build\common.props" />
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
@@ -9,12 +9,14 @@
     <AssemblyName>Plugin.Testable</AssemblyName>
     <NoWarn>$(NoWarn);CS1701</NoWarn>
     <Description>A sample cross platform plugin used for end-to-end tests.</Description>
+    <SystemPackagesVersion>"2.0.0"</SystemPackagesVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="$(NuGetCoreSrcDirectory)NuGet.Protocol\NuGet.Protocol.csproj" />
     <ProjectReference Include="$(NuGetCoreSrcDirectory)NuGet.Versioning\NuGet.Versioning.csproj" />
   </ItemGroup>
+
 
   <ItemGroup Condition="'$(IsCore)' == 'true'">
     <PackageReference Include="System.Collections" Version="$(SystemPackagesVersion)" />
