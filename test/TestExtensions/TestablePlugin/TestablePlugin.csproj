@@ -1,4 +1,4 @@
-<Project>
+﻿<Project>
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), 'README.md'))\build\common.props" />
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
@@ -9,6 +9,7 @@
     <AssemblyName>Plugin.Testable</AssemblyName>
     <NoWarn>$(NoWarn);CS1701</NoWarn>
     <Description>A sample cross platform plugin used for end-to-end tests.</Description>
+    <SystemPackagesVersion>4.3.0</SystemPackagesVersion>
   </PropertyGroup>
 
   <ItemGroup>
