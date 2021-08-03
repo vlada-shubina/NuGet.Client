@@ -92,15 +92,6 @@ DisableTextTemplateSecurityWarning $VSVersion
 SuppressNuGetUI -registryValueName 'DoNotShowPreviewWindow'
 SuppressNuGetUI -registryValueName 'SuppressUILegalDisclaimer'
 
-$net35x86 = "C:\windows\Microsoft.NET\Framework\v3.5\msbuild.exe"
-$net35x64 = "C:\windows\Microsoft.NET\Framework64\v3.5\msbuild.exe"
-
-if (!(Test-Path $net35x86) -or !(Test-Path $net35x64))
-{
-    Write-Host -ForegroundColor Yellow 'WARNING: .NET 3.5 is not installed on the machine. Please install'
-    exit 1
-}
-
 EnableWindowsDeveloperMode
 Set-VSINSTALLDIR
 
