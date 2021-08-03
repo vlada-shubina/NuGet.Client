@@ -116,6 +116,14 @@ function LaunchVSAndWaitForDTE {
             return $dte2
         }
 
+        $process.Refresh();
+        if ($process.HasExited)
+        {
+            $message = "Process has unexpectedly exited"
+            Write-Error $message
+            throw $message
+        }
+
         $count++
     }
 
