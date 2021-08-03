@@ -6,7 +6,8 @@ param (
     [Parameter(Mandatory = $true)]
     [int]$ProcessExitTimeoutInSeconds,
     [Parameter()]
-    [string]$VSInstanceId)
+    [string]$VSInstanceId,
+    [switch]$uninstall)
 
 . "$PSScriptRoot\VSUtils.ps1"
 
@@ -32,16 +33,18 @@ else {
     $VSInstance = Get-SpecificVSInstance $VSInstanceId
 }
 
-# Because we are upgrading an installed system component VSIX, we need to downgrade first.
-$numberOfTries = 0
-$success = $false
-do {
-    KillRunningInstancesOfVS $VSInstance
-    $numberOfTries++
-    Write-Host "Attempt # $numberOfTries to downgrade VSIX..."
-    $success = DowngradeVSIX $VSInstance $ProcessExitTimeoutInSeconds
+if ($uninstall) {
+    # Because we are upgrading an installed system component VSIX, we need to downgrade first.
+    $numberOfTries = 0
+    $success = $false
+    do {
+        KillRunningInstancesOfVS $VSInstance
+        $numberOfTries++
+        Write-Host "Attempt # $numberOfTries to downgrade VSIX..."
+        $success = DowngradeVSIX $VSInstance $ProcessExitTimeoutInSeconds
+    }
+    until (($success -eq $true) -or ($numberOfTries -gt 3))
 }
-until (($success -eq $true) -or ($numberOfTries -gt 3))
 
 # Clearing MEF cache helps load the right dlls for VSIX
 ClearMEFCache $VSInstance
