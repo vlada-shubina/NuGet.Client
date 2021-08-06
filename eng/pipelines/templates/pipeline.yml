@@ -148,7 +148,7 @@ stages:
     - template: Apex_Tests_On_Windows.yml
 
 - stage: Source_Build
-  dependsOn: Build_Insertable
+  dependsOn: Initialize
   jobs:
   - job: Build_Source_Build
     timeoutInMinutes: 120
