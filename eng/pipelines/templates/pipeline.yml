@@ -21,7 +21,7 @@ resources:
 variables:
   DOTNET_NOLOGO: 1
 
-pipeline:
+extends:
   - template: Initialize_Build.yml
   - template: Build_and_UnitTest.yml
   - template: Apex_Tests_On_Windows.yml
