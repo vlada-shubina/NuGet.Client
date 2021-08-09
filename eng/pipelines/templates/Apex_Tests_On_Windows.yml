@@ -1,4 +1,62 @@
-steps:
+parameters:
+- name: part
+  type: string
+- name: stageName
+  type: string
+- name: testMachineConfigurationJobName
+  type: string
+- name: testMachineDeploymentJobName
+  type: string
+- name: testExecutionJobName
+  type: string
+- name: testMachineCleanUpJobName
+  type: string
+- name: dependsOn
+  type: object
+- name: bootstrapperUrl
+  type: string
+- name: runSettingsURI
+  type: string
+- name: DartLabEnvironment
+  type: string
+- name: condition
+  type: string
+- name: variables
+  type: object
+- name: testExecutionJobTimeoutInMinutes
+  type: number
+
+- template: stages\visual-studio\base.yml@DartLabTemplates
+  parameters:
+    name: ${{parameters.stageName}}
+    condition: ${{parameters.condition}}
+    dependsOn: ${{parameters.dependsOn}}
+    testMachineConfigurationJobName: ${{parameters.testMachineConfigurationJobName}}
+    testMachineDeploymentJobName: ${{parameters.testMachineDeploymentJobName}}
+    testExecutionJobName: ${{parameters.testExecutionJobName}}
+    testExecutionJobTimeoutInMinutes: ${{parameters.testExecutionJobTimeoutInMinutes}}
+    testMachineCleanUpJobName: ${{parameters.testMachineCleanUpJobName}}
+    variables:
+    - name: bootstrapperUrl
+      value: ${{parameters.bootstrapperUrl}}
+    - name: runSettingsURI
+      value: ${{parameters.runSettingsURI}}
+    - name: Part
+      value: ${{parameters.part}}
+    - ${{parameters.variables}}
+    visualStudioBootstrapperURI: $(bootstrapperUrl)
+    visualStudioInstallationParameters: $(VisualStudio.InstallationUnderTest.SetupParameters)
+    testLabPoolName: VS-Platform
+    dartLabEnvironment: ${{parameters.DartLabEnvironment}}
+    visualStudioSigning: Test
+    preTestMachineConfigurationStepList:
+    - task: PowerShell@2
+      displayName: Set 'VisualStudio.InstallationUnderTest.SetupParameters'
+      inputs:
+        filePath: $(DartLab.Path)\Scripts\VisualStudio\Installation\Get-VisualStudioSetupParameters.ps1
+        arguments: -RunSettingsURI '$(runSettingsURI)' -InstallPath 'C:\Test\VisualStudio' -NoRestart -Quiet -Wait -OutVariableName 'VisualStudio.InstallationUnderTest.SetupParameters'
+
+deployAndRunTestsStepList:
 - checkout: self
   clean: true
   submodules: true
@@ -26,33 +84,20 @@ steps:
 - task: PowerShell@1
   displayName: "Bootstrap.ps1"
   inputs:
-    scriptName: "$(System.DefaultWorkingDirectory)/scripts/e2etests/Bootstrap.ps1"
+    scriptName: "$(System.DefaultWorkingDirectory)/artifacts/EndToEnd/scripts/Bootstrap.ps1"
     arguments: "-NuGetDropPath $(Build.Repository.LocalPath)\\artifacts\\VS15 -FuncTestRoot $(System.DefaultWorkingDirectory)\\artifacts -verbose"
 
 - task: PowerShell@1
   displayName: "SetupFunctionalTests.ps1"
   inputs:
-    scriptName: "$(System.DefaultWorkingDirectory)/scripts/e2etests/SetupFunctionalTests.ps1"
+    scriptName: "$(System.DefaultWorkingDirectory)/artifacts/EndToEnd/scripts/SetupFunctionalTests.ps1"
 
 - task: PowerShell@1
   displayName: "InstallNuGetVSIX.ps1"
   inputs:
-    scriptName: "$(System.DefaultWorkingDirectory)/scripts/e2etests/InstallNuGetVSIX.ps1"
+    scriptName: "$(System.DefaultWorkingDirectory)/artifacts/EndToEnd/scripts/InstallNuGetVSIX.ps1"
     arguments: "-NuGetDropPath $(Build.Repository.LocalPath)\\artifacts\\VS15 -FuncTestRoot $(System.DefaultWorkingDirectory)\\artifacts -ProcessExitTimeoutInSeconds 180"
     failOnStandardError: "false"
-
-# - task: PowerShell@1
-#   displayName: "Collect VS Logs"
-#   inputs:
-#     scriptType: "inlineScript"
-#     inlineScript: |
-#       Invoke-WebRequest -Uri $(CollectExeUrl) -OutFile $(System.DefaultWorkingDirectory)\\VSCollect.exe
-#       if(-not (Test-Path $(EndToEndResultsDropPath)))
-#         {
-#           New-Item -Path $(EndToEndResultsDropPath) -ItemType Directory -Force
-#         }
-#       $(System.DefaultWorkingDirectory)\\VSCollect.exe -zip:$(EndToEndResultsDropPath)\\apex-collectlogs.zip
-#   condition: "failed()"
 
 - task: NuGetCommand@2
   displayName: "Add Apex Feed Source"
