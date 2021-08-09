@@ -1,48 +1,67 @@
-steps:
-- task: PowerShell@1
-  displayName: "Check VSTS Personal Access Token"
-  inputs:
-    scriptType: "inlineScript"
-    inlineScript: |
-      . $(Build.Repository.LocalPath)\\scripts\\utils\\PostGitCommitStatus.ps1
-      CheckVstsPersonalAccessToken -VstsPersonalAccessToken $(System.AccessToken)
+stages:
+  - stage: Initialize
+    jobs:
+      - job: GetSemanticVersion
+        displayName: Get NuGet.Client semantic version
+        timeoutInMinutes: 10
+        pool:
+          vmImage: windows-latest
+        steps:
+          - template: Initialize_Build_SemanticVersion.yml
 
-- task: PowerShell@1
-  displayName: "Initialize Git Commit Status on GitHub"
-  inputs:
-    scriptType: "inlineScript"
-    inlineScript: |
-      . $(Build.Repository.LocalPath)\\scripts\\utils\\PostGitCommitStatus.ps1
-      InitializeAllTestsToPending -PersonalAccessToken $(NuGetLurkerPersonalAccessToken) -CommitSha $(Build.SourceVersion)
-  condition: "not(eq(variables['ManualGitHubChecks'], 'false'))"
+      - job: Initialize_Build
+        dependsOn: GetSemanticVersion
+        timeoutInMinutes: 10
+        variables:
+          SemanticVersion: $[dependencies.GetSemanticVersion.outputs['setsemanticversion.SemanticVersion']]
+          BuildRevision: $[counter(format('{0}.{1}', variables['SemanticVersion'], variables['build.definitionname']), 1)]
+        pool:
+          vmImage: windows-latest
+        steps:
+          - task: PowerShell@1
+            displayName: "Check VSTS Personal Access Token"
+            inputs:
+              scriptType: "inlineScript"
+              inlineScript: |
+                . $(Build.Repository.LocalPath)\\scripts\\utils\\PostGitCommitStatus.ps1
+                CheckVstsPersonalAccessToken -VstsPersonalAccessToken $(System.AccessToken)
 
-- task: PowerShell@1
-  displayName: "Update Build Number"
-  name: "updatebuildnumber"
-  inputs:
-    scriptType: "inlineScript"
-    inlineScript: |
-      try {
-        $FullBuildNumber = "$(SemanticVersion).$(BuildRevision)"
-        $msbuildExe = 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\bin\msbuild.exe'
-        $targetChannel = & $msbuildExe $env:BUILD_REPOSITORY_LOCALPATH\build\config.props /v:m /nologo /t:GetVsTargetChannel
-        $targetChannel = $targetChannel.Trim()
-        $targetMajorVersion = & $msbuildExe $env:BUILD_REPOSITORY_LOCALPATH\build\config.props /v:m /nologo /t:GetVsTargetMajorVersion
-        $targetMajorVersion = $targetMajorVersion.Trim()
-        Write-Host "##vso[task.setvariable variable=VsTargetChannel;isOutput=true]$targetChannel"
-        Write-Host "##vso[task.setvariable variable=VsTargetMajorVersion;isOutput=true]$targetMajorVersion"
-        Write-Host "##vso[build.updatebuildnumber]$FullBuildNumber"
-        Write-Host "##vso[task.setvariable variable=BuildNumber;isOutput=true]$(BuildRevision)"
-        Write-Host "##vso[task.setvariable variable=FullVstsBuildNumber;isOutput=true]$FullBuildNumber"
-      } catch {
-        Write-Host "##vso[task.LogIssue type=error;]Unable to set build number"
-        exit 1
-      }
+          - task: PowerShell@1
+            displayName: "Initialize Git Commit Status on GitHub"
+            inputs:
+              scriptType: "inlineScript"
+              inlineScript: |
+                . $(Build.Repository.LocalPath)\\scripts\\utils\\PostGitCommitStatus.ps1
+                InitializeAllTestsToPending -PersonalAccessToken $(NuGetLurkerPersonalAccessToken) -CommitSha $(Build.SourceVersion)
+            condition: "not(eq(variables['ManualGitHubChecks'], 'false'))"
 
-- task: PowerShell@1
-  displayName: "Add Build Tags"
-  inputs:
-    scriptType: "inlineScript"
-    inlineScript: |
-      Write-Host "##vso[build.addbuildtag]${env:BUILD_SOURCEVERSIONAUTHOR}"
-      Write-Host "##vso[build.addbuildtag]${env:BUILD_SOURCEBRANCHNAME}"
+          - task: PowerShell@1
+            displayName: "Update Build Number"
+            name: "updatebuildnumber"
+            inputs:
+              scriptType: "inlineScript"
+              inlineScript: |
+                try {
+                  $FullBuildNumber = "$(SemanticVersion).$(BuildRevision)"
+                  $msbuildExe = 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\bin\msbuild.exe'
+                  $targetChannel = & $msbuildExe $env:BUILD_REPOSITORY_LOCALPATH\build\config.props /v:m /nologo /t:GetVsTargetChannel
+                  $targetChannel = $targetChannel.Trim()
+                  $targetMajorVersion = & $msbuildExe $env:BUILD_REPOSITORY_LOCALPATH\build\config.props /v:m /nologo /t:GetVsTargetMajorVersion
+                  $targetMajorVersion = $targetMajorVersion.Trim()
+                  Write-Host "##vso[task.setvariable variable=VsTargetChannel;isOutput=true]$targetChannel"
+                  Write-Host "##vso[task.setvariable variable=VsTargetMajorVersion;isOutput=true]$targetMajorVersion"
+                  Write-Host "##vso[build.updatebuildnumber]$FullBuildNumber"
+                  Write-Host "##vso[task.setvariable variable=BuildNumber;isOutput=true]$(BuildRevision)"
+                  Write-Host "##vso[task.setvariable variable=FullVstsBuildNumber;isOutput=true]$FullBuildNumber"
+                } catch {
+                  Write-Host "##vso[task.LogIssue type=error;]Unable to set build number"
+                  exit 1
+                }
+
+          - task: PowerShell@1
+            displayName: "Add Build Tags"
+            inputs:
+              scriptType: "inlineScript"
+              inlineScript: |
+                Write-Host "##vso[build.addbuildtag]${env:BUILD_SOURCEVERSIONAUTHOR}"
+                Write-Host "##vso[build.addbuildtag]${env:BUILD_SOURCEBRANCHNAME}"
