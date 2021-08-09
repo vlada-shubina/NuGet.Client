@@ -22,27 +22,27 @@ variables:
   DOTNET_NOLOGO: 1
 
 stages:
-- template: Initialize_Build.yml
-- template: Build_and_UnitTest.yml
-- template: Apex_Tests_On_Windows.yml
-  parameters:
-    stageName: VS_ApexTests
-    condition: "and(succeeded(), eq(variables['RunApexTests'], 'true'))"
-    dependsOn:
-      - Initialize
-      - Build_Insertable
-    testMachineConfigurationJobName: Configure_VM_ApexTests
-    testMachineDeploymentJobName: Deploy_VM_ApexTests
-    testExecutionJobName: RunApexTests
-    testMachineCleanUpJobName: Cleanup_VM_ApexTests
-    testExecutionJobTimeoutInMinutes: 100
-    bootstrapperUrl:
-    runSettingsURI:
-    DartLabEnvironment: ${{parameters.DartLabEnvironment}}
-    variables:
-      - name: FullVstsBuildNumber
-        value: $[stageDependencies.Initialize.Initialize_Build.outputs['updatebuildnumber.FullVstsBuildNumber']]
-      - name: SDKVersionForBuild
-        value: $[stageDependencies.Initialize.Initialize_Build.outputs['getSDKVersionForBuild.SDKVersionForBuild']]
-      - name: BuildNumber
-        value: $[stageDependencies.Initialize.Initialize_Build.outputs['updatebuildnumber.BuildNumber']]
+  - template: Initialize_Build.yml
+  - template: Build_and_UnitTest.yml
+  - template: Apex_Tests_On_Windows.yml
+    parameters:
+      stageName: VS_ApexTests
+      condition: "and(succeeded(), eq(variables['RunApexTests'], 'true'))"
+      dependsOn:
+        - Initialize
+        - Build_Insertable
+      testMachineConfigurationJobName: Configure_VM_ApexTests
+      testMachineDeploymentJobName: Deploy_VM_ApexTests
+      testExecutionJobName: RunApexTests
+      testMachineCleanUpJobName: Cleanup_VM_ApexTests
+      testExecutionJobTimeoutInMinutes: 100
+      bootstrapperUrl:
+      runSettingsURI:
+      DartLabEnvironment: ${{parameters.DartLabEnvironment}}
+      variables:
+        - name: FullVstsBuildNumber
+          value: $[stageDependencies.Initialize.Initialize_Build.outputs['updatebuildnumber.FullVstsBuildNumber']]
+        - name: SDKVersionForBuild
+          value: $[stageDependencies.Initialize.Initialize_Build.outputs['getSDKVersionForBuild.SDKVersionForBuild']]
+        - name: BuildNumber
+          value: $[stageDependencies.Initialize.Initialize_Build.outputs['updatebuildnumber.BuildNumber']]
