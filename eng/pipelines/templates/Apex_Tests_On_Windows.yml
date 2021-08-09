@@ -26,6 +26,7 @@ parameters:
 - name: testExecutionJobTimeoutInMinutes
   type: number
 
+jobs:
 - template: stages\visual-studio\base.yml@DartLabTemplates
   parameters:
     name: ${{parameters.stageName}}
@@ -41,8 +42,6 @@ parameters:
       value: ${{parameters.bootstrapperUrl}}
     - name: runSettingsURI
       value: ${{parameters.runSettingsURI}}
-    - name: Part
-      value: ${{parameters.part}}
     - ${{parameters.variables}}
     visualStudioBootstrapperURI: $(bootstrapperUrl)
     visualStudioInstallationParameters: $(VisualStudio.InstallationUnderTest.SetupParameters)
