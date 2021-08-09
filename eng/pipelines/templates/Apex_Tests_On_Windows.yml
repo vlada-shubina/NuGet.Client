@@ -26,6 +26,7 @@ parameters:
   - name: testExecutionJobTimeoutInMinutes
     type: number
 
+extends:
   - template: stages\visual-studio\base.yml@DartLabTemplates
     parameters:
       name: ${{parameters.stageName}}
