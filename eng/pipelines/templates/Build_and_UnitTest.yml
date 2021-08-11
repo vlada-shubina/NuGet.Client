@@ -227,9 +227,10 @@ steps:
 - task: PowerShell@1
   displayName: "Ensure all Nupkgs and Symbols are created"
   inputs:
-    scriptName: "$(Build.Repository.LocalPath)\\scripts\\utils\\EnsureAllPackagesExist.ps1"
-    arguments: "$(Build.Repository.LocalPath)\\artifacts\\$(NupkgOutputDir) -BuildRTM:$(BuildRTM)"
-    failOnStandardError: "true"
+    scriptType: "inlineScript"
+    inlineScript: |
+      $isBuildRTM = [boolean]::Parse($BuildRTM)
+      & $(Build.Repository.LocalPath)\\scripts\\utils\\EnsureAllPackagesExist.ps1 $(Build.Repository.LocalPath)\\artifacts\\$(NupkgOutputDir) -BuildRTM:$isBuildRTM
 
 - task: MSBuild@1
   displayName: "Pack VSIX"
