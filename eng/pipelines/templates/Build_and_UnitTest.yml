@@ -224,12 +224,12 @@ steps:
     msbuildArguments: "/t:Pack /p:BuildRTM=$(BuildRTM) /p:ExcludeTestProjects=$(BuildRTM) /p:BuildNumber=$(BuildNumber)"
     maximumCpuCount: true
 
-- task: MSBuild@1
+- task: PowerShell@1
   displayName: "Ensure all Nupkgs and Symbols are created"
   inputs:
-    solution: "build\\build.proj"
-    configuration: "$(BuildConfiguration)"
-    msbuildArguments: "/t:EnsurePackagesExist /p:ExcludeTestProjects=$(BuildRTM)"
+    scriptName: "$(Build.Repository.LocalPath)\\scripts\\utils\\EnsureAllPackagesExist.ps1"
+    arguments: "$(Build.Repository.LocalPath)\\artifacts\\$(NupkgOutputDir) -BuildRTM:$(BuildRTM)"
+    failOnStandardError: "true"
 
 - task: MSBuild@1
   displayName: "Pack VSIX"
