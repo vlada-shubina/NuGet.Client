@@ -3,8 +3,10 @@
 [CmdletBinding(SupportsShouldProcess=$True)]
 Param (
     [string]$NupkgOutputPath,
-    [switch]$BuildRTM
+    [string]$BuildRTM,
 )
+
+$isRTMBuild = [boolean]::Parse($BuildRTM)
 
 # The list of projects need to be packed.
 [System.Collections.ArrayList]$PackageIDListShouldExist = @(
@@ -33,7 +35,7 @@ Param (
 "NuGet.Resolver",
 "NuGet.Versioning")
 
-if (!$BuildRTM)
+if (!$isRTMBuild)
 {
     $PackageIDListShouldExist.Add("Test.Utility")
     $PackageIDListShouldExist.Add("NuGet.Localization")
