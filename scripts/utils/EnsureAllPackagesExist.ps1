@@ -3,7 +3,7 @@
 [CmdletBinding(SupportsShouldProcess=$True)]
 Param (
     [string]$NupkgOutputPath,
-    [string]$BuildRTM,
+    [string]$BuildRTM
 )
 
 $isRTMBuild = [boolean]::Parse($BuildRTM)
