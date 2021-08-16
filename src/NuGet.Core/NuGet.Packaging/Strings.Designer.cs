@@ -19,7 +19,7 @@ namespace NuGet.Packaging {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Strings {
@@ -628,6 +628,15 @@ namespace NuGet.Packaging {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The file at &apos;{0}&apos; is invalid.  The file must be a valid PKCS #7 file with a &apos;.p7b&apos; extension..
+        /// </summary>
+        internal static string InvalidP7bFileExtension {
+            get {
+                return ResourceManager.GetString("InvalidP7bFileExtension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The framework in the folder name of &apos;{0}&apos; in package &apos;{1}&apos; could not be parsed..
         /// </summary>
         internal static string InvalidPackageFrameworkFolderName {
@@ -1119,6 +1128,15 @@ namespace NuGet.Packaging {
         internal static string NuGetV3ServiceIndexUrlInvalidValue {
             get {
                 return ResourceManager.GetString("NuGetV3ServiceIndexUrlInvalidValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The file at &apos;{0}&apos; was not found..
+        /// </summary>
+        internal static string P7bFileNotFound {
+            get {
+                return ResourceManager.GetString("P7bFileNotFound", resourceCulture);
             }
         }
         
