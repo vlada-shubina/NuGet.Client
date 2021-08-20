@@ -2737,6 +2737,7 @@ EndProject";
             }
         }
 
+
         [Fact]
         public void RestoreCommand_PackageNamespace_NoNamespaceMatches()
         {
@@ -2807,8 +2808,7 @@ EndProject";
                     waitForExit: true);
 
                 // Assert
-                Assert.Equal(_failureCode, r.ExitCode);
-                Assert.Contains("Unable to find version '1.0.0' of package 'My.MVC.ASP'.", r.Errors);
+                Assert.Equal(_successCode, r.ExitCode);
                 Assert.Contains("Package namespace match not found for package ID 'My.MVC.ASP'", r.Output);
             }
         }
