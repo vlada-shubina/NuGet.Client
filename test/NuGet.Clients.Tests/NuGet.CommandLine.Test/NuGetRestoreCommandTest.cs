@@ -3124,8 +3124,8 @@ EndProject";
                 // Assert
                 Assert.Equal(_successCode, r.ExitCode);
                 // If we pass source then log include actual path to repository instead of repository name.
-                Assert.Contains($"Package namespace matches found for package ID 'Contoso.MVC.ASP' are: '{sharedRepositoryPath}'", r.Output);
-                Assert.Contains($"Package namespace matches found for package ID 'Contoso.Opensource.A' are: '{opensourceRepositoryPath}'", r.Output);
+                Assert.Contains($"Package namespace matches found for package ID 'Contoso.MVC.ASP' are: 'SharedRepository'", r.Output);
+                Assert.Contains($"Package namespace matches found for package ID 'Contoso.Opensource.A' are: 'PublicRepository'", r.Output);
             }
         }
 
@@ -3211,7 +3211,7 @@ EndProject";
                     waitForExit: true);
 
                 // Assert
-                Assert.Contains($"Package namespace matches found for package ID 'Contoso.MVC.ASP' are: '{sharedRepositoryPath}'", r.Output);
+                Assert.Contains($"Package namespace matches found for package ID 'Contoso.MVC.ASP' are: 'SharedRepository'", r.Output);
                 // Even though there is eligible source SharedRepository exist but only opensourceRepositoryPath passed as option it'll fail to restore.
                 Assert.Equal(_failureCode, r.ExitCode);
                 Assert.Contains("WARNING: Unable to find version '1.0.0' of package 'Contoso.MVC.ASP'.", r.Output);
