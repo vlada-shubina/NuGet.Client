@@ -1791,7 +1791,6 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 Directory.CreateDirectory(privateRepositoryPath);
 
                 var net461 = NuGetFramework.Parse("net461");
-
                 var projectA = new SimpleTestProjectContext(
                     "a",
                     ProjectStyle.PackageReference,
@@ -1801,31 +1800,17 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 // Add both repositories as RestoreSources
                 projectA.Properties.Add("RestoreSources", $"{opensourceRepositoryPath};{privateRepositoryPath}");
 
-                var packageOpenSourceA = new SimpleTestPackageContext()
-                {
-                    Id = "Contoso.Opensource.A",
-                    Version = "1.0.0"
-                };
-
+                var packageOpenSourceA = new SimpleTestPackageContext("Contoso.Opensource.A", "1.0.0");
                 packageOpenSourceA.AddFile("lib/net461/openA.dll");
 
-                var packageOpenSourceContosoMvc = new SimpleTestPackageContext()
-                {
-                    Id = "Contoso.MVC.ASP",  // Package Id conflict with internally created package
-                    Version = "1.0.0"
-                };
+                var packageOpenSourceContosoMvc = new SimpleTestPackageContext("Contoso.MVC.ASP", "1.0.0"); // Package Id conflict with internally created package
                 packageOpenSourceContosoMvc.AddFile("lib/net461/openA.dll");
 
-                var packageContosoMvcReal = new SimpleTestPackageContext()
-                {
-                    Id = "Contoso.MVC.ASP",
-                    Version = "1.0.0"
-                };
+                var packageContosoMvcReal = new SimpleTestPackageContext("Contoso.MVC.ASP", "1.0.0");
                 packageContosoMvcReal.AddFile("lib/net461/realA.dll");
 
                 projectA.AddPackageToAllFrameworks(packageOpenSourceA);
                 projectA.AddPackageToAllFrameworks(packageOpenSourceContosoMvc);
-
                 solution.Projects.Add(projectA);
                 solution.Create(pathContext.SolutionRoot);
 
@@ -1857,12 +1842,8 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
                 await SimpleTestPackageUtility.CreateFolderFeedV3Async(
                     opensourceRepositoryPath,
-                    packageOpenSourceA);
-
-                await SimpleTestPackageUtility.CreateFolderFeedV3Async(
-                    opensourceRepositoryPath,
+                    packageOpenSourceA,
                     packageOpenSourceContosoMvc);
-
 
                 await SimpleTestPackageUtility.CreateFolderFeedV3Async(
                     privateRepositoryPath,
@@ -1898,7 +1879,6 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 Directory.CreateDirectory(privateRepositoryPath);
 
                 var net461 = NuGetFramework.Parse("net461");
-
                 var projectA = new SimpleTestProjectContext(
                     "a",
                     ProjectStyle.PackageReference,
@@ -1908,32 +1888,17 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 // Add only 1 repository as RestoreSources
                 projectA.Properties.Add("RestoreSources", $"{opensourceRepositoryPath}");
 
-                var packageOpenSourceA = new SimpleTestPackageContext()
-                {
-                    Id = "Contoso.Opensource.A",
-                    Version = "1.0.0"
-                };
-
+                var packageOpenSourceA = new SimpleTestPackageContext("Contoso.Opensource.A", "1.0.0");
                 packageOpenSourceA.AddFile("lib/net461/openA.dll");
 
-                var packageOpenSourceContosoMvc = new SimpleTestPackageContext()
-                {
-                    Id = "Contoso.MVC.ASP",  // Package Id conflict with internally created package
-                    Version = "1.0.0"
-                };
-                packageOpenSourceContosoMvc.Files.Clear();
+                var packageOpenSourceContosoMvc = new SimpleTestPackageContext("Contoso.MVC.ASP", "1.0.0"); // Package Id conflict with internally created package
                 packageOpenSourceContosoMvc.AddFile("lib/net461/openA.dll");
 
-                var packageContosoMvcReal = new SimpleTestPackageContext()
-                {
-                    Id = "Contoso.MVC.ASP",
-                    Version = "1.0.0"
-                };
+                var packageContosoMvcReal = new SimpleTestPackageContext("Contoso.MVC.ASP", "1.0.0");
                 packageContosoMvcReal.AddFile("lib/net461/realA.dll");
 
                 projectA.AddPackageToAllFrameworks(packageOpenSourceA);
                 projectA.AddPackageToAllFrameworks(packageOpenSourceContosoMvc);
-
                 solution.Projects.Add(projectA);
                 solution.Create(pathContext.SolutionRoot);
 
@@ -1965,12 +1930,8 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
                 await SimpleTestPackageUtility.CreateFolderFeedV3Async(
                     opensourceRepositoryPath,
-                    packageOpenSourceA);
-
-                await SimpleTestPackageUtility.CreateFolderFeedV3Async(
-                    opensourceRepositoryPath,
+                    packageOpenSourceA,
                     packageOpenSourceContosoMvc);
-
 
                 await SimpleTestPackageUtility.CreateFolderFeedV3Async(
                     privateRepositoryPath,
