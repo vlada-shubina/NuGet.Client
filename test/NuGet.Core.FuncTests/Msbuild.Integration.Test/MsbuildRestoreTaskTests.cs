@@ -1601,7 +1601,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                     Assert.Contains("lib/net461/openA.dll", allFiles);
                 }
 
-                Assert.True(result.ExitCode == 0);
+                Assert.True(result.ExitCode == 1);
                 Assert.Contains("Package namespace match not found for package ID 'My.MVC.ASP'", result.Output);
             }
         }

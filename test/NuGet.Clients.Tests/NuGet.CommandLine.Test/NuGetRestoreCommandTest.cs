@@ -2808,7 +2808,7 @@ EndProject";
                     waitForExit: true);
 
                 // Assert
-                Assert.Equal(_successCode, r.ExitCode);
+                Assert.Equal(_failureCode, r.ExitCode);
                 Assert.Contains("Package namespace match not found for package ID 'My.MVC.ASP'", r.Output);
             }
         }
@@ -3290,7 +3290,6 @@ EndProject";
                 Assert.Equal(_successCode, r.ExitCode);
                 var contosoRestorePath = Path.Combine(packagePath, "Contoso.MVC.ASP.1.0.0", "Contoso.MVC.ASP.1.0.0.nupkg");
                 Assert.True(File.Exists(contosoRestorePath));
-                Assert.Contains("Package namespace matches found for package ID 'Contoso.MVC.ASP' are: 'encyclopædia'", r.Output);
                 Assert.Contains($"Added package 'Contoso.MVC.ASP.1.0.0' to folder '{packagePath}' from source '{sharedRepositoryPath2}'", r.Output);
             }
         }
