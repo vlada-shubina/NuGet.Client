@@ -1,6 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -17,6 +18,19 @@ namespace NuGet.PackageManagement.UI
         public LicenseAcceptanceWindow()
         {
             InitializeComponent();
+
+             //MinWidth = "500"
+            //  Width = "500"
+
+            int desiredLength = 450;
+            //int heightPadding = 25; // Make window height at least this much smaller than the screen height.
+            Height = Math.Min(desiredLength, SystemParameters.MaximizedPrimaryScreenHeight);
+            MaxHeight = SystemParameters.VirtualScreenHeight;
+            MinHeight = Height;
+
+            Width = Math.Min(desiredLength, SystemParameters.MaximizedPrimaryScreenWidth);
+            MaxWidth = SystemParameters.VirtualScreenWidth;
+            MinWidth = Width;
         }
 
         private void OnViewLicenseTermsRequestNavigate(object sender, RoutedEventArgs e)
