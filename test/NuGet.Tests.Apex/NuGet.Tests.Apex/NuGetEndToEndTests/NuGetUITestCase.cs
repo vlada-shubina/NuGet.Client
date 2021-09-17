@@ -165,15 +165,8 @@ namespace NuGet.Tests.Apex
             EnsureVisualStudioHost();
             var solutionService = VisualStudio.Get<SolutionService>();
             string solutionDirectory = CommonUtility.CreateSolutionDirectory(Directory.GetCurrentDirectory());
-            solutionService.CreateEmptySolution("TestSolution", solutionDirectory);
-
-            var privateRepositoryPath = Path.Combine(solutionService.ContainingDirectory, "PrivateRepository");
+            var privateRepositoryPath = Path.Combine(solutionDirectory, "PrivateRepository");
             Directory.CreateDirectory(privateRepositoryPath);
-
-            var packageName = "Contoso.A";
-            var packageVersion = "1.0.0";
-
-            await CommonUtility.CreatePackageInSourceAsync(privateRepositoryPath, packageName, packageVersion);
 
             // Create nuget.config with Package namespace filtering rules before project is created.
             CommonUtility.CreateConfigurationFile(Path.Combine(solutionDirectory, "NuGet.config"), $@"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -190,6 +183,13 @@ namespace NuGet.Tests.Apex
         </packageSource>
     </packageSourceMapping>
 </configuration>");
+
+            solutionService.CreateEmptySolution("TestSolution", solutionDirectory);
+            
+            var packageName = "Contoso.A";
+            var packageVersion = "1.0.0";
+
+            await CommonUtility.CreatePackageInSourceAsync(privateRepositoryPath, packageName, packageVersion);
 
             var project = solutionService.AddProject(ProjectLanguage.CSharp, ProjectTemplate.ClassLibrary, ProjectTargetFramework.V46, "TestProject");
             VisualStudio.ClearOutputWindow();
