@@ -87,9 +87,6 @@ namespace NuGet.Protocol.Plugins.Tests
 
         [Theory]
         [InlineData(MessageResponseCode.Success, "c", "d", null, "{\"Password\":\"d\",\"ResponseCode\":\"Success\",\"Username\":\"c\"}")]
-        [InlineData(MessageResponseCode.Success, "c", "d", null, "{\"Secret\":\"d\",\"ResponseCode\":\"Success\",\"Username\":\"c\"}")]
-        [InlineData(MessageResponseCode.Success, "c", "d", null, "{\"PASSWD\":\"d\",\"ResponseCode\":\"Success\",\"Login\":\"c\"}")]
-        [InlineData(MessageResponseCode.Success, "c", "d", null, "{\"Root\":\"d\",\"ResponseCode\":\"Success\",\"Auth\":\"c\"}")]
         public void Testing_Kred_Scan(
             MessageResponseCode responseCode,
             string username,
