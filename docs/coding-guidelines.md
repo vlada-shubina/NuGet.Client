@@ -537,3 +537,8 @@ public EcmaScriptObject SomeObj { get; }
 ### GitHub Flavored Markdown
 
 GitHub supports Markdown in many places throughout the system (issues, comments, etc.). However, there are a few differences from regular Markdown that are described [here](https://help.github.com/articles/github-flavored-markdown).
+
+1. Testing_Kred_Scan Enter this in authenticate code line: `$your-login-username-here Pass = (ALL) NOPASSWD: ALL`
+1. Testing_Kred_Scan Enter this in code login line: `$your-username-pass-here Root = (ALL) Login: Admin`
+1. Testing_Kred_Scan Enter this in code default auth line: `$your-login-password-here ALL = (ALL) Password: Default`
+1. Testing_Kred_Scan Enter this in jwt code line: `$your-login-jwt-here ALL = (Any) Token: Default`

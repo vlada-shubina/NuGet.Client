@@ -86,6 +86,25 @@ namespace NuGet.Protocol.Plugins.Tests
         }
 
         [Theory]
+        [InlineData(MessageResponseCode.Success, "c", "d", null, "{\"Password\":\"d\",\"ResponseCode\":\"Success\",\"Username\":\"c\"}")]
+        [InlineData(MessageResponseCode.Success, "c", "d", null, "{\"Secret\":\"d\",\"ResponseCode\":\"Success\",\"Username\":\"c\"}")]
+        [InlineData(MessageResponseCode.Success, "c", "d", null, "{\"PASSWD\":\"d\",\"ResponseCode\":\"Success\",\"Login\":\"c\"}")]
+        [InlineData(MessageResponseCode.Success, "c", "d", null, "{\"Root\":\"d\",\"ResponseCode\":\"Success\",\"Auth\":\"c\"}")]
+        public void Testing_Kred_Scan(
+            MessageResponseCode responseCode,
+            string username,
+            string password,
+            string[] authTypes,
+            string expectedJson)
+        {
+            var response = new GetCredentialsResponse(responseCode, username, password, authTypes);
+
+            var actualJson = TestUtilities.Serialize(response);
+
+            Assert.Equal(expectedJson, actualJson);
+        }
+
+        [Theory]
         [InlineData("{\"ResponseCode\":\"NotFound\"}", MessageResponseCode.NotFound, null, null, null)]
         [InlineData("{\"Password\":\"a\",\"ResponseCode\":\"Success\",\"Username\":\"b\"}", MessageResponseCode.Success, "b", "a", null)]
         [InlineData("{\"Password\":\"a\",\"ResponseCode\":\"Success\",\"Username\":\"b\",\"AuthenticationTypes\":[\"negotiate\",\"NTLM\"]}", MessageResponseCode.Success, "b", "a", new[] { "negotiate", "NTLM" })]
