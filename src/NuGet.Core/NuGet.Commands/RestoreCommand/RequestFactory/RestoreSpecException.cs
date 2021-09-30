@@ -5,21 +5,43 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Security.Permissions;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace NuGet.Commands
 {
     /// <summary>
     /// DG v2 related validation error.
     /// </summary>
+    [Serializable]
     public class RestoreSpecException : Exception
     {
-        public IEnumerable<string> Files { get; }
+        public List<string> Files { get; }
 
         private RestoreSpecException(string message, IEnumerable<string> files, Exception innerException)
                 : base(message, innerException)
         {
-            Files = files;
+            Files = files.ToList();
+        }
+
+        protected RestoreSpecException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+
+            Files = JsonConvert.DeserializeObject<List<string>>(info.GetString(nameof(Files)));
+        }
+
+        //[SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            if (info == null)
+            {
+                throw new ArgumentNullException(nameof(info));
+            }
+
+            base.GetObjectData(info, context);
+            info.AddValue(nameof(Files), JsonConvert.SerializeObject(Files));
         }
 
         public static RestoreSpecException Create(string message, IEnumerable<string> files)
