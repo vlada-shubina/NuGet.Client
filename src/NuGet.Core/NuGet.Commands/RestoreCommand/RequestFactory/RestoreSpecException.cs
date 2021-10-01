@@ -24,7 +24,8 @@ namespace NuGet.Commands
             Files = files.ToList();
         }
 
-        protected RestoreSpecException(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected RestoreSpecException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
             Files = (List<string>)info.GetValue(nameof(Files), typeof(List<string>));
         }

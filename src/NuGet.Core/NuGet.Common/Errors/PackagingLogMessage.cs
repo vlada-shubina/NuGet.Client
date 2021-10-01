@@ -5,6 +5,7 @@ using System;
 
 namespace NuGet.Common
 {
+    [Serializable]
     public class PackagingLogMessage : IPackLogMessage
     {
         public LogLevel Level { get; set; }

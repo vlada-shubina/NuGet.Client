@@ -8,6 +8,7 @@ namespace NuGet.Common
     /// <summary>
     /// Basic log message.
     /// </summary>
+    [Serializable]
     public class LogMessage : ILogMessage
     {
         public LogLevel Level { get; set; }

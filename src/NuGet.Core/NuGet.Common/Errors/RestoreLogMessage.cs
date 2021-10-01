@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace NuGet.Common
 {
+    [Serializable]
     public class RestoreLogMessage : IRestoreLogMessage
     {
         public LogLevel Level { get; set; }
