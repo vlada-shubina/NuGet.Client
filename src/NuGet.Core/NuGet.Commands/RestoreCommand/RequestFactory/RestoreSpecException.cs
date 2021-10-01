@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 namespace NuGet.Commands
@@ -12,14 +13,26 @@ namespace NuGet.Commands
     /// <summary>
     /// DG v2 related validation error.
     /// </summary>
+    [Serializable]
     public class RestoreSpecException : Exception
     {
-        public IEnumerable<string> Files { get; }
+        public List<string> Files { get; }
 
         private RestoreSpecException(string message, IEnumerable<string> files, Exception innerException)
                 : base(message, innerException)
         {
-            Files = files;
+            Files = files.ToList();
+        }
+
+        protected RestoreSpecException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+            Files = (List<string>)info.GetValue(nameof(Files), typeof(List<string>));
+        }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+            info.AddValue(nameof(Files), Files);
         }
 
         public static RestoreSpecException Create(string message, IEnumerable<string> files)

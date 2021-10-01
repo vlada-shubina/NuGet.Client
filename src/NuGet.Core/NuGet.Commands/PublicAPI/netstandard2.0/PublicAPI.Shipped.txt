@@ -737,7 +737,6 @@ NuGet.Commands.RestoreResultPair.Result.get -> NuGet.Commands.RestoreResult
 NuGet.Commands.RestoreResultPair.SummaryRequest.get -> NuGet.Commands.RestoreSummaryRequest
 NuGet.Commands.RestoreRunner
 NuGet.Commands.RestoreSpecException
-NuGet.Commands.RestoreSpecException.Files.get -> System.Collections.Generic.IEnumerable<string>
 NuGet.Commands.RestoreSummary
 NuGet.Commands.RestoreSummary.ConfigFiles.get -> System.Collections.Generic.IReadOnlyList<string>
 NuGet.Commands.RestoreSummary.Errors.get -> System.Collections.Generic.IReadOnlyList<NuGet.Common.IRestoreLogMessage>
