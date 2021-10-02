@@ -33,11 +33,6 @@ namespace NuGet.PackageManagement.VisualStudio
             _threadingService = threadingService;
         }
 
-        public string GetPropertyValue(string propertyName)
-        {
-            return _threadingService.JoinableTaskFactory.Run(() => GetPropertyValueAsync(propertyName));
-        }
-
         public async Task<string> GetPropertyValueAsync(string propertyName)
         {
             Assumes.NotNullOrEmpty(propertyName);
