@@ -55,5 +55,24 @@ namespace NuGet.Protocol.Plugins.Tests
 
             Assert.Equal("message", exception.ParamName);
         }
+
+        [Theory]
+        [InlineData(MessageResponseCode.NotFound, null, null, null, "{\"ResponseCode\":\"NotFound\"}")]
+        [InlineData(MessageResponseCode.Success, "a", "b", null, "{\"Password\":\"b\",\"ResponseCode\":\"Success\",\"Username\":\"a\"}")]
+        [InlineData(MessageResponseCode.Success, "a", "b", new[] { "basic", "negotiate" }, "{\"Password\":\"b\",\"ResponseCode\":\"Success\",\"Username\":\"a\",\"AuthenticationTypes\":[\"basic\",\"negotiate\"]}")]
+        public void JsonSerialization_BadTest(
+            MessageResponseCode responseCode,
+            string username,
+            string password,
+            string[] authTypes,
+            string expectedJson)
+        {
+            var response = new GetCredentialsResponse(responseCode, username, password, authTypes);
+
+            var actualJson = TestUtilities.Serialize(response);
+
+            Assert.Equal(expectedJson, actualJson);
+        }
+
     }
 }
