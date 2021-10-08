@@ -1,4 +1,10 @@
 steps:
+- task: PowerShell@1
+  displayName: "Print Environment Variables"
+  inputs:
+    scriptType: "inlineScript"
+    inlineScript: |
+      Get-ChildItem Env: | Sort-Object Name | Format-Table -Wrap -AutoSize
 - task: CredScan@2
   inputs:
     toolMajorVersion: "V2"
