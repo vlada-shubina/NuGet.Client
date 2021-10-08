@@ -23,6 +23,7 @@ using NuGet.ProjectManagement;
 using NuGet.ProjectManagement.Projects;
 using NuGet.Protocol.Core.Types;
 using NuGet.Resolver;
+using NuGet.Versioning;
 using NuGet.VisualStudio;
 using NuGet.VisualStudio.Internal.Contracts;
 using StreamJsonRpc;
@@ -397,7 +398,8 @@ namespace NuGet.PackageManagement.VisualStudio
             bool includePrelease,
             DependencyBehavior dependencyBehavior,
             IReadOnlyList<string> packageSourceNames,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken,
+            VersionRange? versionRange)
         {
             Assumes.NotNullOrEmpty(projectIds);
             Assumes.NotNull(packageIdentity);
@@ -436,7 +438,8 @@ namespace NuGet.PackageManagement.VisualStudio
                     resolutionContext,
                     projectContext,
                     sourceRepositories,
-                    cancellationToken);
+                    cancellationToken,
+                    versionRange);
 
                 var projectActions = new List<ProjectAction>();
 

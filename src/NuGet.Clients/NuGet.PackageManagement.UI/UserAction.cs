@@ -8,7 +8,7 @@ namespace NuGet.PackageManagement.UI
 {
     public class UserAction
     {
-        private UserAction(NuGetProjectActionType action, string packageId, NuGetVersion packageVersion)
+        private UserAction(NuGetProjectActionType action, string packageId, NuGetVersion packageVersion, VersionRange versionRange)
         {
             Action = action;
 
@@ -19,6 +19,7 @@ namespace NuGet.PackageManagement.UI
 
             PackageId = packageId;
             Version = packageVersion;
+            VersionRange = versionRange;
         }
 
         public NuGetProjectActionType Action { get; private set; }
@@ -27,19 +28,21 @@ namespace NuGet.PackageManagement.UI
 
         public NuGetVersion Version { get; }
 
-        public static UserAction CreateInstallAction(string packageId, NuGetVersion packageVersion)
+        public VersionRange VersionRange { get; }
+
+        public static UserAction CreateInstallAction(string packageId, NuGetVersion packageVersion, VersionRange versionRange)
         {
             if (packageVersion == null)
             {
                 throw new ArgumentNullException(nameof(packageVersion));
             }
 
-            return new UserAction(NuGetProjectActionType.Install, packageId, packageVersion);
+            return new UserAction(NuGetProjectActionType.Install, packageId, packageVersion, versionRange);
         }
 
         public static UserAction CreateUnInstallAction(string packageId)
         {
-            return new UserAction(NuGetProjectActionType.Uninstall, packageId, packageVersion: null);
+            return new UserAction(NuGetProjectActionType.Uninstall, packageId, packageVersion: null, versionRange: null);
         }
     }
 }
