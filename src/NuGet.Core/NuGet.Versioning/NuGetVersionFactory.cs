@@ -42,7 +42,7 @@ namespace NuGet.Versioning
                 Version systemVersion = null;
 
                 // trim the value before passing it in since we not strict here
-                var sections = ParseSections(value.Trim());
+                var sections = ParseSections(value.Trim().AsSpan());
 
                 // null indicates the string did not meet the rules
                 if (sections != null

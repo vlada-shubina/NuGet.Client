@@ -40,7 +40,7 @@ namespace NuGet.Versioning
             {
                 Version systemVersion = null;
 
-                var sections = ParseSections(value);
+                var sections = ParseSections(value.AsSpan());
 
                 // null indicates the string did not meet the rules
                 if (sections != null
@@ -180,11 +180,11 @@ namespace NuGet.Versioning
         /// to parsing and validating a semver. Regex would be much cleaner, but
         /// due to the number of versions created in NuGet Regex is too slow.
         /// </summary>
-        internal static Tuple<string, string[], string> ParseSections(string value)
+        internal static Tuple<string, string[], string> ParseSections(ReadOnlySpan<char> value)
         {
-            string versionString = null;
+            ReadOnlySpan<char> versionString = null;
             string[] releaseLabels = null;
-            string buildMetadata = null;
+            ReadOnlySpan<char> buildMetadata = null;
 
             var dashPos = -1;
             var plusPos = -1;
@@ -201,7 +201,7 @@ namespace NuGet.Versioning
                         || value[i] == '+')
                     {
                         var endPos = i + (end ? 1 : 0);
-                        versionString = value.Substring(0, endPos);
+                        versionString = value.Slice(0, endPos);
 
                         dashPos = i;
 
@@ -217,9 +217,9 @@ namespace NuGet.Versioning
                     {
                         var start = dashPos + 1;
                         var endPos = i + (end ? 1 : 0);
-                        var releaseLabel = value.Substring(start, endPos - start);
+                        var releaseLabelString = value.Slice(start, endPos - start).ToString();
 
-                        releaseLabels = releaseLabel.Split('.');
+                        releaseLabels = releaseLabelString.Split('.');
 
                         plusPos = i;
                     }
@@ -228,11 +228,11 @@ namespace NuGet.Versioning
                 {
                     var start = plusPos + 1;
                     var endPos = i + (end ? 1 : 0);
-                    buildMetadata = value.Substring(start, endPos - start);
+                    buildMetadata = value.Slice(start, endPos - start);
                 }
             }
 
-            return new Tuple<string, string[], string>(versionString, releaseLabels, buildMetadata);
+            return new Tuple<string, string[], string>(versionString.ToString(), releaseLabels, buildMetadata.ToString());
         }
 
         internal static Version NormalizeVersionValue(Version version)
