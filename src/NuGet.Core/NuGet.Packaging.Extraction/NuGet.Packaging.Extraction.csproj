@@ -306,6 +306,10 @@
     <PackageReference Include="Newtonsoft.Json" />
   </ItemGroup>
 
+  <ItemGroup Condition=" '$(IsDesktop)' == 'true' ">
+    <PackageReference Include="System.Memory" />
+  </ItemGroup>
+
   <ItemGroup>
     <Compile Update="NuGet.Packaging\Rules\AnalysisResources.Designer.cs">
       <DesignTime>True</DesignTime>
