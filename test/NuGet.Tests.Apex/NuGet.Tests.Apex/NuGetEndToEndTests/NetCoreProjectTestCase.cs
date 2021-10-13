@@ -28,7 +28,6 @@ namespace NuGet.Tests.Apex
             EnsureVisualStudioHost();
 
             ProjectTemplate projectTemplate = ProjectTemplate.NetStandardClassLib;
-
             using (var testContext = new ApexTestContext(VisualStudio, projectTemplate, addNetStandardFeeds: true))
             {
                 VisualStudio.AssertNoErrors();
