@@ -98,7 +98,7 @@ namespace NuGet.Versioning
                 return false;
             }
 
-            var charArray = trimmedValue.ToCharArray();
+            ReadOnlySpan<char> charArray = trimmedValue.AsSpan();
 
             // * is the only 1 char range
             if (allowFloating
@@ -147,7 +147,7 @@ namespace NuGet.Versioning
                 }
 
                 // Get rid of the two brackets
-                trimmedValue = trimmedValue.Substring(1, trimmedValue.Length - 2);
+                trimmedValue = charArray.Slice(1, charArray.Length - 2).ToString();
 
                 // Split by comma, and make sure we don't get more than two pieces
                 var parts = trimmedValue.Split(',');

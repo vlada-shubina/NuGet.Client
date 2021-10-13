@@ -50,9 +50,15 @@ namespace NuGet.Packaging
         /// <returns>The package install path.</returns>
         public virtual string GetInstallPath(string packageId, NuGetVersion version)
         {
+#if NETCORE5_0
+            return Path.Join(
+                RootPath,
+                GetPackageDirectory(packageId, version));
+#else
             return Path.Combine(
                 RootPath,
                 GetPackageDirectory(packageId, version));
+#endif
         }
 
         /// <summary>
@@ -126,9 +132,15 @@ namespace NuGet.Packaging
         /// <returns>The hash file path.</returns>
         public string GetNupkgMetadataPath(string packageId, NuGetVersion version)
         {
+#if NETCORE5_0
+            return Path.Join(
+                GetInstallPath(packageId, version),
+                PackagingCoreConstants.NupkgMetadataFileExtension);
+#else
             return Path.Combine(
                 GetInstallPath(packageId, version),
                 PackagingCoreConstants.NupkgMetadataFileExtension);
+#endif
         }
 
         /// <summary>

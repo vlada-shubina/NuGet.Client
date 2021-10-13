@@ -183,7 +183,7 @@ namespace NuGet.Versioning
         internal static Tuple<string, string[], string> ParseSections(ReadOnlySpan<char> value)
         {
             ReadOnlySpan<char> versionString = null;
-            string[] releaseLabels = null;
+            ReadOnlySpan<char> releaseLabels = null;
             ReadOnlySpan<char> buildMetadata = null;
 
             var dashPos = -1;
@@ -217,9 +217,7 @@ namespace NuGet.Versioning
                     {
                         var start = dashPos + 1;
                         var endPos = i + (end ? 1 : 0);
-                        var releaseLabelString = value.Slice(start, endPos - start).ToString();
-
-                        releaseLabels = releaseLabelString.Split('.');
+                        releaseLabels = value.Slice(start, endPos - start);
 
                         plusPos = i;
                     }
@@ -232,7 +230,7 @@ namespace NuGet.Versioning
                 }
             }
 
-            return new Tuple<string, string[], string>(versionString.ToString(), releaseLabels, buildMetadata.ToString());
+            return new Tuple<string, string[], string>(versionString.ToString(), releaseLabels.Length > 0 ? releaseLabels.ToString().Split('.') : null, buildMetadata.Length > 0 ? buildMetadata.ToString() : null);
         }
 
         internal static Version NormalizeVersionValue(Version version)
