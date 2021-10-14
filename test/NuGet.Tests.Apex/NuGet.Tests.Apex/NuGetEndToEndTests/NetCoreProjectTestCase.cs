@@ -36,6 +36,7 @@ namespace NuGet.Tests.Apex
 
         // basic create for .net core template
         [Ignore] //https://github.com/NuGet/Home/issues/9410
+        [TestMethod]
         [Timeout(Timeout)]
         public void CreateNetCoreProject_AddProjectReference()
         {
