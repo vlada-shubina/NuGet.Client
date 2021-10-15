@@ -315,8 +315,8 @@ steps:
 - task: MicroBuildBuildVSBootstrapper@2
   displayName: 'Build a Visual Studio bootstrapper'
   inputs:
-    channelName: "$(VsTargetChannel)"
-    vsMajorVersion: "$(VsTargetMajorVersion)"
+    channelName: "Preview"
+    vsMajorVersion: "17"
     manifests: '$(Build.Repository.LocalPath)\artifacts\VS15\Microsoft.VisualStudio.NuGet.Core.vsman'
     outputFolder: '$(Build.Repository.LocalPath)\artifacts\VS15'
   condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'))"
