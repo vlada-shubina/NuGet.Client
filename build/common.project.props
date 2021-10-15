@@ -288,6 +288,10 @@
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MSBuildLockFiles.Tasks" PrivateAssets="All" Condition="'$(EnableBuildLockFile)' != 'false'" />
+  </ItemGroup>
+
     <!-- FxCop Analyzers -->
   <ItemGroup Condition="'$(Shipping)' == 'true' AND '$(SkipAnalyzers)' != 'true' AND '$(IsBuildOnlyXPLATProjects)' != 'true'">
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers">

@@ -46,6 +46,7 @@
         <PackageReference Update="Microsoft.VisualStudio.Workspace.VSIntegration" Version="17.0.7-preview-0001-g5492e466a9" />
         <PackageReference Update="Microsoft.VSSDK.BuildTools" Version="17.0.1600" />
         <PackageReference Update="Microsoft.Web.Xdt" Version="$(MicrosoftWebXdtPackageVersion)" />
+        <PackageReference Update="MSBuildLockFiles.Tasks" Version="1.0.7-preview-g0beb023a58" />
         <PackageReference Update="Newtonsoft.Json" Version="$(NewtonsoftJsonPackageVersion)" />
         <PackageReference Update="SharpZipLib" Version="1.3.2" />
         <PackageReference Update="System.ComponentModel.Composition" Version="$(SystemComponentModelCompositionPackageVersion)" />

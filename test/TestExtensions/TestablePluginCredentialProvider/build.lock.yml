@@ -1,0 +1,53 @@
+net472:
+  constants:
+  - DEBUG
+  - DEBUG
+  - IS_DESKTOP
+  - IS_SIGNING_SUPPORTED
+  - NET20_OR_GREATER
+  - NET30_OR_GREATER
+  - NET35_OR_GREATER
+  - NET40_OR_GREATER
+  - NET45_OR_GREATER
+  - NET451_OR_GREATER
+  - NET452_OR_GREATER
+  - NET46_OR_GREATER
+  - NET461_OR_GREATER
+  - NET462_OR_GREATER
+  - NET47_OR_GREATER
+  - NET471_OR_GREATER
+  - NET472
+  - NET472_OR_GREATER
+  - NETFRAMEWORK
+  - TRACE
+  - TRACE
+  outputs:
+  - CredentialProvider.Testable.exe
+  - CredentialProvider.Testable.exe.config
+  - CredentialProvider.Testable.pdb
+  references:
+  - {FrameworkAssemblies}/Microsoft.CSharp.dll
+  - {FrameworkAssemblies}/mscorlib.dll
+  - {FrameworkAssemblies}/System.Core.dll
+  - {FrameworkAssemblies}/System.Data.dll
+  - {FrameworkAssemblies}/System.dll
+  - {FrameworkAssemblies}/System.Drawing.dll
+  - {FrameworkAssemblies}/System.IO.Compression.FileSystem.dll
+  - {FrameworkAssemblies}/System.Numerics.dll
+  - {FrameworkAssemblies}/System.Runtime.Serialization.dll
+  - {FrameworkAssemblies}/System.Xml.dll
+  - {FrameworkAssemblies}/System.Xml.Linq.dll
+  - {NuGetPackageRoot}/newtonsoft.json/13.0.1/lib/net45/Newtonsoft.Json.dll
+  sources:
+  - ../../../build/Shared/EncodingUtility.cs
+  - ../../../build/Shared/EqualityUtility.cs
+  - ../../../build/Shared/HashCodeCombiner.cs
+  - ../../../build/Shared/SharedExtensions.cs
+  - ../../../build/Shared/SimplePool.cs
+  - ../../../build/Shared/StringBuilderPool.cs
+  - ../../../build/Shared/TypeExtensions.cs
+  - ../../../build/Shared/TypeInfo.cs
+  - ../../../build/Shared/XmlUtility.cs
+  - Program.cs
+  - TestCredentialRequest.cs
+  - TestCredentialResponse.cs

@@ -1,0 +1,29 @@
+net472:
+  constants:
+  - DEBUG
+  - IS_SIGNING_SUPPORTED
+  - TRACE
+  outputs:
+  - TestableVSCredentialProvider.dll
+  - TestableVSCredentialProvider.pdb
+  references:
+  - ../../../artifacts/NuGet.VisualStudio/bin/Debug/net472/NuGet.VisualStudio.dll
+  - {FrameworkAssemblies}/Facades/netstandard.dll
+  - {FrameworkAssemblies}/mscorlib.dll
+  - {FrameworkAssemblies}/System.ComponentModel.Composition.dll
+  - {FrameworkAssemblies}/System.Core.dll
+  - {FrameworkAssemblies}/System.dll
+  - {FrameworkAssemblies}/System.Web.dll
+  - {NuGetPackageRoot}/microsoft.visualstudio.componentmodelhost/17.0.67-g9e37b637e6/lib/net472/Microsoft.VisualStudio.ComponentModelHost.dll
+  - {NuGetPackageRoot}/microsoft.visualstudio.imaging.interop.14.0.designtime/17.0.0-preview-2-31221-277/lib/net472/Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime.dll
+  - {NuGetPackageRoot}/microsoft.visualstudio.interop/17.0.0-previews-1-31321-016/lib/net472/Microsoft.VisualStudio.Interop.dll
+  - {NuGetPackageRoot}/microsoft.visualstudio.ole.interop/17.0.0-preview-2-31221-277/lib/net472/Microsoft.VisualStudio.OLE.Interop.dll
+  - {NuGetPackageRoot}/microsoft.visualstudio.shell.interop.10.0/17.0.0-preview-2-31221-277/lib/net472/Microsoft.VisualStudio.Shell.Interop.10.0.dll
+  - {NuGetPackageRoot}/microsoft.visualstudio.shell.interop.8.0/17.0.0-preview-2-31221-277/lib/net472/Microsoft.VisualStudio.Shell.Interop.8.0.dll
+  - {NuGetPackageRoot}/microsoft.visualstudio.shell.interop/17.0.0-preview-2-31221-277/lib/net472/Microsoft.VisualStudio.Shell.Interop.dll
+  - {NuGetPackageRoot}/microsoft.visualstudio.templatewizardinterface/17.0.0-previews-1-31321-016/lib/net472/Microsoft.VisualStudio.TemplateWizardInterface.dll
+  sources:
+  - Properties/AssemblyInfo.cs
+  - TestCredentialProvider.cs
+  - TestCredentialProvider2.cs
+  - TestCredentials.cs
