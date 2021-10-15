@@ -172,24 +172,26 @@ namespace NuGet.ContentModel.Infrastructure
                     throw new Exception(string.Format("Unable to find property definition for {{{0}}}", _token));
                 }
 
-                for (var scanIndex = startIndex; scanIndex != path.Length;)
+                var pathSpan = path.AsSpan();
+
+                for (var scanIndex = startIndex; scanIndex != pathSpan.Length;)
                 {
-                    var delimiterIndex = path.Length;
-                    for (var i = scanIndex + 1; i < path.Length; i++)
+                    var delimiterIndex = pathSpan.Length;
+                    for (var i = scanIndex + 1; i < pathSpan.Length; i++)
                     {
-                        if (path[i] == _delimiter)
+                        if (pathSpan[i] == _delimiter)
                         {
                             delimiterIndex = i;
                             break;
                         }
                     }
 
-                    if (delimiterIndex == path.Length
+                    if (delimiterIndex == pathSpan.Length
                         && _delimiter != '\0')
                     {
                         break;
                     }
-                    var substring = path.AsSpan(startIndex, delimiterIndex - startIndex);
+                    var substring = pathSpan.Slice(startIndex, delimiterIndex - startIndex);
                     object value;
                     if (propertyDefinition.TryLookup(substring, _table, out value))
                     {
@@ -200,6 +202,7 @@ namespace NuGet.ContentModel.Infrastructure
                             {
                                 item = new ContentItem
                                 {
+                                    // Use path argument directly to avoid .ToString() invocation on pathSpan
                                     Path = path
                                 };
                             }
