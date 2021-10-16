@@ -124,11 +124,13 @@ namespace NuGet.ContentModel
             {
                 if (FileExtensionAllowSubFolders || !ContainsSlash(name))
                 {
+                    string strName = name.ToString();
+
                     foreach (var fileExtension in FileExtensions)
                     {
-                        if (name.EndsWith(fileExtension.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                        if (strName.EndsWith(fileExtension, StringComparison.OrdinalIgnoreCase))
                         {
-                            value = name.ToString();
+                            value = strName;
                             return true;
                         }
                     }
