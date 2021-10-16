@@ -120,11 +120,13 @@ namespace NuGet.ContentModel
                 return false;
             }
 
+            string strName = default;
+
             if (FileExtensions?.Count > 0)
             {
                 if (FileExtensionAllowSubFolders || !ContainsSlash(name))
                 {
-                    string strName = name.ToString();
+                    strName = name.ToString();
 
                     foreach (var fileExtension in FileExtensions)
                     {
@@ -139,7 +141,7 @@ namespace NuGet.ContentModel
 
             if (Parser != null)
             {
-                value = Parser.Invoke(name.ToString(), table);
+                value = Parser.Invoke(strName ?? name.ToString(), table);
                 if (value != null)
                 {
                     return true;
