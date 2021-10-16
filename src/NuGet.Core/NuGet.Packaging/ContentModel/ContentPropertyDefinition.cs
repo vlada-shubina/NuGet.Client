@@ -106,13 +106,7 @@ namespace NuGet.ContentModel
 
         public Func<string, PatternTable, object> Parser { get; }
 
-        [Obsolete("Use another overload that accepts ReadOnlySpan instead")]
         public virtual bool TryLookup(string name, PatternTable table, out object value)
-        {
-            return TryLookup(name.AsSpan(), table, out value);
-        }
-
-        public virtual bool TryLookup(ReadOnlySpan<char> name, PatternTable table, out object value)
         {
             if (name == null)
             {
@@ -120,19 +114,15 @@ namespace NuGet.ContentModel
                 return false;
             }
 
-            string strName = default;
-
             if (FileExtensions?.Count > 0)
             {
                 if (FileExtensionAllowSubFolders || !ContainsSlash(name))
                 {
-                    strName = name.ToString();
-
                     foreach (var fileExtension in FileExtensions)
                     {
-                        if (strName.EndsWith(fileExtension, StringComparison.OrdinalIgnoreCase))
+                        if (name.EndsWith(fileExtension, StringComparison.OrdinalIgnoreCase))
                         {
-                            value = strName;
+                            value = name;
                             return true;
                         }
                     }
@@ -141,7 +131,7 @@ namespace NuGet.ContentModel
 
             if (Parser != null)
             {
-                value = Parser.Invoke(strName ?? name.ToString(), table);
+                value = Parser.Invoke(name, table);
                 if (value != null)
                 {
                     return true;
@@ -152,7 +142,7 @@ namespace NuGet.ContentModel
             return false;
         }
 
-        private static bool ContainsSlash(ReadOnlySpan<char> name)
+        private static bool ContainsSlash(string name)
         {
             var containsSlash = false;
             foreach (var ch in name)

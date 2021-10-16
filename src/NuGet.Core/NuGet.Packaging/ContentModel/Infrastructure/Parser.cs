@@ -172,26 +172,24 @@ namespace NuGet.ContentModel.Infrastructure
                     throw new Exception(string.Format("Unable to find property definition for {{{0}}}", _token));
                 }
 
-                var pathSpan = path.AsSpan();
-
-                for (var scanIndex = startIndex; scanIndex != pathSpan.Length;)
+                for (var scanIndex = startIndex; scanIndex != path.Length;)
                 {
-                    var delimiterIndex = pathSpan.Length;
-                    for (var i = scanIndex + 1; i < pathSpan.Length; i++)
+                    var delimiterIndex = path.Length;
+                    for (var i = scanIndex + 1; i < path.Length; i++)
                     {
-                        if (pathSpan[i] == _delimiter)
+                        if (path[i] == _delimiter)
                         {
                             delimiterIndex = i;
                             break;
                         }
                     }
 
-                    if (delimiterIndex == pathSpan.Length
+                    if (delimiterIndex == path.Length
                         && _delimiter != '\0')
                     {
                         break;
                     }
-                    var substring = pathSpan.Slice(startIndex, delimiterIndex - startIndex);
+                    var substring = path.Substring(startIndex, delimiterIndex - startIndex);
                     object value;
                     if (propertyDefinition.TryLookup(substring, _table, out value))
                     {
@@ -202,13 +200,12 @@ namespace NuGet.ContentModel.Infrastructure
                             {
                                 item = new ContentItem
                                 {
-                                    // Use path argument directly to avoid .ToString() invocation on pathSpan
                                     Path = path
                                 };
                             }
                             if (StringComparer.Ordinal.Equals(_token, "tfm"))
                             {
-                                item.Properties.Add("tfm_raw", substring.ToString());
+                                item.Properties.Add("tfm_raw", substring);
                             }
                             item.Properties.Add(_token, value);
                         }
