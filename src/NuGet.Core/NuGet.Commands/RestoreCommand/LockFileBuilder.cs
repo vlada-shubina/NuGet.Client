@@ -365,18 +365,10 @@ namespace NuGet.Commands
             IList<LockFileTargetLibrary> libraries = lockFileTarget.Libraries;
             var libraryReferences = new Dictionary<string, LockFileTargetLibrary>();
 
-#if NETCORE5_0
-            ReadOnlySpan<char> spaceChar = " ";
-#else
-            const string spaceChar = " ";
-#endif
             foreach (LockFileTargetLibrary library in libraries)
             {
-#if NETCORE5_0
-                var libraryKey = string.Concat(library.Name.AsSpan(), spaceChar, library.Version.ToString().AsSpan());
-#else
-                var libraryKey = library.Name + spaceChar + library.Version;
-#endif
+                var libraryKey = library.Name + " " + library.Version;
+
                 if (libraryReferences.TryGetValue(libraryKey, out LockFileTargetLibrary existingLibrary))
                 {
                     if (RankReferences(existingLibrary.Type) > RankReferences(library.Type))

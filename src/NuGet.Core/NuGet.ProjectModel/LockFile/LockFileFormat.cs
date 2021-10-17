@@ -287,15 +287,9 @@ namespace NuGet.ProjectModel
 
             WritePathArray(json, FilesProperty, library.Files, JsonUtility.WriteString);
 
-#if NETCORE5_0
-            return new JProperty(
-                string.Concat(library.Name.AsSpan(), "/", library.Version.ToNormalizedString()),
-                json);
-#else
             return new JProperty(
                 library.Name + "/" + library.Version.ToNormalizedString(),
                 json);
-#endif
         }
 
         private static JProperty WriteTarget(LockFileTarget target)
@@ -614,11 +608,7 @@ namespace NuGet.ProjectModel
                 json[EmbedProperty] = JsonUtility.WriteObject(ordered, WriteFileItem);
             }
 
-#if NETCORE5_0
-            return new JProperty(string.Concat(library.Name.AsSpan(), "/".AsSpan(), library.Version.ToNormalizedString().AsSpan()), json);
-#else
             return new JProperty(library.Name + "/" + library.Version.ToNormalizedString(), json);
-#endif
         }
 
         private static LockFileRuntimeTarget ReadRuntimeTarget(string property, JToken json)

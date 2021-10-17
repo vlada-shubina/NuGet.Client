@@ -1,9 +1,6 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-#if NETCORE5_0
-using System;
-#endif
 using System.IO;
 using NuGet.Packaging.Core;
 using NuGet.Versioning;
@@ -55,7 +52,7 @@ namespace NuGet.Packaging
         {
 #if NETCORE5_0
             return Path.Join(
-                RootPath.AsSpan(),
+                RootPath,
                 GetPackageDirectory(packageId, version));
 #else
             return Path.Combine(
@@ -73,14 +70,13 @@ namespace NuGet.Packaging
         {
 #if NETCORE5_0
             return Path.Join(
-                RootPath.AsSpan(),
-                GetVersionListDirectory(packageId).AsSpan());
+                RootPath,
+                GetVersionListDirectory(packageId));
 #else
             return Path.Combine(
                 RootPath,
                 GetVersionListDirectory(packageId));
 #endif
-
         }
 
         /// <summary>
@@ -93,8 +89,8 @@ namespace NuGet.Packaging
         {
 #if NETCORE5_0
             return Path.Join(
-                GetInstallPath(packageId, version).AsSpan(),
-                GetPackageFileName(packageId, version).AsSpan());
+                GetInstallPath(packageId, version),
+                GetPackageFileName(packageId, version));
 #else
             return Path.Combine(
                 GetInstallPath(packageId, version),
@@ -113,8 +109,8 @@ namespace NuGet.Packaging
             packageId = Normalize(packageId);
 #if NETCORE5_0            
             return Path.Join(
-                GetInstallPath(packageId, version).AsSpan(),
-                GetManifestFileName(packageId, version).AsSpan());
+                GetInstallPath(packageId, version),
+                GetManifestFileName(packageId, version));
 #else
             return Path.Combine(
                 GetInstallPath(packageId, version),
@@ -132,8 +128,8 @@ namespace NuGet.Packaging
         {
 #if NETCORE5_0
             return Path.Join(
-                GetInstallPath(packageId, version).AsSpan(),
-                GetHashFileName(packageId, version).AsSpan());
+                GetInstallPath(packageId, version),
+                GetHashFileName(packageId, version));
 #else
             return Path.Combine(
                 GetInstallPath(packageId, version),
@@ -162,8 +158,8 @@ namespace NuGet.Packaging
         {
 #if NETCORE5_0
             return Path.Join(
-                GetInstallPath(packageId, version).AsSpan(),
-                PackagingCoreConstants.NupkgMetadataFileExtension.AsSpan());
+                GetInstallPath(packageId, version),
+                PackagingCoreConstants.NupkgMetadataFileExtension);
 #else
             return Path.Combine(
                 GetInstallPath(packageId, version),
@@ -191,8 +187,8 @@ namespace NuGet.Packaging
         {
 #if NETCORE5_0
             return Path.Join(
-                GetVersionListDirectory(packageId).AsSpan(),
-                Normalize(version).AsSpan());
+                GetVersionListDirectory(packageId),
+                Normalize(version));
 #else
             return Path.Combine(
                 GetVersionListDirectory(packageId),
