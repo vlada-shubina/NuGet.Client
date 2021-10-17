@@ -1,6 +1,9 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+#if NETCORE5_0
+using System;
+#endif
 using System.IO;
 using NuGet.Packaging.Core;
 using NuGet.Versioning;
@@ -50,9 +53,15 @@ namespace NuGet.Packaging
         /// <returns>The package install path.</returns>
         public virtual string GetInstallPath(string packageId, NuGetVersion version)
         {
+#if NETCORE5_0
+            return Path.Join(
+                RootPath.AsSpan(),
+                GetPackageDirectory(packageId, version));
+#else
             return Path.Combine(
                 RootPath,
                 GetPackageDirectory(packageId, version));
+#endif
         }
 
         /// <summary>
@@ -62,9 +71,16 @@ namespace NuGet.Packaging
         /// <returns>The package version list path.</returns>
         public string GetVersionListPath(string packageId)
         {
+#if NETCORE5_0
+            return Path.Join(
+                RootPath.AsSpan(),
+                GetVersionListDirectory(packageId).AsSpan());
+#else
             return Path.Combine(
                 RootPath,
                 GetVersionListDirectory(packageId));
+#endif
+
         }
 
         /// <summary>
@@ -75,9 +91,15 @@ namespace NuGet.Packaging
         /// <returns>The package file path.</returns>
         public string GetPackageFilePath(string packageId, NuGetVersion version)
         {
+#if NETCORE5_0
+            return Path.Join(
+                GetInstallPath(packageId, version).AsSpan(),
+                GetPackageFileName(packageId, version).AsSpan());
+#else
             return Path.Combine(
                 GetInstallPath(packageId, version),
                 GetPackageFileName(packageId, version));
+#endif
         }
 
         /// <summary>
@@ -89,9 +111,15 @@ namespace NuGet.Packaging
         public string GetManifestFilePath(string packageId, NuGetVersion version)
         {
             packageId = Normalize(packageId);
+#if NETCORE5_0            
+            return Path.Join(
+                GetInstallPath(packageId, version).AsSpan(),
+                GetManifestFileName(packageId, version).AsSpan());
+#else
             return Path.Combine(
                 GetInstallPath(packageId, version),
                 GetManifestFileName(packageId, version));
+#endif
         }
 
         /// <summary>
@@ -102,9 +130,15 @@ namespace NuGet.Packaging
         /// <returns>The hash file path.</returns>
         public string GetHashPath(string packageId, NuGetVersion version)
         {
+#if NETCORE5_0
+            return Path.Join(
+                GetInstallPath(packageId, version).AsSpan(),
+                GetHashFileName(packageId, version).AsSpan());
+#else
             return Path.Combine(
                 GetInstallPath(packageId, version),
                 GetHashFileName(packageId, version));
+#endif
         }
 
         /// <summary>
@@ -126,9 +160,15 @@ namespace NuGet.Packaging
         /// <returns>The hash file path.</returns>
         public string GetNupkgMetadataPath(string packageId, NuGetVersion version)
         {
+#if NETCORE5_0
+            return Path.Join(
+                GetInstallPath(packageId, version).AsSpan(),
+                PackagingCoreConstants.NupkgMetadataFileExtension.AsSpan());
+#else
             return Path.Combine(
                 GetInstallPath(packageId, version),
                 PackagingCoreConstants.NupkgMetadataFileExtension);
+#endif
         }
 
         /// <summary>
@@ -149,9 +189,15 @@ namespace NuGet.Packaging
         /// <returns>The package directory.</returns>
         public virtual string GetPackageDirectory(string packageId, NuGetVersion version)
         {
+#if NETCORE5_0
+            return Path.Join(
+                GetVersionListDirectory(packageId).AsSpan(),
+                Normalize(version).AsSpan());
+#else
             return Path.Combine(
                 GetVersionListDirectory(packageId),
                 Normalize(version));
+#endif
         }
 
         /// <summary>

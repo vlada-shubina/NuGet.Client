@@ -17,6 +17,8 @@ namespace NuGet.Packaging
     // If the version was always normalized for package directory and package file name, there would be no issue :(
     public static class PackagePathHelper
     {
+        private static readonly string NupkgExtension = "*" + PackagingCoreConstants.NupkgExtension;
+
         internal static IEnumerable<string> GetFiles(string root, string path, string filter, bool recursive)
         {
             path = PathUtility.EnsureTrailingSlash(Path.Combine(root, path));
@@ -65,7 +67,7 @@ namespace NuGet.Packaging
 
         private static IEnumerable<string> GetPackageFiles(string root, string filter)
         {
-            filter = filter ?? "*" + PackagingCoreConstants.NupkgExtension;
+            filter ??= NupkgExtension;
             Debug.Assert(
                 filter.EndsWith(PackagingCoreConstants.NupkgExtension, StringComparison.OrdinalIgnoreCase) ||
                 filter.EndsWith(PackagingCoreConstants.NuspecExtension, StringComparison.OrdinalIgnoreCase));

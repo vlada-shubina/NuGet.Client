@@ -49,7 +49,7 @@
     <PackageReference Include="System.Security.Cryptography.Cng" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(IsDesktop)' == 'true' OR '$(IsCoreNetStandard)' == 'true' ">
+  <ItemGroup Condition=" '$(IsNet5Era)' == '' ">
     <PackageReference Include="System.Memory" />
   </ItemGroup>
 

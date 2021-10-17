@@ -34,8 +34,8 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.Memory" Version="4.5.4" Condition=" '$(TargetFramework)' == 'net472' or '$(TargetFramework)' == 'net45' or '$(TargetFramework)' == 'netstandard2.0'" />
+  <ItemGroup  Condition=" '$(IsNet5Era)' == '' ">
+    <PackageReference Include="System.Memory" />
   </ItemGroup>
 
   <Import Project="$(BuildCommonDirectory)common.targets"/>
