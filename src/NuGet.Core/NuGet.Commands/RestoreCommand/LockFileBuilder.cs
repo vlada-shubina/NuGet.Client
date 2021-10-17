@@ -364,10 +364,11 @@ namespace NuGet.Commands
         {
             IList<LockFileTargetLibrary> libraries = lockFileTarget.Libraries;
             var libraryReferences = new Dictionary<string, LockFileTargetLibrary>();
+            const char Space = ' ';
 
             foreach (LockFileTargetLibrary library in libraries)
             {
-                var libraryKey = library.Name + " " + library.Version;
+                var libraryKey = library.Name + Space + library.Version;
 
                 if (libraryReferences.TryGetValue(libraryKey, out LockFileTargetLibrary existingLibrary))
                 {
