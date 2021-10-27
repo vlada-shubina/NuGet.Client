@@ -291,6 +291,7 @@ Copyright (c) .NET Foundation. All rights reserved.
         Projects="@(FilteredRestoreGraphProjectInputItemsWithoutDuplicates)"
         Targets="_IsProjectRestoreSupported"
         SkipNonexistentTargets="true"
+        ContinueOnError="$(RestoreContinueOnError)"
         Properties="$(_GenerateRestoreGraphProjectEntryInputProperties)">
 
       <Output
@@ -1018,6 +1019,7 @@ Copyright (c) .NET Foundation. All rights reserved.
       Targets="_GenerateRestoreProjectPathItemsPerFramework"
       SkipNonexistentTargets="true"
       SkipNonexistentProjects="true"
+      ContinueOnError="$(RestoreContinueOnError)"
       Properties="TargetFramework=%(_RestoreTargetFrameworkItems.Identity);
                   $(_GenerateRestoreGraphProjectEntryInputProperties)">
 
@@ -1060,6 +1062,7 @@ Copyright (c) .NET Foundation. All rights reserved.
       Targets="_GenerateRestoreProjectPathWalk"
       SkipNonexistentTargets="true"
       SkipNonexistentProjects="true"
+      ContinueOnError="$(RestoreContinueOnError)"
       Properties="$(_GenerateRestoreGraphProjectEntryInputProperties)">
 
       <Output
@@ -1116,6 +1119,7 @@ Copyright (c) .NET Foundation. All rights reserved.
         Targets="_GenerateRestoreProjectPathWalk"
         SkipNonexistentTargets="true"
         SkipNonexistentProjects="true"
+        ContinueOnError="$(RestoreContinueOnError)"
         Properties="$(_GenerateRestoreGraphProjectEntryInputProperties)">
 
       <Output
@@ -1153,6 +1157,7 @@ Copyright (c) .NET Foundation. All rights reserved.
         Targets="_IsProjectRestoreSupported"
         SkipNonexistentTargets="true"
         SkipNonexistentProjects="true"
+        ContinueOnError="$(RestoreContinueOnError)"
         Properties="$(_GenerateRestoreGraphProjectEntryInputProperties)">
 
       <Output
