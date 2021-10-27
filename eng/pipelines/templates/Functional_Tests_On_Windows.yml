@@ -8,7 +8,6 @@ steps:
 
 - task: PowerShell@1
   displayName: "Download Config Files"
-  enabled: "false"
   inputs:
     scriptType: "inlineScript"
     inlineScript: |
