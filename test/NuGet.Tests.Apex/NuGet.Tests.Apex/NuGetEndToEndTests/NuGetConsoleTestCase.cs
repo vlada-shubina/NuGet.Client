@@ -564,8 +564,9 @@ namespace NuGet.Tests.Apex
             solutionService.Save();
         }
 
-        [NuGetWpfTheory]
-        [MemberData(nameof(GetPackageReferenceTemplates))]
+        [DataTestMethod]
+        [DataRow(ProjectTemplate.NetStandardClassLib, true)]
+        [Timeout(Timeout)]
         public async Task InstallPackageForPR_PackageNamespace_WithMultipleFeedsWithIdenticalPackages_InstallsCorrectPackage(ProjectTemplate projectTemplate)
         {
             // Arrange
@@ -622,8 +623,9 @@ namespace NuGet.Tests.Apex
             Assert.True(VisualStudio.HasNoErrorsInOutputWindows());
         }
 
-        [NuGetWpfTheory]
-        [MemberData(nameof(GetPackageReferenceTemplates))]
+        [DataTestMethod]
+        [DataRow(ProjectTemplate.NetStandardClassLib, true)]
+        [Timeout(Timeout)]
         public async Task UpdatePackageForPR_PackageNamespace_WithMultipleFeedsWithIdenticalPackages_InstallsCorrectPackage(ProjectTemplate projectTemplate)
         {
             // Arrange

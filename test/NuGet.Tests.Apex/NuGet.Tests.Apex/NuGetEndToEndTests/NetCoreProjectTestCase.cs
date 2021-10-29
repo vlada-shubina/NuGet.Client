@@ -55,13 +55,16 @@ namespace NuGet.Tests.Apex
             }
         }
 
-        [NuGetWpfTheory]
-        [MemberData(nameof(GetNetCoreTemplates))]
+        [TestMethod]
+        [Timeout(Timeout)]
         public async Task WithSourceMappingEnabled_InstallPackageFromPMUIFromExpectedSource_Succeeds(ProjectTemplate projectTemplate)
         {
             // Arrange
             EnsureVisualStudioHost();
 
+            // There  is a bug with VS or Apex where NetCoreConsoleApp and NetCoreClassLib create netcore 2.1 projects that are not supported by the sdk
+            // Commenting out any NetCoreConsoleApp or NetCoreClassLib template and swapping it for NetStandardClassLib as both are package ref.
+            ProjectTemplate projectTemplate = ProjectTemplate.NetStandardClassLib;
             using (var simpleTestPathContext = new SimpleTestPathContext())
             {
                 string solutionDirectory = simpleTestPathContext.SolutionRoot;
@@ -118,13 +121,14 @@ namespace NuGet.Tests.Apex
             }
         }
 
-        [NuGetWpfTheory]
-        [MemberData(nameof(GetNetCoreTemplates))]
+        [TestMethod]
+        [Timeout(Timeout)]
         public async Task WithSourceMappingEnabled_InstallAndUpdatePackageFromPMUIFromExpectedSource_Succeeds(ProjectTemplate projectTemplate)
         {
             // Arrange
             EnsureVisualStudioHost();
 
+            ProjectTemplate projectTemplate = ProjectTemplate.NetStandardClassLib;
             using (var simpleTestPathContext = new SimpleTestPathContext())
             {
                 string solutionDirectory = simpleTestPathContext.SolutionRoot;
@@ -190,13 +194,14 @@ namespace NuGet.Tests.Apex
             }
         }
 
-        [NuGetWpfTheory]
-        [MemberData(nameof(GetNetCoreTemplates))]
+        [TestMethod]
+        [Timeout(Timeout)]
         public async Task WithSourceMappingEnabled_InstallPackageFromPMUIAndNoSourcesFound_Fails(ProjectTemplate projectTemplate)
         {
             // Arrange
             EnsureVisualStudioHost();
 
+            ProjectTemplate projectTemplate = ProjectTemplate.NetStandardClassLib;
             using (var simpleTestPathContext = new SimpleTestPathContext())
             {
                 string solutionDirectory = simpleTestPathContext.SolutionRoot;
@@ -247,14 +252,6 @@ namespace NuGet.Tests.Apex
                     CommonUtility.AssertPackageReferenceDoesNotExist(VisualStudio, testContext.SolutionService.Projects[0], packageName, packageVersion, XunitLogger);
                 }
             }
-        }
-
-        // There  is a bug with VS or Apex where NetCoreConsoleApp and NetCoreClassLib create netcore 2.1 projects that are not supported by the sdk
-        // Commenting out any NetCoreConsoleApp or NetCoreClassLib template and swapping it for NetStandardClassLib as both are package ref.
-
-        public static IEnumerable<object[]> GetNetCoreTemplates()
-        {
-            yield return new object[] { ProjectTemplate.NetStandardClassLib };
         }
     }
 }
