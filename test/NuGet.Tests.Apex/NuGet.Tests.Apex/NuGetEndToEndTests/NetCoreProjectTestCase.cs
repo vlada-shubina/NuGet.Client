@@ -14,11 +14,6 @@ namespace NuGet.Tests.Apex
     {
         private const int Timeout = 5 * 60 * 1000; // 5 minutes
 
-        public NetCoreProjectTestCase()
-            : base()
-        {
-        }
-
         // basic create for .net core template
         [TestMethod]
         [Timeout(Timeout)]

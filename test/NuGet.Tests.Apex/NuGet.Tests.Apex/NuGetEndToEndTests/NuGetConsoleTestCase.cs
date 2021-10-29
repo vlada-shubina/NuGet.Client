@@ -16,11 +16,6 @@ namespace NuGet.Tests.Apex
     {
         private const int Timeout = 5 * 60 * 1000; // 5 minutes
 
-        public NuGetConsoleTestCase()
-            : base()
-        {
-        }
-
         [TestMethod]
         [Timeout(Timeout)]
         public async Task InstallPackageFromPMCWithNoAutoRestoreVerifyAssetsFileAsync()

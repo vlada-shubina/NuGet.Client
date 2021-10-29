@@ -19,11 +19,6 @@ namespace NuGet.Tests.Apex
         private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(10);
         private static readonly TimeSpan Interval = TimeSpan.FromSeconds(2);
 
-        public NuGetUITestCase()
-            : base()
-        {
-        }
-
         [TestMethod]
         [Timeout(TestTimeoutLimit)]
         public void SearchPackageFromUI()

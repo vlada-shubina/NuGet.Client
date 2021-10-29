@@ -21,11 +21,6 @@ namespace NuGet.Tests.Apex
 
         private static SignedPackagesTestsApexFixture Fixture;
 
-        public RepositoryCountersignedPackageTestCase()
-            : base()
-        {
-        }
-
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
         {
