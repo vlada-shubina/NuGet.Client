@@ -8,8 +8,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft;
 using Microsoft.ServiceHub.Framework;
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Shell.ServiceBroker;
 using Microsoft.VisualStudio.Threading;
 using NuGet.Common;
 using NuGet.PackageManagement.VisualStudio;
@@ -29,10 +30,14 @@ namespace API.Test
                     await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                     var dte = ServiceLocator.GetDTE();
 
-                    var projectUniqueNames = new List<string>();
+                    var projectGuids = new List<Guid>();
+                    var vsSolution2 = ServiceLocator.GetService<SVsSolution, IVsSolution2>();
+
                     foreach (EnvDTE.Project project in dte.Solution.Projects)
                     {
-                        projectUniqueNames.Add(project.Name);
+                        var hierarchy = await project.ToVsHierarchyAsync();
+                        vsSolution2.GetGuidOfProject(hierarchy, out Guid guid);
+                        projectGuids.Add(guid);
                     }
 
                     // This is technically a big no-no in production code,
@@ -42,11 +47,13 @@ namespace API.Test
                         await TaskScheduler.Default;
                     }
 
-                    var service = await GetIVsPackageInstallerClientAsync();
-                    foreach (var projectName in projectUniqueNames)
+                    INuGetProjectService service = await GetNuGetProjectServiceAsync();
+
+                    foreach (var projectName in projectGuids)
                     {
-                        await service.InstallLatestPackageAsync(null, projectName, id, prerelease, CancellationToken.None);
+                        await service.InstallLatestPackageAsync(projectName, source: null, id, prerelease, CancellationToken.None);
                         return;
+
                     }
                 });
         }
@@ -59,10 +66,14 @@ namespace API.Test
                     await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                     var dte = ServiceLocator.GetDTE();
 
-                    var projectUniqueNames = new List<string>();
+                    var projectGuids = new List<Guid>();
+                    var vsSolution2 = ServiceLocator.GetService<SVsSolution, IVsSolution2>();
+
                     foreach (EnvDTE.Project project in dte.Solution.Projects)
                     {
-                        projectUniqueNames.Add(project.Name);
+                        var hierarchy = await project.ToVsHierarchyAsync();
+                        vsSolution2.GetGuidOfProject(hierarchy, out Guid guid);
+                        projectGuids.Add(guid);
                     }
 
                     // Condition thread switches is technically a big no-no in production code,
@@ -72,10 +83,10 @@ namespace API.Test
                         await TaskScheduler.Default;
                     }
 
-                    var service = await GetIVsPackageInstallerClientAsync();
-                    foreach (var projectName in projectUniqueNames)
+                    INuGetProjectService service = await GetNuGetProjectServiceAsync();
+                    foreach (var projectName in projectGuids)
                     {
-                        await service.InstallPackageAsync(source, projectName, id, version, CancellationToken.None);
+                        await service.InstallPackageAsync(projectName, source, id, version, CancellationToken.None);
                         return;
                     }
                 });
@@ -255,20 +266,24 @@ namespace API.Test
                 });
         }
 
-        private static async Task<INuGetPackageInstaller> GetIVsPackageInstallerClientAsync()
+        private static async Task<INuGetProjectService> GetNuGetProjectServiceAsync()
         {
             IBrokeredServiceContainer brokeredServiceContainer = await GetBrokeredServiceContainerAsync();
             Assumes.Present(brokeredServiceContainer);
+
             IServiceBroker sb = brokeredServiceContainer.GetFullAccessServiceBroker();
-            INuGetPackageInstaller client = await sb.GetProxyAsync<INuGetPackageInstaller>(NuGetServices.PackageInstallerService);
-            return client;
+#pragma warning disable ISB001 // Dispose of proxies
+            var service = await sb.GetProxyAsync<INuGetProjectService>(NuGetServices.NuGetProjectServiceV1, CancellationToken.None);
+#pragma warning restore ISB001 // Dispose of proxies
+            return service;
+
+            static async Task<IBrokeredServiceContainer> GetBrokeredServiceContainerAsync()
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                // We don't have access to an async service provider here, so we use the global one.
+                return ServiceLocator.GetService<SVsBrokeredServiceContainer, IBrokeredServiceContainer>();
+            }
         }
 
-        private static async Task<IBrokeredServiceContainer> GetBrokeredServiceContainerAsync()
-        {
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-            // We don't have access to an async service provider here, so we use the global one.
-            return ServiceLocator.GetService<SVsBrokeredServiceContainer, IBrokeredServiceContainer>();
-        }
     }
 }

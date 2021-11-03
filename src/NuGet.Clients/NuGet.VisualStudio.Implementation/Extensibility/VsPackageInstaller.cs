@@ -135,7 +135,6 @@ namespace NuGet.VisualStudio
             }
         }
 
-        // Calls from the installer sync APIs end up here.
         private Task InstallPackageAsync(string source, Project project, string packageId, NuGetVersion version, bool includePrerelease, bool ignoreDependencies)
         {
             (IEnumerable<string> sources, List<PackageIdentity> toInstall, VSAPIProjectContext projectContext) = PrepForInstallation(_settings, source, packageId, version, isAllRespected: true);

@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
 using NuGet.Common;
@@ -94,9 +93,8 @@ namespace NuGet.VisualStudio.Implementation.Extensibility
 
         private Task InstallPackageAsync(Guid projectId, string packageId, NuGetVersion version, bool includePrerelease, CancellationToken cancellationToken)
         {
-            // TODO NK - Run it with the correct context.
             (IEnumerable<string> sources, List<PackageIdentity> toInstall, VSAPIProjectContext projectContext) = VsPackageInstaller.PrepForInstallation(_settings, null, packageId, version, isAllRespected: false);
-            Task<NuGetProject> getNuGetProjectAsync(IVsSolutionManager vsSolutionManager) => GetNuGetProjectAsync(vsSolutionManager, projectId);
+            Task<NuGetProject> getNuGetProjectAsync(IVsSolutionManager vsSolutionManager) => vsSolutionManager.GetNuGetProjectAsync(projectId.ToString());
             ISourceRepositoryProvider sourceRepositoryProvider = null;
 
             return PackageServiceUtilities.InstallInternalAsync(
@@ -110,11 +108,6 @@ namespace NuGet.VisualStudio.Implementation.Extensibility
                 includePrerelease,
                 ignoreDependencies: false,
                 cancellationToken);
-        }
-
-        private static async Task<NuGetProject> GetNuGetProjectAsync(IVsSolutionManager vsSolutionManager, Guid projectId)
-        {
-            return await vsSolutionManager.GetNuGetProjectAsync(projectId.ToString());
         }
 
         private async Task<(InstalledPackageResultStatus, IReadOnlyCollection<NuGetInstalledPackage>)> GetInstalledPackagesAsync(BuildIntegratedNuGetProject project, CancellationToken cancellationToken)
