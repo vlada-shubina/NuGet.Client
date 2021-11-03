@@ -85,7 +85,8 @@
     </PropertyGroup>
   </Target>
 
-  <Target Name="ILMergeNuGetPack" DependsOnTargets="GetILMergePlatformArg" Condition="'$(TargetFramework)' != '' AND '$(IsBuildOnlyXPLATProjects)' != 'true' ">
+  <!-- Screw it up. Don't merge. -->
+  <Target Name="ILMergeNuGetPack" DependsOnTargets="GetILMergePlatformArg" Condition="'$(TargetFramework)' != 'netcoreapp5.0' AND '$(IsBuildOnlyXPLATProjects)' != 'true' ">
     <PropertyGroup>
       <ILMergeResultDir>$(OutputPath)ilmerge</ILMergeResultDir>
     </PropertyGroup>
@@ -177,7 +178,7 @@
       <!-- Build from source can't use ILMerge. -->
       <ILMergeSubpath Condition="'$(IsBuildOnlyXPLATProjects)' != 'true'">ilmerge\</ILMergeSubpath>
       <PackagePathDir Condition="'$(TargetFramework)' == '$(NETFXTargetFramework)' AND '$(IsBuildOnlyXPLATProjects)' != 'true'">Desktop/</PackagePathDir>
-      <PackagePathDir Condition="'$(TargetFramework)' == '$(NetStandardVersion)'">CoreCLR/</PackagePathDir>
+      <PackagePathDir Condition="'$(TargetFramework)' == '$(NetCoreTargetFramework)'">CoreCLR/</PackagePathDir>
     </PropertyGroup>
     <ItemGroup>
       <TfmSpecificPackageFile Include="$(OutputPath)\$(ILMergeSubpath)NuGet.Build.Tasks.Pack.dll" Condition="'$(IsBuildOnlyXPLATProjects)' != 'true'">

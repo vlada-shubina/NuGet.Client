@@ -34,8 +34,8 @@
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Net.Http" />
   </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == '$(NetStandardVersion)' ">
+  
+  <ItemGroup Condition=" '$(TargetFramework)' == '$(NetCoreTargetFramework)' ">
     <PackageReference Include="System.ComponentModel.Composition" />
   </ItemGroup>
 
