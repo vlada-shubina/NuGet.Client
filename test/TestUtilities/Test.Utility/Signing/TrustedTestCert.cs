@@ -46,6 +46,10 @@ namespace Test.Utility.Signing
 
         private const string KeychainForMac = "/Library/Keychains/System.keychain";
 
+        //MacOS 11.6(Big Sur) has different security settings and permissions compared with 11.5.
+        //If running the following command, it could bypass a popup asking for unlocking a keychain.
+        private const string BypassGUIAuthCheckForMac = "sudo security authorizationdb write com.apple.trust-settings.admin allow";
+
         public TrustedTestCert(T source,
             Func<T, X509Certificate2> getCert,
             StoreName storeName = StoreName.TrustedPeople,
@@ -127,6 +131,8 @@ namespace Test.Utility.Signing
 
             File.WriteAllBytes(certFile.FullName, TrustedCert.RawData);
 
+            RunMacCommand(BypassGUIAuthCheckForMac);
+
             string addToKeyChainCmd = $"sudo security add-trusted-cert -d -r trustRoot " +
                                       $"-k \"{KeychainForMac}\" " +
                                       $"\"{certFile.FullName}\"";
@@ -142,6 +148,8 @@ namespace Test.Utility.Signing
             var certFile = new FileInfo(Path.Combine("/tmp", $"{TrustedCert.Thumbprint}.cer"));
 
             string removeFromKeyChainCmd = $"sudo security delete-certificate -Z {TrustedCert.Thumbprint}  \"{KeychainForMac}\"";
+
+            RunMacCommand(BypassGUIAuthCheckForMac);
 
             try
             {
