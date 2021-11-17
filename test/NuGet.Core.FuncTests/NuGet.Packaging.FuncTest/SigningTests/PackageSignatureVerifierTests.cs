@@ -235,8 +235,12 @@ namespace NuGet.Packaging.FuncTest
 
                         Assert.False(results.IsValid);
                         Assert.Equal(SignatureVerificationStatus.Disallowed, result.Trust);
+
                         Assert.Equal(1, result.Issues.Count(issue => issue.Level == LogLevel.Error));
-                        Assert.Equal(0, result.Issues.Count(issue => issue.Level == LogLevel.Warning));
+
+                        string warnings = string.Join(",",result.Issues.Where(issue => issue.Level == LogLevel.Warning));
+                        result.Issues.Count(issue => issue.Level == LogLevel.Warning).Should().Be(0, because: warnings);
+                        //Assert.Equal(0, result.Issues.Count(issue => issue.Level == LogLevel.Warning));
 
                         Assert.Contains(result.Issues, issue =>
                             issue.Code == NuGetLogCode.NU3037 &&

@@ -91,11 +91,13 @@ namespace NuGet.Packaging.Signing
                     }
                 }
 
+                string fatalStatusString = string.Join(";", fatalStatuses.Select(x => x.Status.ToString()).ToArray());
+
                 if (fatalStatuses.Any())
                 {
                     if (certificateType == CertificateType.Timestamp)
                     {
-                        throw new TimestampException(logCode, Strings.CertificateChainValidationFailed);
+                        throw new TimestampException(logCode, Strings.CertificateChainValidationFailed + fatalStatusString);
                     }
 
                     throw new SignatureException(logCode, Strings.CertificateChainValidationFailed);
