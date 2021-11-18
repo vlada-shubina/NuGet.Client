@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using NuGet.Common;
 using NuGet.Protocol.Events;
 
+#nullable enable
+
 namespace NuGet.Protocol
 {
     /// <summary>
@@ -37,10 +39,12 @@ namespace NuGet.Protocol
         /// requests cannot always be used. For example, suppose the request is a POST and contains content
         /// of a stream that can only be consumed once.
         /// </remarks>
+#nullable restore // nullable affects PublicAPI.*.txt
         public Task<HttpResponseMessage> SendAsync(
             HttpRetryHandlerRequest request,
             ILogger log,
             CancellationToken cancellationToken)
+#nullable enable
         {
             return SendAsync(request, source: string.Empty, log, cancellationToken);
         }
@@ -53,12 +57,14 @@ namespace NuGet.Protocol
         /// requests cannot always be used. For example, suppose the request is a POST and contains content
         /// of a stream that can only be consumed once.
         /// </remarks>
+#nullable restore // nullable affects PublicAPI.*.txt
         public async Task<HttpResponseMessage> SendAsync(
             HttpRetryHandlerRequest request,
             string source,
             ILogger log,
             CancellationToken cancellationToken)
         {
+#nullable enable
             if (source == null)
             {
                 throw new ArgumentNullException(nameof(source));
@@ -71,33 +77,12 @@ namespace NuGet.Protocol
             }
 
             var tries = 0;
-            HttpResponseMessage response = null;
+            HttpResponseMessage? response = null;
             var success = false;
 
             while (tries < request.MaxTries && !success)
             {
-                // There are many places where another variable named "MaxTries" is set to 1,
-                // so the Delay() never actually occurs.
-                // When opted in to "enhanced retry", do the delay and have it increase exponentially where applicable
-                // (i.e. when "tries" is allowed to be > 1)
-                if (tries > 0 || (_enhancedHttpRetryHelper.EnhancedHttpRetryEnabled && request.IsRetry))
-                {
-                    // "Enhanced" retry: In the case where this is actually a 2nd-Nth try, back off exponentially with some random.
-                    // In many cases due to the external retry loop, this will be always be 1 * request.RetryDelay.TotalMilliseconds + 0-200 ms
-                    if (_enhancedHttpRetryHelper.EnhancedHttpRetryEnabled)
-                    {
-                        if (tries >= 3 || (tries == 0 && request.IsRetry))
-                        {
-                            log.LogVerbose("Enhanced retry: HttpRetryHandler is in a state that retry would have been abandoned or not waited if it were not enabled.");
-                        }
-                        await Task.Delay(TimeSpan.FromMilliseconds((Math.Pow(2, tries) * request.RetryDelay.TotalMilliseconds) + new Random().Next(200)));
-                    }
-                    // Old behavior; always delay a constant amount
-                    else
-                    {
-                        await Task.Delay(request.RetryDelay, cancellationToken);
-                    }
-                }
+                await WaitBeforeRetryAsync(tries, request, response, log, cancellationToken);
 
                 tries++;
                 success = true;
@@ -107,7 +92,7 @@ namespace NuGet.Protocol
                     var stopwatches = new List<Stopwatch>(2);
                     var bodyStopwatch = new Stopwatch();
                     stopwatches.Add(bodyStopwatch);
-                    Stopwatch headerStopwatch = null;
+                    Stopwatch? headerStopwatch = null;
                     if (request.CompletionOption == HttpCompletionOption.ResponseHeadersRead)
                     {
                         headerStopwatch = new Stopwatch();
@@ -208,6 +193,14 @@ namespace NuGet.Protocol
                         {
                             success = false;
                         }
+                        else if ((int)response.StatusCode >= 400 && response.Headers.RetryAfter != null)
+                        {
+                            // Most likely HTTP 429 Too many requests
+                            // But looking at docs online, it might also happen on:
+                            // HTTP 503 - although that will be caught above
+                            // HTTP 301 - although we allow the HttpClient to follow redirects automatically, so we shouldn't get those reponses here
+                            success = false;
+                        }
                     }
                     catch (OperationCanceledException)
                     {
@@ -265,6 +258,56 @@ namespace NuGet.Protocol
             }
 
             return response;
+        }
+
+        private async Task WaitBeforeRetryAsync(int tries, HttpRetryHandlerRequest request, HttpResponseMessage? response, ILogger log, CancellationToken cancellationToken)
+        {
+            // There are many places where another variable named "MaxTries" is set to 1,
+            // so the Delay() never actually occurs.
+            // When opted in to "enhanced retry", do the delay and have it increase exponentially where applicable
+            // (i.e. when "tries" is allowed to be > 1)
+            if (tries == 0 && !_enhancedHttpRetryHelper.EnhancedHttpRetryEnabled && !request.IsRetry)
+                return;
+
+            // "Enhanced" retry: In the case where this is actually a 2nd-Nth try, back off exponentially with some random.
+            // In many cases due to the external retry loop, this will be always be 1 * request.RetryDelay.TotalMilliseconds + 0-200 ms
+            TimeSpan delay = _enhancedHttpRetryHelper.EnhancedHttpRetryEnabled
+                ? TimeSpan.FromMilliseconds((Math.Pow(2, tries) * request.RetryDelay.TotalMilliseconds) + new Random().Next(200))
+                : request.RetryDelay;
+
+            if (_enhancedHttpRetryHelper.EnhancedHttpRetryEnabled)
+            {
+                if (tries >= 3 || (tries == 0 && request.IsRetry))
+                {
+                    log.LogVerbose("Enhanced retry: HttpRetryHandler is in a state that retry would have been abandoned or not waited if it were not enabled.");
+                }
+            }
+
+            // If there is a previous response, and contains a Retry-After header, use that delay instead.
+            if (response?.Headers?.RetryAfter != null)
+            {
+                TimeSpan? newDelay = response.Headers.RetryAfter.Delta;
+                if (newDelay.HasValue)
+                {
+                    delay = newDelay.Value;
+                }
+                else
+                {
+                    DateTimeOffset? date = response.Headers.RetryAfter.Date;
+                    if (date.HasValue)
+                    {
+                        newDelay = date.Value.ToUniversalTime() - DateTimeOffset.UtcNow;
+                    }
+                }
+
+                // If the server is reporting a very long delay, for example a planned 1 hour maintainance, we don't want to wait that long
+                if (newDelay != null && newDelay < TimeSpan.FromSeconds(10))
+                {
+                    delay = newDelay.Value;
+                }
+            }
+
+            await Task.Delay(delay, cancellationToken);
         }
     }
 }
