@@ -238,7 +238,7 @@ namespace NuGet.Packaging.FuncTest
 
                         Assert.Equal(1, result.Issues.Count(issue => issue.Level == LogLevel.Error));
 
-                        string warnings = string.Join(",",result.Issues.Where(issue => issue.Level == LogLevel.Warning));
+                        string warnings = string.Join(",",result.Issues.Where(issue => issue.Level == LogLevel.Warning).Select(x => x.Message.ToString()).ToArray());
                         result.Issues.Count(issue => issue.Level == LogLevel.Warning).Should().Be(0, because: warnings);
                         //Assert.Equal(0, result.Issues.Count(issue => issue.Level == LogLevel.Warning));
 
