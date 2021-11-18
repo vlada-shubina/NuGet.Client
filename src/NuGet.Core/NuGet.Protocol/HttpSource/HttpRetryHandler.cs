@@ -262,8 +262,7 @@ namespace NuGet.Protocol
 
         private async Task WaitBeforeRetryAsync(int tries, HttpRetryHandlerRequest request, HttpResponseMessage? response, ILogger log, CancellationToken cancellationToken)
         {
-            // There are many places where another variable named "MaxTries" is set to 1,
-            // so the Delay() never actually occurs.
+            // Some NuGet.Protocol resources try to do retries themselves, hence tell HttpRetryHandler MaxTries == 1.
             // When opted in to "enhanced retry", do the delay and have it increase exponentially where applicable
             // (i.e. when "tries" is allowed to be > 1)
             if (tries == 0 && !_enhancedHttpRetryHelper.EnhancedHttpRetryEnabled && !request.IsRetry)
