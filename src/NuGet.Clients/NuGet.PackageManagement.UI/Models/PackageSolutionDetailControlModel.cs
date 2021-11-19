@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
@@ -53,15 +54,17 @@ namespace NuGet.PackageManagement.UI
             _solutionManager.ProjectRenamed += SolutionProjectChanged;
 
             // when the SelectedVersion is changed, we need to update CanInstall and CanUninstall.
-            PropertyChanged += (_, e) =>
-            {
-                if (e.PropertyName == nameof(SelectedVersion))
-                {
-                    UpdateCanInstallAndCanUninstall();
-                }
-            };
+            PropertyChanged += OnInstallItemPropertyChanged;
 
             await CreateProjectListsAsync(cancellationToken);
+        }
+
+        protected override void OnInstallItemPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(SelectedVersion))
+            {
+                UpdateCanInstallAndCanUninstall();
+            }
         }
 
         public static async ValueTask<PackageSolutionDetailControlModel> CreateAsync(

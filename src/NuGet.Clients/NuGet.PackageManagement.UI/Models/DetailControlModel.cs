@@ -79,9 +79,17 @@ namespace NuGet.PackageManagement.UI
             {
                 _selectedVersionCancellationTokenSource.Dispose();
                 Options.SelectedChanged -= DependencyBehavior_SelectedChanged;
+
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged -= OnInstallItemPropertyChanged;
+                }
+
                 CleanUp();
             }
         }
+
+        protected abstract void OnInstallItemPropertyChanged(object sender, PropertyChangedEventArgs e);
 
         /// <summary>
         /// Returns the list of projects that are selected for the given action

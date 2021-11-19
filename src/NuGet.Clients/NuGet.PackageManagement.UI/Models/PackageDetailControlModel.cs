@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using Microsoft.ServiceHub.Framework;
@@ -221,6 +222,11 @@ namespace NuGet.PackageManagement.UI
         public override IEnumerable<IProjectContextInfo> GetSelectedProjects(UserAction action)
         {
             return _nugetProjects;
+        }
+
+        protected override void OnInstallItemPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            // no op
         }
     }
 }
