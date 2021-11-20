@@ -92,7 +92,7 @@ namespace NuGet.Test.Utility
 
                         var processName = Path.GetFileName(process);
 
-                        throw new TimeoutException($"{processName} timed out: " + psi.Arguments + $" Output: {output.ToString()}");
+                        throw new TimeoutException($"{processName} timed out: " + psi.Arguments);
                     }
                 }
 
