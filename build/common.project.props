@@ -59,6 +59,7 @@
     <!-- additional warnings new in .NET 6 that we need to disable when building with source-build -->
     <NoWarn Condition="'$(DotNetBuildFromSource)' == 'true'">$(NoWarn);CS1998;CA1416;CS0618;CS1574</NoWarn>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>5</AnalysisLevel>
   </PropertyGroup>
 
   <!-- Defaults -->
