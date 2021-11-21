@@ -87,3 +87,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "<Pending>", Scope = "type", Target = "~T:NuGet.PackageManagement.UI.Test.NuGetUITests")]
 [assembly: SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "<Pending>", Scope = "type", Target = "~T:NuGet.PackageManagement.UI.Test.PackageItemViewModelTests")]
 [assembly: SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "<Pending>", Scope = "type", Target = "~T:NuGet.PackageManagement.UI.Test.UserInterfaceService.NuGetUIContextTests")]
+[assembly: SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>", Scope = "member", Target = "~M:NuGet.PackageManagement.UI.Test.PackageItemViewModelTests.VerifyImageResult(System.Object,NuGet.PackageManagement.UI.IconBitmapStatus)")]
