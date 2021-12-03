@@ -23,7 +23,7 @@ jobs:
           msBuildVersion: '16.0'
           msBuildArchitecture: 'amd64'
           setupCommandline: '$(Build.Repository.LocalPath)\\configure.cmd -Force'
-          msBuildCommandline: 'msbuild.exe $(Build.Repository.LocalPath)\\build\\build.proj /t:RestoreVS,BuildNoVSIX /v:m /p:SkipILMergeOfNuGetExe=true'
+          msBuildCommandline: 'dotnet build $(Build.Repository.LocalPath)\\build\\build.proj /t:RestoreVS,BuildNoVSIX /v:m /p:SkipILMergeOfNuGetExe=true'
 
       - task: CredScan@2
         inputs:
