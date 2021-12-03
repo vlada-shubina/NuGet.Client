@@ -70,7 +70,19 @@ namespace NuGet.CommandLine.Test
         /// </summary>
         public void Start()
         {
-            Listener.Start();
+            try
+            {
+                Listener.Start();
+                if (Listener.Prefixes.Count > 0)
+                {
+                    throw new HttpListenerException(5050, "Donnie testing a fake Http error");
+                }
+            }
+            catch (HttpListenerException ex)
+            {
+                System.Console.WriteLine("Unexpected error code: {0}. Ex: {1}", ex.ErrorCode, ex);
+                throw;
+            }
             _listenerTask = Task.Factory.StartNew(() => HandleRequest());
         }
 
