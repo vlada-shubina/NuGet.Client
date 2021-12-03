@@ -17,6 +17,14 @@ jobs:
       vmImage: windows-latest
 
     steps:
+      - task: RoslynAnalyzers@3
+        inputs:
+          userProvideBuildInfo: 'msBuildInfo'
+          msBuildVersion: '16.0'
+          msBuildArchitecture: 'amd64'
+          setupCommandline: '$(Build.Repository.LocalPath)\\configure.cmd -Force'
+          msBuildCommandline: 'msbuild.exe build\\build.proj /t:RestoreVS,BuildNoVSIX /v:m /p:SkipILMergeOfNuGetExe=true'
+
       - task: CredScan@2
         inputs:
           toolMajorVersion: "V2"
