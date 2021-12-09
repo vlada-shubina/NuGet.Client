@@ -612,7 +612,7 @@ namespace NuGet.CommandLine.FuncTest.Commands
         }
 
         /// <summary>
-        /// When pushing *.Nupkg with SkipDuplicate, a 409 Conflict is ignored and the secondary symbols push proceeds.
+        /// When pushing *.Nupkg with SkipDuplicate, a 409 Conflict is ignored and the corresponding symbols push is skipped.
         /// </summary>
         [Fact]
         public void PushCommand_Server_Nupkg_ByWildcard_FindsMatchingSnupkgs_SkipDuplicate()
@@ -673,8 +673,8 @@ namespace NuGet.CommandLine.FuncTest.Commands
                 Assert.DoesNotContain(MESSAGE_PACKAGE_PUSHED, result.AllOutput); //nothing is pushed since nupkg/snupkgs are all skipped duplicates
                 Assert.DoesNotContain(genericFileNotFoundError, result.Errors);
 
-                Assert.Contains(snupkgFileName, result.AllOutput); //first snupkg is attempted as push
-                Assert.Contains(snupkgFileName2, result.AllOutput); //second snupkg is attempted when first duplicate is skipped
+                Assert.DoesNotContain(snupkgFileName, result.AllOutput); //first snupkg is not attempted since snupkg was duplicate.
+                Assert.DoesNotContain(snupkgFileName2, result.AllOutput); //second snupkg is not attempted since snupkg was duplicate.
             }
         }
 
