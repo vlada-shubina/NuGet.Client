@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -52,6 +53,8 @@ namespace NuGet.Protocol.Core.Types
         {
             get { return UriUtility.CreateSourceUri(_source); }
         }
+
+        public static List<string> ConflictPackageIdentities { get; private set; }
 
         public async Task Push(
             IList<string> packagePaths,
@@ -189,7 +192,6 @@ namespace NuGet.Protocol.Core.Types
             bool explicitSymbolsPush,
             CancellationToken token)
         {
-
             var isSymbolEndpointSnupkgCapable = symbolPackageUpdateResource != null;
             // Get the symbol package for this package
             var symbolPackagePath = GetSymbolsPath(packagePath, isSymbolEndpointSnupkgCapable);
@@ -344,10 +346,10 @@ namespace NuGet.Protocol.Core.Types
             ILogger logger,
             CancellationToken token)
         {
-            var serviceEndpointUrl = GetServiceEndpointUrl(source, string.Empty, noServiceEndpoint);
-            var useTempApiKey = IsSourceNuGetSymbolServer(source);
-            var codeNotToThrow = ConvertSkipDuplicateParamToHttpStatusCode(skipDuplicate);
-            var showPushCommandPackagePushed = true;
+            Uri serviceEndpointUrl = GetServiceEndpointUrl(source, string.Empty, noServiceEndpoint);
+            bool useTempApiKey = IsSourceNuGetSymbolServer(source);
+            HttpStatusCode? codeNotToThrow = ConvertSkipDuplicateParamToHttpStatusCode(skipDuplicate);
+            bool showPushCommandPackagePushed = true;
 
             if (useTempApiKey)
             {
@@ -355,7 +357,7 @@ namespace NuGet.Protocol.Core.Types
 
                 using (var packageReader = new PackageArchiveReader(pathToPackage))
                 {
-                    var packageIdentity = packageReader.GetIdentity();
+                    PackageIdentity packageIdentity = packageReader.GetIdentity();
                     var success = false;
                     var retry = 0;
 
@@ -366,7 +368,7 @@ namespace NuGet.Protocol.Core.Types
                             retry++;
                             success = true;
                             // If user push to https://nuget.smbsrc.net/, use temp api key.
-                            var tmpApiKey = await GetSecureApiKey(packageIdentity, apiKey, noServiceEndpoint, requestTimeout, logger, token);
+                            string tmpApiKey = await GetSecureApiKey(packageIdentity, apiKey, noServiceEndpoint, requestTimeout, logger, token);
 
                             await _httpSource.ProcessResponseAsync(
                                 new HttpSourceRequest(() => CreateRequest(serviceEndpointUrl, pathToPackage, tmpApiKey, logger))
@@ -376,9 +378,8 @@ namespace NuGet.Protocol.Core.Types
                                 },
                                 response =>
                                 {
-                                    var responseStatusCode = EnsureSuccessStatusCode(response, codeNotToThrow, logger);
-
-                                    var logOccurred = DetectAndLogSkippedErrorOccurrence(responseStatusCode, source, pathToPackage, response.ReasonPhrase, logger);
+                                    HttpStatusCode? responseStatusCode = EnsureSuccessStatusCode(response, codeNotToThrow, logger);
+                                    bool logOccurred = DetectAndLogSkippedErrorOccurrence(responseStatusCode, source, pathToPackage, response.ReasonPhrase, logger);
                                     showPushCommandPackagePushed = !logOccurred;
 
                                     return Task.FromResult(0);
@@ -419,8 +420,8 @@ namespace NuGet.Protocol.Core.Types
                     },
                     response =>
                     {
-                        var responseStatusCode = EnsureSuccessStatusCode(response, codeNotToThrow, logger);
-                        var logOccurred = DetectAndLogSkippedErrorOccurrence(responseStatusCode, source, pathToPackage, response.ReasonPhrase, logger);
+                        HttpStatusCode? responseStatusCode = EnsureSuccessStatusCode(response, codeNotToThrow, logger);
+                        bool logOccurred = DetectAndLogSkippedErrorOccurrence(responseStatusCode, source, pathToPackage, response.ReasonPhrase, logger);
                         showPushCommandPackagePushed = !logOccurred;
 
                         return Task.FromResult(0);
@@ -462,9 +463,13 @@ namespace NuGet.Protocol.Core.Types
         /// Gently log any specified Skipped status code without throwing.
         /// </summary>
         /// <param name="skippedErrorStatusCode">If provided, it indicates that this StatusCode occurred but was flagged as to be Skipped.</param>
+        /// <param name="source"></param>
+        /// <param name="packageIdentity"></param>
+        /// <param name="reasonMessage"></param>
         /// <param name="logger"></param>
         /// <returns>Indication of whether the log occurred.</returns>
-        private static bool DetectAndLogSkippedErrorOccurrence(HttpStatusCode? skippedErrorStatusCode, string source, string packageIdentity, string reasonMessage, ILogger logger)
+        private static bool DetectAndLogSkippedErrorOccurrence(HttpStatusCode? skippedErrorStatusCode, string source, string packageIdentity,
+            string reasonMessage, ILogger logger)
         {
             bool skippedErrorOccurred = false;
 
@@ -476,7 +481,6 @@ namespace NuGet.Protocol.Core.Types
                 switch (skippedErrorStatusCode.Value)
                 {
                     case HttpStatusCode.Conflict:
-
                         messageToLog = string.Format(
                                    CultureInfo.CurrentCulture,
                                    Strings.AddPackage_PackageAlreadyExists,
