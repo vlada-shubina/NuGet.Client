@@ -71,35 +71,41 @@ namespace NuGet.Protocol.Core.Types
             // TODO: Figure out how to hook this up with the HTTP request
             _disableBuffering = disableBuffering;
 
-            using (var tokenSource = new CancellationTokenSource())
+            using var tokenSource = new CancellationTokenSource();
+            var requestTimeout = TimeSpan.FromSeconds(timeoutInSecond);
+            tokenSource.CancelAfter(requestTimeout);
+            var apiKey = getApiKey(_source);
+
+            foreach (string packagePath in packagePaths)
             {
-                var requestTimeout = TimeSpan.FromSeconds(timeoutInSecond);
-                tokenSource.CancelAfter(requestTimeout);
-                var apiKey = getApiKey(_source);
+                bool explicitSnupkgPush = true;
+                bool wasPackagePushed = false;
 
-                foreach (var packagePath in packagePaths)
+                if (!packagePath.EndsWith(NuGetConstants.SnupkgExtension, StringComparison.OrdinalIgnoreCase))
                 {
-                    bool explicitSnupkgPush = true;
-                    if (!packagePath.EndsWith(NuGetConstants.SnupkgExtension, StringComparison.OrdinalIgnoreCase))
-                    {
-                        await PushPackage(packagePath, _source, apiKey, noServiceEndpoint, skipDuplicate,
-                            requestTimeout, log, tokenSource.Token);
+                    wasPackagePushed = await PushPackagePath(packagePath, _source, apiKey, noServiceEndpoint, skipDuplicate,
+                        requestTimeout, log, tokenSource.Token);
 
-                        //Since this was not a snupkg push (probably .nupkg), when we try pushing symbols later, don't error if there are no snupkg files found.
-                        explicitSnupkgPush = false;
-                    }
+                    //Since this was not a snupkg push (probably .nupkg), when we try pushing symbols later, don't error if there are no snupkg files found.
+                    explicitSnupkgPush = false;
+                }
 
-                    // symbolSource is only set when:
-                    // - The user specified it on the command line
-                    // - The endpoint for main package supports pushing snupkgs
-                    if (!string.IsNullOrEmpty(symbolSource))
-                    {
-                        var symbolApiKey = getSymbolApiKey(symbolSource);
+                // If the primary push didn't succeed, don't attempt pushing symbols.
+                if (!wasPackagePushed)
+                {
+                    continue;
+                }
 
-                        await PushSymbols(packagePath, symbolSource, symbolApiKey,
-                            noServiceEndpoint, skipDuplicate, symbolPackageUpdateResource,
-                            requestTimeout, log, explicitSnupkgPush, tokenSource.Token);
-                    }
+                // symbolSource is only set when:
+                // - The user specified it on the command line
+                // - The endpoint for main package supports pushing snupkgs
+                if (!string.IsNullOrEmpty(symbolSource))
+                {
+                    string symbolApiKey = getSymbolApiKey(symbolSource);
+
+                    await PushSymbolsPath(packagePath, symbolSource, symbolApiKey,
+                        noServiceEndpoint, skipDuplicate, symbolPackageUpdateResource,
+                        requestTimeout, log, explicitSnupkgPush, tokenSource.Token);
                 }
             }
         }
@@ -181,7 +187,7 @@ namespace NuGet.Protocol.Core.Types
             }
         }
 
-        private async Task PushSymbols(string packagePath,
+        private async Task PushSymbolsPath(string packagePath,
             string source,
             string apiKey,
             bool noServiceEndpoint,
@@ -192,11 +198,11 @@ namespace NuGet.Protocol.Core.Types
             bool explicitSymbolsPush,
             CancellationToken token)
         {
-            var isSymbolEndpointSnupkgCapable = symbolPackageUpdateResource != null;
+            bool isSymbolEndpointSnupkgCapable = symbolPackageUpdateResource != null;
             // Get the symbol package for this package
-            var symbolPackagePath = GetSymbolsPath(packagePath, isSymbolEndpointSnupkgCapable);
+            string symbolPackagePath = GetSymbolsPath(packagePath, isSymbolEndpointSnupkgCapable);
 
-            var symbolsToPush = LocalFolderUtility.ResolvePackageFromPath(symbolPackagePath, isSnupkg: isSymbolEndpointSnupkgCapable);
+            IEnumerable<string> symbolsToPush = LocalFolderUtility.ResolvePackageFromPath(symbolPackagePath, isSnupkg: isSymbolEndpointSnupkgCapable);
             bool symbolsPathResolved = symbolsToPush != null && symbolsToPush.Any();
 
             //No files were resolved.
@@ -211,7 +217,7 @@ namespace NuGet.Protocol.Core.Types
             }
             else
             {
-                var sourceUri = UriUtility.CreateSourceUri(source);
+                Uri sourceUri = UriUtility.CreateSourceUri(source);
 
                 // See if the api key exists
                 if (string.IsNullOrEmpty(apiKey) && !sourceUri.IsFile)
@@ -222,11 +228,14 @@ namespace NuGet.Protocol.Core.Types
                         Strings.DefaultSymbolServer));
                 }
 
-                await PushAll(source, apiKey, noServiceEndpoint, skipDuplicate, requestTimeout, log, packagesToPush: symbolsToPush, token);
+                foreach (string packageToPush in symbolsToPush)
+                {
+                    await PushPackageCore(source, apiKey, packageToPush, noServiceEndpoint, skipDuplicate, requestTimeout, log, token);
+                }
             }
         }
 
-        private async Task PushPackage(string packagePath,
+        private async Task<bool> PushPackagePath(string packagePath,
             string source,
             string apiKey,
             bool noServiceEndpoint,
@@ -235,7 +244,7 @@ namespace NuGet.Protocol.Core.Types
             ILogger log,
             CancellationToken token)
         {
-            var nupkgsToPush = LocalFolderUtility.ResolvePackageFromPath(packagePath, isSnupkg: false);
+            IEnumerable<string> nupkgsToPush = LocalFolderUtility.ResolvePackageFromPath(packagePath, isSnupkg: false);
 
             if (!(nupkgsToPush != null && nupkgsToPush.Any()))
             {
@@ -244,7 +253,7 @@ namespace NuGet.Protocol.Core.Types
                     packagePath));
             }
 
-            var sourceUri = UriUtility.CreateSourceUri(source);
+            Uri sourceUri = UriUtility.CreateSourceUri(source);
 
             if (string.IsNullOrEmpty(apiKey) && !sourceUri.IsFile)
             {
@@ -253,18 +262,15 @@ namespace NuGet.Protocol.Core.Types
                     GetSourceDisplayName(source)));
             }
 
-            await PushAll(source, apiKey, noServiceEndpoint, skipDuplicate, requestTimeout, log, packagesToPush: nupkgsToPush, token);
-        }
-
-        private async Task PushAll(string source, string apiKey, bool noServiceEndpoint, bool skipDuplicate, TimeSpan requestTimeout, ILogger log, IEnumerable<string> packagesToPush, CancellationToken token)
-        {
-            foreach (var packageToPush in packagesToPush)
+            //TODO: need to not just return a bool here, but keep track of which package ID (? or path?).
+            //or DCR: we push package/snupkg together, rather than in 2 batches.
+            foreach (string packageToPush in nupkgsToPush)
             {
                 await PushPackageCore(source, apiKey, packageToPush, noServiceEndpoint, skipDuplicate, requestTimeout, log, token);
             }
         }
 
-        private async Task PushPackageCore(string source,
+        private async Task<bool> PushPackageCore(string source,
             string apiKey,
             string packageToPush,
             bool noServiceEndpoint,
@@ -299,6 +305,8 @@ namespace NuGet.Protocol.Core.Types
             {
                 log.LogInformation(Strings.PushCommandPackagePushed);
             }
+
+            return showPushCommandPackagePushed;
         }
 
         private static string GetSourceDisplayName(string source)
