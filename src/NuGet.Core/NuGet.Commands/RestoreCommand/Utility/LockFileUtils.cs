@@ -567,8 +567,11 @@ namespace NuGet.Commands
                     {
                         // If the project did not provide a list of assets, add in default ones.
                         // These are used to detect transitive vs non-transitive project references.
+#if NETCORE5_0
+                        var absolutePath = Path.Join(projectDir, "bin", "placeholder", $"{localMatch.Library.Name}.dll");
+#else
                         var absolutePath = Path.Combine(projectDir, "bin", "placeholder", $"{localMatch.Library.Name}.dll");
-
+#endif
                         files.Add(new ProjectRestoreMetadataFile(libAnyPath, absolutePath));
                     }
 
