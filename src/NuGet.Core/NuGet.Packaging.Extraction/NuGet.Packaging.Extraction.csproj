@@ -92,7 +92,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\NuGet.Packaging\ArrayPool.cs" Link="ArrayPool.cs" />
     <Compile Include="..\NuGet.Packaging\Core\comparers\PackageDependencyComparer.cs" Link="NuGet.Packaging\Core\comparers\PackageDependencyComparer.cs" />
     <Compile Include="..\NuGet.Packaging\Core\comparers\PackageDependencyInfoComparer.cs" Link="NuGet.Packaging\Core\comparers\PackageDependencyInfoComparer.cs" />
     <Compile Include="..\NuGet.Packaging\Core\PackageDependencyInfo.cs" Link="NuGet.Packaging\Core\PackageDependencyInfo.cs" />
@@ -303,6 +302,10 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(IsDesktop)' == 'true' ">
+    <PackageReference Include="System.Memory" />
   </ItemGroup>
 
   <ItemGroup>

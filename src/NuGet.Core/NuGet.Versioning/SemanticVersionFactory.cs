@@ -182,30 +182,31 @@ namespace NuGet.Versioning
         /// </summary>
         internal static Tuple<string, string[], string> ParseSections(string value)
         {
-            string versionString = null;
-            string[] releaseLabels = null;
-            string buildMetadata = null;
+            ReadOnlySpan<char> valueAsSpan = value.AsSpan();
+            ReadOnlySpan<char> version = default;
+            ReadOnlySpan<char> releaseLabels = default;
+            ReadOnlySpan<char> buildMetadata = default;
 
             var dashPos = -1;
             var plusPos = -1;
 
-            var end = false;
-            for (var i = 0; i < value.Length; i++)
+            bool end = false;
+            for (var i = 0; i < valueAsSpan.Length; i++)
             {
-                end = (i == value.Length - 1);
+                end = (i == valueAsSpan.Length - 1);
 
                 if (dashPos < 0)
                 {
                     if (end
-                        || value[i] == '-'
-                        || value[i] == '+')
+                        || valueAsSpan[i] == '-'
+                        || valueAsSpan[i] == '+')
                     {
                         var endPos = i + (end ? 1 : 0);
-                        versionString = value.Substring(0, endPos);
+                        version = valueAsSpan.Slice(0, endPos);
 
                         dashPos = i;
 
-                        if (value[i] == '+')
+                        if (valueAsSpan[i] == '+')
                         {
                             plusPos = i;
                         }
@@ -213,13 +214,11 @@ namespace NuGet.Versioning
                 }
                 else if (plusPos < 0)
                 {
-                    if (end || value[i] == '+')
+                    if (end || valueAsSpan[i] == '+')
                     {
                         var start = dashPos + 1;
                         var endPos = i + (end ? 1 : 0);
-                        var releaseLabel = value.Substring(start, endPos - start);
-
-                        releaseLabels = releaseLabel.Split('.');
+                        releaseLabels = valueAsSpan.Slice(start, endPos - start);
 
                         plusPos = i;
                     }
@@ -228,11 +227,13 @@ namespace NuGet.Versioning
                 {
                     var start = plusPos + 1;
                     var endPos = i + (end ? 1 : 0);
-                    buildMetadata = value.Substring(start, endPos - start);
+                    buildMetadata = valueAsSpan.Slice(start, endPos - start);
                 }
             }
 
-            return new Tuple<string, string[], string>(versionString, releaseLabels, buildMetadata);
+            return new Tuple<string, string[], string>(version.ToString(),
+                releaseLabels.Length > 0 ? releaseLabels.ToString().Split('.') : null,
+                buildMetadata.Length > 0 ? buildMetadata.ToString() : null);
         }
 
         internal static Version NormalizeVersionValue(Version version)

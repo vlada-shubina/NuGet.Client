@@ -49,6 +49,11 @@
     <PackageReference Include="System.Security.Cryptography.Cng" />
   </ItemGroup>
 
+  <ItemGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch(
+         $(DefineConstants), '^(.*;)*NETCORE5_0(;.*)*$')) == 'false'">
+    <PackageReference Include="System.Memory" />
+  </ItemGroup>
+
   <ItemGroup>
     <Compile Update="Signing\DerEncoding\SR.Designer.cs">
       <DesignTime>True</DesignTime>
