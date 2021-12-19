@@ -50,9 +50,15 @@ namespace NuGet.Packaging
         /// <returns>The package install path.</returns>
         public virtual string GetInstallPath(string packageId, NuGetVersion version)
         {
+#if NETCORE5_0
+            return Path.Join(
+                RootPath,
+                GetPackageDirectory(packageId, version));
+#else
             return Path.Combine(
                 RootPath,
                 GetPackageDirectory(packageId, version));
+#endif
         }
 
         /// <summary>
@@ -62,9 +68,15 @@ namespace NuGet.Packaging
         /// <returns>The package version list path.</returns>
         public string GetVersionListPath(string packageId)
         {
+#if NETCORE5_0
+            return Path.Join(
+                RootPath,
+                GetVersionListDirectory(packageId));
+#else
             return Path.Combine(
                 RootPath,
                 GetVersionListDirectory(packageId));
+#endif
         }
 
         /// <summary>
@@ -75,9 +87,15 @@ namespace NuGet.Packaging
         /// <returns>The package file path.</returns>
         public string GetPackageFilePath(string packageId, NuGetVersion version)
         {
+#if NETCORE5_0
+            return Path.Join(
+                GetInstallPath(packageId, version),
+                GetPackageFileName(packageId, version));
+#else
             return Path.Combine(
                 GetInstallPath(packageId, version),
                 GetPackageFileName(packageId, version));
+#endif
         }
 
         /// <summary>
@@ -89,9 +107,15 @@ namespace NuGet.Packaging
         public string GetManifestFilePath(string packageId, NuGetVersion version)
         {
             packageId = Normalize(packageId);
+#if NETCORE5_0            
+            return Path.Join(
+                GetInstallPath(packageId, version),
+                GetManifestFileName(packageId, version));
+#else
             return Path.Combine(
                 GetInstallPath(packageId, version),
                 GetManifestFileName(packageId, version));
+#endif
         }
 
         /// <summary>
@@ -102,9 +126,15 @@ namespace NuGet.Packaging
         /// <returns>The hash file path.</returns>
         public string GetHashPath(string packageId, NuGetVersion version)
         {
+#if NETCORE5_0
+            return Path.Join(
+                GetInstallPath(packageId, version),
+                GetHashFileName(packageId, version));
+#else
             return Path.Combine(
                 GetInstallPath(packageId, version),
                 GetHashFileName(packageId, version));
+#endif
         }
 
         /// <summary>
@@ -126,9 +156,15 @@ namespace NuGet.Packaging
         /// <returns>The hash file path.</returns>
         public string GetNupkgMetadataPath(string packageId, NuGetVersion version)
         {
+#if NETCORE5_0
+            return Path.Join(
+                GetInstallPath(packageId, version),
+                PackagingCoreConstants.NupkgMetadataFileExtension);
+#else
             return Path.Combine(
                 GetInstallPath(packageId, version),
                 PackagingCoreConstants.NupkgMetadataFileExtension);
+#endif
         }
 
         /// <summary>
@@ -149,9 +185,15 @@ namespace NuGet.Packaging
         /// <returns>The package directory.</returns>
         public virtual string GetPackageDirectory(string packageId, NuGetVersion version)
         {
+#if NETCORE5_0
+            return Path.Join(
+                GetVersionListDirectory(packageId),
+                Normalize(version));
+#else
             return Path.Combine(
                 GetVersionListDirectory(packageId),
                 Normalize(version));
+#endif
         }
 
         /// <summary>
