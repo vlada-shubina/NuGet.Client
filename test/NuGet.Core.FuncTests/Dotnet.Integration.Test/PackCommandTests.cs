@@ -5881,9 +5881,10 @@ namespace ClassLibrary
                 msbuildFixture.CreateDotnetNewProject(testDirectory, projectName);
                 string projectXml = $@"<Project Sdk=""Microsoft.NET.Sdk"">
   <PropertyGroup>
-    <TargetFrameworks>net5.0;net451</TargetFrameworks>
+    <TargetFrameworks>net5.0;net48</TargetFrameworks>
     <Version>1.2.3</Version>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AutomaticallyUseReferenceAssemblyPackages>false</AutomaticallyUseReferenceAssemblyPackages>
   </PropertyGroup>
 
   <ItemGroup>
@@ -5891,7 +5892,7 @@ namespace ClassLibrary
     <PackageReference Include=""{prereleaseDependencyAName}"" Version=""{prereleaseDependencyAVersion}"" NoWarn = ""NU5104""/>
   </ItemGroup>
 
-  <ItemGroup Condition="" '$(TargetFramework)' == 'net451'"">
+  <ItemGroup Condition="" '$(TargetFramework)' == 'net48'"">
     <PackageReference Include=""{prereleaseDependencyBName}"" Version=""{prereleaseDependencyBVersion}""/>
   </ItemGroup>
 </Project>";
@@ -5945,9 +5946,10 @@ namespace ClassLibrary
                 msbuildFixture.CreateDotnetNewProject(testDirectory, projectName);
                 string projectXml = $@"<Project Sdk=""Microsoft.NET.Sdk"">
   <PropertyGroup>
-    <TargetFrameworks>net5.0;net451</TargetFrameworks>
+    <TargetFrameworks>net5.0;net48</TargetFrameworks>
     <Version>1.2.3</Version>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AutomaticallyUseReferenceAssemblyPackages>false</AutomaticallyUseReferenceAssemblyPackages>
   </PropertyGroup>
 
   <ItemGroup>
@@ -5955,7 +5957,7 @@ namespace ClassLibrary
     <PackageReference Include=""{prereleaseDependencyAName}"" Version=""{prereleaseDependencyAVersion}"" NoWarn = ""NU5104""/>
   </ItemGroup>
 
-  <ItemGroup Condition="" '$(TargetFramework)' == 'net451'"">
+  <ItemGroup Condition="" '$(TargetFramework)' == 'net48'"">
     <PackageReference Include=""{prereleaseDependencyBName}"" Version=""{prereleaseDependencyBVersion}"" NoWarn = ""NU5104""/>
   </ItemGroup>
 </Project>";
@@ -6038,7 +6040,7 @@ namespace ClassLibrary
                 msbuildFixture.CreateDotnetNewProject(testDirectory, projectName);
                 string projectXml = $@"<Project Sdk=""Microsoft.NET.Sdk"">
   <PropertyGroup>
-    <TargetFrameworks>net5.0;net451</TargetFrameworks>
+    <TargetFrameworks>net5.0;net48</TargetFrameworks>
     <Version>1.2.3</Version>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NoWarn>NU5104</NoWarn>
@@ -6049,7 +6051,7 @@ namespace ClassLibrary
     <PackageReference Include=""{prereleaseDependencyAName}"" Version=""{prereleaseDependencyAVersion}"" />
   </ItemGroup>
 
-  <ItemGroup Condition="" '$(TargetFramework)' == 'net451'"">
+  <ItemGroup Condition="" '$(TargetFramework)' == 'net48'"">
     <PackageReference Include=""{prereleaseDependencyBName}"" Version=""{prereleaseDependencyBVersion}"" />
   </ItemGroup>
 </Project>";
