@@ -498,9 +498,11 @@ namespace NuGet.PackageManagement.UI
 
         private async Task PackageSourcesChangedAsync(IReadOnlyCollection<PackageSourceContextInfo> packageSources, TimeSpan timeSpan)
         {
+            IReadOnlyCollection<PackageSourceMoniker> list = null;
+
             try
             {
-                IReadOnlyCollection<PackageSourceMoniker> list = await PackageSourceMoniker.PopulateListAsync(packageSources, CancellationToken.None);
+                list = await PackageSourceMoniker.PopulateListAsync(packageSources, CancellationToken.None);
 
                 await NuGetUIThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                 // We access UI components in these calls
@@ -523,6 +525,17 @@ namespace NuGet.PackageManagement.UI
             finally
             {
                 _dontStartNewSearch = false;
+
+                bool anySources = list?.Any() ?? false;
+                PackageSourcesExist(anyExist: anySources);
+            }
+        }
+
+        private void PackageSourcesExist(bool anyExist)
+        {
+            if (!anyExist)
+            {
+                _packageList.SetLoadingStatusIndicatorError(message: "There are no enabled package sources. Open Settings to add at least one package source to use this screen.");
             }
         }
 
@@ -806,6 +819,13 @@ namespace NuGet.PackageManagement.UI
         internal async Task SearchPackagesAndRefreshUpdateCountAsync(string searchText, bool useCachedPackageMetadata, IVsSearchCallback pSearchCallback, IVsSearchTask searchTask)
         {
             await NuGetUIThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            //Package sources are required to perform a search.
+            if (SelectedSource is null)
+            {
+                PackageSourcesExist(anyExist: false);
+                return;
+            }
 
             ItemFilter filterToRender = _topPanel.Filter;
 
@@ -1299,6 +1319,25 @@ namespace NuGet.PackageManagement.UI
             }
         }
 
+        /// <summary>
+        /// Supports disabling most PM UI controls, except for core functions like Settings, and Loading indicators.
+        /// </summary>
+        /// <param name="isEnabled"></param>
+        private void EnableUIControls(bool isEnabled)
+        {
+            IsEnabled = true;
+            _topPanel.IsEnabled = true;
+            _packageList.IsEnabled = true;
+
+            _topPanel.tabsPackageManagement.IsEnabled = isEnabled;
+            _topPanel._sourceRepoList.IsEnabled = isEnabled;
+            _packageList._updateButtonContainer.IsEnabled = isEnabled;
+            _packageList._selectAllPackages.IsEnabled = isEnabled;
+            _packageList._list.IsEnabled = isEnabled;
+            _packageList._loadingStatusBar.IsEnabled = isEnabled;
+            _packageDetail.IsEnabled = isEnabled;
+        }
+
         private void SelectMatchingUpdatePackages(ShowUpdatePackageOptions updatePackageOptions)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -1623,6 +1662,11 @@ namespace NuGet.PackageManagement.UI
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        private void _gridSplitter_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            EnableUIControls(isEnabled: !_packageList._list.IsEnabled);
         }
     }
 }

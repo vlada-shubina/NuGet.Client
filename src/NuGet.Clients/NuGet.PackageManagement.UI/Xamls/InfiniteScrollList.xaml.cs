@@ -716,5 +716,11 @@ namespace NuGet.PackageManagement.UI
         {
             _loadingStatusIndicator.Reset(string.Empty);
         }
+
+        public void SetLoadingStatusIndicatorError(string message)
+        {
+            _loadingStatusIndicator.SetError(message);
+            Items.Add(_loadingStatusIndicator);
+        }
     }
 }
