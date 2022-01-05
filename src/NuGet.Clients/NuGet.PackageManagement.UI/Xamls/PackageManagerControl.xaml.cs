@@ -537,6 +537,8 @@ namespace NuGet.PackageManagement.UI
             {
                 _packageList.SetLoadingStatusIndicatorError(message: "There are no enabled package sources. Open Settings to add at least one package source to use this screen.");
             }
+
+            EnableUIControls(isEnabled: anyExist);
         }
 
         private async Task<string> GetSettingsKeyAsync(CancellationToken cancellationToken)
