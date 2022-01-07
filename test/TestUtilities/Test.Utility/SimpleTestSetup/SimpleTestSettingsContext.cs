@@ -93,6 +93,7 @@ namespace NuGet.Test.Utility
             packageSources.Add(new XElement(XName.Get("clear")));
             packageSourceMapping.Add(new XElement(XName.Get("clear")));
             disabledSources.Add(new XElement(XName.Get("clear")));
+            packageSourceMapping.Add(new XElement(XName.Get("clear")));
 
             return doc;
         }
