@@ -11,6 +11,7 @@
     <TargetName>$(MSBuildProjectName)</TargetName>
     <DropFolder>$(VsixPublishDestination)</DropFolder>
     <OutputPath Condition="'$(IsVsixBuild)' != 'true'">$(DropFolder)</OutputPath>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(IsVsixBuild)' == 'true'">
