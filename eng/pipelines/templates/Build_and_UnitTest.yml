@@ -200,12 +200,21 @@ steps:
     maximumCpuCount: true
   condition: "and(succeeded(),eq(variables['BuildRTM'], 'false'))"
 
+- task: PowerShell@1
+  displayName: "Create an empty msbuild.binlog file"
+  inputs:
+    scriptType: "inlineScript"
+    inlineScript: |
+      cd $(Build.Repository.LocalPath)
+      New-Item -Name msbuild.binlog -ItemType File
+      ls msbuild.binlog
+
 - task: MSBuild@1
   displayName: "Generate Build Tools package"
   inputs:
     solution: "setup/Microsoft.VisualStudio.NuGet.BuildTools.vsmanproj"
     configuration: "$(BuildConfiguration)"
-    msbuildArguments: "/p:BuildNumber=$(BuildNumber) /p:IsVsixBuild=true /bl"
+    msbuildArguments: "/p:BuildNumber=$(BuildNumber) /p:IsVsixBuild=true /bl:$(Build.Repository.LocalPath)\msbuild.binlog"
   condition: " and(succeeded(), eq(variables['BuildRTM'], 'false'))"
 
 - task: PublishBuildArtifacts@1
