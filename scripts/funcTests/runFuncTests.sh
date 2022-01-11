@@ -89,7 +89,8 @@ done
 
 # Display .NET CLI info
 $DOTNET --info
-
+saaaaaaaaaaaaa
+asdfasdklklkkad
 echo "initial dotnet cli install finished at `date -u +"%Y-%m-%dT%H:%M:%S"`"
 
 echo "================="
