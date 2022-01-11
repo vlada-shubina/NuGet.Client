@@ -36,7 +36,7 @@ curl -o cli/dotnet-install.sh -L https://dot.net/v1/dotnet-install.sh
 chmod +x cli/dotnet-install.sh
 
 # Get recommended version for bootstrapping testing version
-cli/dotnet-install.sh -i cli -c 2.2 -Quality Daily -nopath
+cli/dotnet-install.sh -i cli -c 2.2 -nopath
 
 if (( $? )); then
 	echo "The .NET CLI Install failed!!"
@@ -79,7 +79,7 @@ do
 
 	echo "Channel is: $Channel"
 	echo "Version is: $Version"
-	cli/dotnet-install.sh -i cli -c $Channel -v $Version -Quality Daily -nopath
+	cli/dotnet-install.sh -i cli -c $Channel -v $Version -nopath
 
 	if (( $? )); then
 		echo "The .NET CLI Install for $DOTNET_BRANCH failed!!"
@@ -89,7 +89,8 @@ done
 
 # Display .NET CLI info
 $DOTNET --info
-
+saaaaaaaaaaaaa
+asdfasdklklkkad
 echo "initial dotnet cli install finished at `date -u +"%Y-%m-%dT%H:%M:%S"`"
 
 echo "================="
