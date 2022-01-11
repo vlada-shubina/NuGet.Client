@@ -78,6 +78,7 @@ done
 $DOTNET --info
 
 echo "================="
+seqwerj;;sdfgsdfgsdfgdfggsd
 
 # init the repo
 git submodule init
