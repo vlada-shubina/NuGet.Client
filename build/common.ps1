@@ -122,7 +122,9 @@ Function Invoke-BuildStep {
                 Trace-Log "[STOPPED +$(Format-ElapsedTime $sw.Elapsed)] $BuildStep"
             }
             else {
-                Error-Log "[FAILED +$(Format-ElapsedTime $sw.Elapsed)] $BuildStep"
+                Error-Log "[FAILED +$(Format-ElapsedTime $sw.Elapsed)]"
+                Error-Log $BuildStep
+                Trace-Log $BuildStep
             }
         }
     }
