@@ -12,6 +12,8 @@ namespace NuGet.Common
         /// </summary>
         public static void SetConnectionLimit()
         {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
 #if !IS_CORECLR
             // Increase the maximum number of connections per server.
             if (!RuntimeEnvironmentHelper.IsMono)

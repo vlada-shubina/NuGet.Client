@@ -88,6 +88,8 @@ namespace NuGet.CommandLine
                 SetConsoleOutputEncoding(Encoding.UTF8);
             }
 
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
             // Increase the maximum number of connections per server.
             if (!RuntimeEnvironmentHelper.IsMono)
             {
