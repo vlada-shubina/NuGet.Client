@@ -191,7 +191,7 @@ namespace Dotnet.Integration.Test
             }
         }
 
-        [CIOnlyTheory]
+        [PlatformTheory(Platform.Windows, Platform.Linux)] // https://github.com/NuGet/Home/issues/11178
         [InlineData("true", true)]
         [InlineData("true", false)]
         [InlineData("false", true)]
