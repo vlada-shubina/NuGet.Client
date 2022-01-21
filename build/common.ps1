@@ -99,6 +99,7 @@ Function Invoke-BuildStep {
 
         try {
             if (-not $Arguments) {
+                Trace-Log "Invoke-Command $Expression -ErrorVariable err"
                 Invoke-Command $Expression -ErrorVariable err
             }
             else {
@@ -177,6 +178,7 @@ Function Install-DotnetCLI {
         $CliBranch = $CliBranch.trim()
         $CliChannelAndVersion = $CliBranch -split ":"
 
+        # If version is not specified, use 'latest' as the version.
         $Channel = $CliChannelAndVersion[0].trim()
         if ($CliChannelAndVersion.count -eq 1) {
             $Version = 'latest'
@@ -200,75 +202,26 @@ Function Install-DotnetCLI {
             $arch = "x86";
         }
 
-        if ($Version -eq 'latest') {
-
-            # When installing latest, we firstly check the latest version from the server against what we have installed locally. This also allows us to check the SDK was correctly installed.
-            # Get the latest specific version number for a certain channel from url like : https://dotnetcli.blob.core.windows.net/dotnet/Sdk/release/3.0.1xx/latest.version
-            $latestVersionLink = "https://dotnetcli.blob.core.windows.net/dotnet/Sdk/" + $Channel + "/latest.version"
-            $latestVersionFile = Invoke-RestMethod -Method Get -Uri $latestVersionLink
-
-            $stringReader = New-Object -TypeName System.IO.StringReader -ArgumentList $latestVersionFile
-            [int]$count = 0
-            while ( $line = $stringReader.ReadLine() ) {
-                if ($count -eq 1) {
-                    $expectedVersion = $line.trim()
-                }
-                $count += 1
-            }
-
-            $httpGetUrl = "https://dotnetcli.blob.core.windows.net/dotnet/Sdk/" + $expectedVersion + "/productVersion.txt"
-            $versionFile = Invoke-RestMethod -Method Get -Uri $httpGetUrl
-
-            $stringReader = New-Object -TypeName System.IO.StringReader -ArgumentList $versionFile
-            [int]$count = 0
-            while ( $line = $stringReader.ReadLine() ) {
-                if ($count -eq 1) {
-                    $specificVersion = $line.trim()
-                }
-                $count += 1
-            }
+        if ($cli.Version -eq 'latest') {
+            # If a specific version is not specified, use "-Channel channel" and "-Quality Signed" to get the latest version in this channel
+            # The channel needs to be two-part version in A.B format, or A.B.Cxx, according to https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-install-script#options.
+            # The '-Quality Daily' is not applicable for 'Current' and 'LTS' channels.
+            Trace-Log "$DotNetInstall -Channel $($cli.Channel) -Quality Signed -InstallDir $($cli.Root) -Architecture $arch -NoPath"
+            & $DotNetInstall -Channel $cli.Channel -Quality Signed -InstallDir $cli.Root -Architecture $arch -NoPath
         }
         else {
-            $specificVersion = $Version
-        }
-
-        Trace-Log "The version of SDK should be installed is : $specificVersion"
-
-        $probeDotnetPath = Join-Path (Join-Path $cli.Root sdk)  $specificVersion
-
-        Trace-Log "Probing folder : $probeDotnetPath"
-
-        #If "-force" is specified, or folder with specific version doesn't exist, the download command will run"
-        if ($Force -or -not (Test-Path $probeDotnetPath)) {
-            $channelMainVersion = ""
-            foreach($channelPart in $cli.Channel.Split('/'))
-            {
-                if ($channelPart -match "\d+.*")
-                {
-                    $channelMainVersion = $channelPart.Split('.')[0]
-                    Break
-                }
-            }
-
-            if ([string]::IsNullOrEmpty($channelMainVersion)) {
-                Error-Log "Unable to detect channel version for dotnetinstall.ps1. The CLI install cannot be initiated." -Fatal
-            }
-
-            Trace-Log "$DotNetInstall -Channel $($channelMainVersion) -Quality Daily -InstallDir $($cli.Root) -Version $($cli.Version) -Architecture $arch -NoPath"
-            & $DotNetInstall -Channel $channelMainVersion -Quality Daily -InstallDir $cli.Root -Version $cli.Version -Architecture $arch -NoPath
+            # If version is specified, use only "-Version version" to get the specific version.
+            Trace-Log "$DotNetInstall -Version $($cli.Version) -InstallDir $($cli.Root) -Architecture $arch -NoPath"
+            & $DotNetInstall -Version $cli.Version -InstallDir $cli.Root -Architecture $arch -NoPath
         }
 
         if (-not (Test-Path $DotNetExe)) {
             Error-Log "Unable to find dotnet.exe. The CLI install may have failed." -Fatal
         }
-        if (-not(Test-Path $probeDotnetPath)) {
-            Error-Log "Unable to find specific version of sdk. The CLI install may have failed." -Fatal
-        }
 
         # Display build info
         & $DotNetExe --info
     }
-
     # Install the 2.x runtime because our tests target netcoreapp2x
     Trace-Log "$DotNetInstall -Runtime dotnet -Channel 2.2 -InstallDir $CLIRoot -NoPath"
     # Work around the following install script bug https://github.com/dotnet/install-scripts/issues/152.
