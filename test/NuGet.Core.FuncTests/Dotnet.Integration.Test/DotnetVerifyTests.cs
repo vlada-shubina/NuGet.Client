@@ -188,6 +188,7 @@ namespace Dotnet.Integration.Test
                 // For certificate with trusted root setting allowUntrustedRoot to true/false doesn't matter
                 verifyResult.Success.Should().BeTrue(because: verifyResult.AllOutput);
                 verifyResult.AllOutput.Should().Contain(_noTimestamperWarningCode);
+                verifyResult.AllOutput.Should().NotContain(_primarySignatureInvalidErrorCode);
             }
         }
 
@@ -229,7 +230,7 @@ namespace Dotnet.Integration.Test
                     ignoreExitCode: true);
 
                 // Assert
-                verifyResult.Success.Should().BeFalse(because: verifyResult.AllOutput);
+                verifyResult.Success.Should().BeFalse();
                 verifyResult.AllOutput.Should().Contain(_noMatchingCertErrorCode);
                 verifyResult.AllOutput.Should().Contain(_noTimestamperWarningCode);
                 verifyResult.AllOutput.Should().Contain("This package is signed but not by a trusted signer.");
