@@ -12,7 +12,7 @@ using Xunit;
 namespace Dotnet.Integration.Test
 {
     [Collection("Dotnet Integration Tests")]
-    public class DotnetVerifyTests
+    public class DotnetVerifyTests : IClassFixture<SignCommandTestFixture>
     {
         private readonly string _noTimestamperWarningCode = NuGetLogCode.NU3027.ToString();
         private readonly string _primarySignatureInvalidErrorCode = NuGetLogCode.NU3018.ToString();
@@ -20,10 +20,12 @@ namespace Dotnet.Integration.Test
         private readonly string _notSignedErrorCode = NuGetLogCode.NU3004.ToString();
 
         private MsbuildIntegrationTestFixture _msbuildFixture;
+        private readonly SignCommandTestFixture _signFixture;
 
-        public DotnetVerifyTests(MsbuildIntegrationTestFixture fixture)
+        public DotnetVerifyTests(MsbuildIntegrationTestFixture msbuildFixture, SignCommandTestFixture signFixture)
         {
-            _msbuildFixture = fixture;
+            _msbuildFixture = msbuildFixture;
+            _signFixture = signFixture;
         }
 
         [CIOnlyFact]
@@ -139,6 +141,37 @@ namespace Dotnet.Integration.Test
                     result.AllOutput.Should().Contain(_primarySignatureInvalidErrorCode);
                     result.AllOutput.Should().Contain(_noTimestamperWarningCode);
                 }
+            }
+        }
+
+        [CIOnlyFact]
+        public async Task Verify_AuthorSignedPackage_WithAuthorItemTrustedCertificate_Succeeds()
+        {
+            // Arrange
+            TrustedTestCert<TestCertificate> cert = _signFixture.TrustedTestCertificateChain.Leaf;
+
+            using (var pathContext = new SimpleTestPathContext())
+            {
+                var nupkg = new SimpleTestPackageContext("A", "1.0.0");
+                string testDirectory = pathContext.WorkingDirectory;
+                await SimpleTestPackageUtility.CreatePackagesAsync(testDirectory, nupkg);
+
+                //Act
+                string certificateFingerprintString = SignatureTestUtility.GetFingerprint(cert.Source.Cert, HashAlgorithmName.SHA256);
+                string signedPackagePath = await SignedArchiveTestUtility.AuthorSignPackageAsync(cert.Source.Cert, nupkg, testDirectory);
+
+                // Arrange
+
+                //Act
+                CommandRunnerResult verifyResult = _msbuildFixture.RunDotnet(
+                    pathContext.WorkingDirectory,
+                    $"nuget verify {signedPackagePath}",
+                    ignoreExitCode: true);
+
+                // Assert
+                // For certificate with trusted root setting allowUntrustedRoot to true/false doesn't matter
+                verifyResult.Success.Should().BeTrue(because: verifyResult.AllOutput);
+                verifyResult.AllOutput.Should().NotContain(_primarySignatureInvalidErrorCode, because: verifyResult.AllOutput);
             }
         }
     }
