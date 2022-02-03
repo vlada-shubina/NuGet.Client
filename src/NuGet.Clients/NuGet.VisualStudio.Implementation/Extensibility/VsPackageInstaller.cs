@@ -448,7 +448,7 @@ namespace NuGet.VisualStudio.Implementation.Extensibility
             // Go off the UI thread. This may be called from the UI thread. Only switch to the UI thread where necessary
             // This method installs multiple packages and can likely take more than a few secs
             // So, go off the UI thread explicitly to improve responsiveness
-            await TaskScheduler.Default;
+            await System.Threading.Tasks.TaskScheduler.Default;
 
             var gatherCache = new GatherCache();
             var sources = repoProvider.GetRepositories().ToList();
@@ -525,7 +525,7 @@ namespace NuGet.VisualStudio.Implementation.Extensibility
             bool ignoreDependencies,
             CancellationToken token)
         {
-            await TaskScheduler.Default;
+            await System.Threading.Tasks.TaskScheduler.Default;
 
             var depBehavior = ignoreDependencies ? DependencyBehavior.Ignore : DependencyBehavior.Lowest;
 

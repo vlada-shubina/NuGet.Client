@@ -347,4 +347,7 @@ The string representation of the user's input framework name.</comment>
     <value>'{0}' cannot be null.</value>
     <comment>0 - property name</comment>
   </data>
+  <data name="ExtensionManagerShim_CouldNotLoadService" xml:space="preserve">
+    <value>Could not load IVsExtensionManager service</value>
+  </data>
 </root>

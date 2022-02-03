@@ -38,6 +38,7 @@
         <PackageReference Update="Microsoft.Internal.VisualStudio.Shell.Framework" Version="$(VSFrameworkVersion)" />
         <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />
         <PackageReference Update="Microsoft.TeamFoundationServer.ExtendedClient" Version="$(VSServicesVersion)" />
+        <PackageReference Update="Microsoft.VisualStudio.Extensibility.Testing.SupportFiles" Version="1.1.0" />
         <PackageReference Update="Microsoft.VisualStudio.ProjectSystem" Version="17.0.77-pre-g62a6cb5699" />
         <PackageReference Update="Microsoft.VisualStudio.SDK" Version="$(VSFrameworkVersion)" />
         <PackageReference Update="Microsoft.VisualStudio.Services.InteractiveClient" Version="$(VSServicesVersion)" />

@@ -34,6 +34,7 @@
     <PackageDownload Include="Microsoft.VisualStudio.ProjectSystem.Managed" />
     <PackageDownload Include="Microsoft.VisualStudio.ProjectSystem.Managed.VS" />
     <PackageReference Include="Microsoft.VisualStudio.Sdk" />
+    <PackageReference Include="Microsoft.VisualStudio.Extensibility.Testing.SupportFiles" GeneratePathProperty="true" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.ProjectSystem.VS">
@@ -45,6 +46,13 @@
     <Reference Include="Microsoft.VisualStudio.ProjectSystem.Managed.VS">
       <HintPath>$(NuGetPackageRoot)microsoft.visualstudio.projectsystem.managed.vs\$(ProjectSystemManagedVersion)\lib\net472\Microsoft.VisualStudio.ProjectSystem.Managed.VS.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.ExtensionEngine">
+      <HintPath>$(PkgMicrosoft_VisualStudio_Extensibility_Testing_SupportFiles)\build\ref\17\Microsoft.VisualStudio.ExtensionEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.ExtensionManager">
+      <HintPath>$(PkgMicrosoft_VisualStudio_Extensibility_Testing_SupportFiles)\build\ref\17\Microsoft.VisualStudio.ExtensionManager.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.ExtensionManager.Implementation" HintPath="$(PkgMicrosoft_VisualStudio_Extensibility_Testing_SupportFiles)\build\ref\17\Microsoft.VisualStudio.ExtensionManager.Implementation.dll" Private="false" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="CommonResources.resx">

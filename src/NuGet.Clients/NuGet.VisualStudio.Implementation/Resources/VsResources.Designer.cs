@@ -19,7 +19,7 @@ namespace NuGet.VisualStudio.Implementation.Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class VsResources {
@@ -192,6 +192,15 @@ namespace NuGet.VisualStudio.Implementation.Resources {
         internal static string Error_ProjectNotInCache {
             get {
                 return ResourceManager.GetString("Error_ProjectNotInCache", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not load IVsExtensionManager service.
+        /// </summary>
+        internal static string ExtensionManagerShim_CouldNotLoadService {
+            get {
+                return ResourceManager.GetString("ExtensionManagerShim_CouldNotLoadService", resourceCulture);
             }
         }
         

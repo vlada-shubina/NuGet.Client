@@ -345,7 +345,7 @@ namespace NuGet.VisualStudio.Implementation.Extensibility
             var packageReferences = await msbuildNuGetProject.GetInstalledPackagesAsync(token);
 
             // switch to a background thread to process packages data
-            await TaskScheduler.Default;
+            await System.Threading.Tasks.TaskScheduler.Default;
 
             var trie = new PathLookupTrie<string>();
 

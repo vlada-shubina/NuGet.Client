@@ -73,7 +73,7 @@ namespace NuGet.VisualStudio.Implementation.Extensibility
                                 && !string.IsNullOrEmpty(await _solutionManager.GetSolutionDirectoryAsync()))
                         {
                             //switch to background thread
-                            await TaskScheduler.Default;
+                            await System.Threading.Tasks.TaskScheduler.Default;
 
                             NuGetPackageManager nuGetPackageManager = CreateNuGetPackageManager();
 
@@ -197,7 +197,7 @@ namespace NuGet.VisualStudio.Implementation.Extensibility
                             && !string.IsNullOrEmpty(await _solutionManager.GetSolutionDirectoryAsync()))
                         {
                             //switch to background thread
-                            await TaskScheduler.Default;
+                            await System.Threading.Tasks.TaskScheduler.Default;
 
                             NuGetPackageManager nuGetPackageManager = CreateNuGetPackageManager();
 

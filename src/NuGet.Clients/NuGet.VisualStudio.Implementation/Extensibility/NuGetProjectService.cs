@@ -54,7 +54,7 @@ namespace NuGet.VisualStudio.Implementation.Extensibility
             try
             {
                 // Just in case we're on the UI thread, switch to background thread. Very low cost (does not schedule new task) if already on background thread.
-                await TaskScheduler.Default;
+                await System.Threading.Tasks.TaskScheduler.Default;
 
                 NuGetProject project = await _solutionManager.GetNuGetProjectAsync(projectId.ToString());
                 if (project == null)
