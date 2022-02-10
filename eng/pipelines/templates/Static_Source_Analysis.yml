@@ -62,3 +62,12 @@ steps:
     msbuildArguments: "/t:EnsurePackageReferenceVersionsInSolution"
   continueOnError: ${{ parameters.isOfficialBuild }}
   condition: succeededOrFailed()
+
+- task: PowerShell@1
+  displayName: "Check source file format"
+  inputs:
+    scriptType: "inlineScript"
+    inlineScript: |
+      dotnet format whitespace NuGet.sln --exclude submodules --verify-no-changes --verbosity detailed
+  continueOnError: ${{ parameters.isOfficialBuild }}
+  condition: succeededOrFailed()
