@@ -69,5 +69,6 @@ steps:
     scriptType: "inlineScript"
     inlineScript: |
       dotnet format whitespace NuGet.sln --exclude submodules --verify-no-changes --verbosity detailed
+      Write-Host "LastExitCode = $LASTEXITCODE"
   continueOnError: ${{ parameters.isOfficialBuild }}
   condition: succeededOrFailed()
