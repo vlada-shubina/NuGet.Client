@@ -189,7 +189,7 @@ function Test-GetPackageForFSharpProjectReturnsCorrectPackages {
     $p = GetFSharpProjectWithPreviewDependencies   
     Build-Solution # wait for project nomination
 
-    Install-Package jQuery -Version 2.0
+    Install-Package jQuery -Version 1.5 -Source $context.RepositoryPath
     Build-Solution # wait for restore & assets file
 
     # Act
@@ -198,7 +198,7 @@ function Test-GetPackageForFSharpProjectReturnsCorrectPackages {
     # Assert
     Assert-AreEqual 1 $result.Count
     Assert-AreEqual "jQuery" $result[0].Id
-    Assert-AreEqual "2.0.0" $result[0].Version
+    Assert-AreEqual "1.5.0" $result[0].Version
 }
 
 # function Test-GetPackageForProjectReturnsEmptyIfItHasNoInstalledPackage {
@@ -522,12 +522,12 @@ function Test-GetPackageForFSharpProjectReturnsCorrectPackages {
 function GetFSharpProjectWithPreviewDependencies()
 {
     [hashtable]$return = @{}
-    # set _NetCoreSdkIsPreview = true F# project file
     $p = New-FSharpConsoleApplication
     $projectName = $p.Name
     $projectPath = $p.FullName
     $doc = [xml](Get-Content $projectPath)
     $node = $doc.SelectSingleNode("//Project/PropertyGroup")
+    # set _NetCoreSdkIsPreview = true F# project file
     $packageIdNode = $doc.CreateElement("_NetCoreSdkIsPreview",$doc.DocumentElement.NamespaceURI)
     $packageIdInnerNode = $doc.CreateTextNode('true');
     $packageIdNode.AppendChild($packageIdInnerNode);
