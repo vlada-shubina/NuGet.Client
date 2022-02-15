@@ -863,3 +863,18 @@ function Get-MSBuildExe {
     $MSBuildRoot = Get-VSFolderPath
     Join-Path $MSBuildRoot "MsBuild\Current\bin\msbuild.exe"
 }
+
+# Fshap patch Tuesday dependencies takes time to propogate into all feeds. 
+# Prevent flaky testing need to enable preview dependencies.
+function PatchFSharpProjectWithPreviewDependencies($project)
+{
+    $projectPath = $project.FullName
+    $doc = [xml](Get-Content $projectPath)
+    $propertyGroupNode = $doc.SelectSingleNode("//Project/PropertyGroup")
+    # set _NetCoreSdkIsPreview = true F# project file
+    $packageIdNode = $doc.CreateElement("_NetCoreSdkIsPreview",$doc.DocumentElement.NamespaceURI)
+    $packageIdInnerNode = $doc.CreateTextNode('true');
+    $packageIdNode.AppendChild($packageIdInnerNode);
+    $propertyGroupNode.InsertAfter($packageIdNode, $propertyGroupNode.LastChild)
+    $doc.Save($projectPath)
+}
