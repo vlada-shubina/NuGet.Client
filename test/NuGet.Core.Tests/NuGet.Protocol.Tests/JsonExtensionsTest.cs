@@ -38,5 +38,7 @@ namespace NuGet.Protocol.Tests
             Assert.Equal("this is a message", metaData.DeprecationMetadata.Message);
             Assert.Null(metaData.DeprecationMetadata.AlternatePackage);
         }
+
+        //todo
     }
 }
