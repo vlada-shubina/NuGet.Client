@@ -2,12 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Moq;
 using NuGet.Common;
 using NuGet.Packaging.Core;
+using NuGet.ProjectManagement;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
@@ -56,7 +58,7 @@ namespace NuGet.PackageManagement.VisualStudio.Test
                     .ReturnsAsync(new[] { emptyTestMetadata });
 
                 // Act
-                var metadata = await _target.GetLocalPackageMetadataAsync(
+                IPackageSearchMetadata metadata = await _target.GetLocalPackageMetadataAsync(
                     TestPackageIdentity,
                     includePrerelease: true,
                     cancellationToken: CancellationToken.None);
@@ -85,7 +87,7 @@ namespace NuGet.PackageManagement.VisualStudio.Test
                     .ReturnsAsync(new[] { emptyTestMetadata });
 
                 // Act
-                var metadata = await _target.GetLocalPackageMetadataAsync(
+                IPackageSearchMetadata metadata = await _target.GetLocalPackageMetadataAsync(
                     TestPackageIdentity,
                     includePrerelease: true,
                     cancellationToken: CancellationToken.None);
@@ -127,7 +129,7 @@ namespace NuGet.PackageManagement.VisualStudio.Test
                     .ReturnsAsync(new[] { metadata2 });
 
                 // Act
-                var metadata = await _target.GetLocalPackageMetadataAsync(
+                IPackageSearchMetadata metadata = await _target.GetLocalPackageMetadataAsync(
                     TestPackageIdentity,
                     includePrerelease: true,
                     cancellationToken: CancellationToken.None);
@@ -159,7 +161,7 @@ namespace NuGet.PackageManagement.VisualStudio.Test
                 SetupRemotePackageMetadata(testPackageId, "1.0.0", "2.0.0", "2.0.1", "1.0.1", "2.0.0", "1.0.0", "1.0.1");
 
                 // Act
-                var packages = await _target.GetPackageMetadataListAsync(
+                IEnumerable<IPackageSearchMetadata> packages = await _target.GetPackageMetadataListAsync(
                     testPackageId,
                     includePrerelease: true,
                     includeUnlisted: false,
@@ -168,7 +170,7 @@ namespace NuGet.PackageManagement.VisualStudio.Test
                 // Assert
                 Assert.NotEmpty(packages);
 
-                var actualVersions = packages.Select(p => p.Identity.Version.ToString()).ToArray();
+                string[] actualVersions = packages.Select(p => p.Identity.Version.ToString()).ToArray();
                 Assert.Equal(
                     new[] { "1.0.0", "2.0.0", "2.0.1", "1.0.1" },
                     actualVersions);
@@ -200,7 +202,7 @@ namespace NuGet.PackageManagement.VisualStudio.Test
                         });
 
                 // Act
-                var metadata = await _target.GetLocalPackageMetadataAsync(
+                IPackageSearchMetadata metadata = await _target.GetLocalPackageMetadataAsync(
                     TestPackageIdentity,
                     includePrerelease: true,
                     cancellationToken: CancellationToken.None);
@@ -232,10 +234,10 @@ namespace NuGet.PackageManagement.VisualStudio.Test
             public async Task GetLatestPackageMetadataAsync_Always_SendsASingleRequestPerSource()
             {
                 // Arrange
-                var testProject = SetupProject(TestPackageIdentity, allowedVersions: null);
+                NuGetProject testProject = SetupProject(TestPackageIdentity, allowedVersions: null);
 
                 // Act
-                await _target.GetLatestPackageMetadataAsync(
+                IPackageSearchMetadata _ = await _target.GetLatestPackageMetadataAsync(
                         TestPackageIdentity,
                         testProject,
                         includePrerelease: true,
@@ -251,7 +253,7 @@ namespace NuGet.PackageManagement.VisualStudio.Test
             public async Task GetPackageMetadataAsync_Always_SendsASingleRequestPerSource()
             {
                 // Act
-                await _target.GetPackageMetadataAsync(
+                IPackageSearchMetadata _ = await _target.GetPackageMetadataAsync(
                     TestPackageIdentity,
                     includePrerelease: true,
                     cancellationToken: CancellationToken.None);
@@ -266,7 +268,7 @@ namespace NuGet.PackageManagement.VisualStudio.Test
             public async Task GetPackageMetadataListAsync_Always_SendsASingleRequestPerSource()
             {
                 // Act
-                await _target.GetPackageMetadataListAsync(
+                IEnumerable<IPackageSearchMetadata> _ = await _target.GetPackageMetadataListAsync(
                     TestPackageIdentity.Id,
                     includePrerelease: true,
                     includeUnlisted: false,
@@ -282,11 +284,11 @@ namespace NuGet.PackageManagement.VisualStudio.Test
             public async Task GetLatestPackageMetadataAsync_WithAllVersions_RetrievesLatestVersion()
             {
                 // Arrange
-                var testProject = SetupProject(TestPackageIdentity, allowedVersions: null);
+                NuGetProject testProject = SetupProject(TestPackageIdentity, allowedVersions: null);
                 SetupRemotePackageMetadata(TestPackageIdentity.Id, "0.0.1", "1.0.0", "2.0.1", "2.0.0", "1.0.1");
 
                 // Act
-                var latest = await _target.GetLatestPackageMetadataAsync(
+                IPackageSearchMetadata latest = await _target.GetLatestPackageMetadataAsync(
                     TestPackageIdentity,
                     testProject,
                     includePrerelease: true,
@@ -296,7 +298,7 @@ namespace NuGet.PackageManagement.VisualStudio.Test
                 Assert.NotNull(latest);
                 Assert.Equal("2.0.1", latest.Identity.Version.ToString());
 
-                var actualVersions = await latest.GetVersionsAsync();
+                IEnumerable<VersionInfo> actualVersions = await latest.GetVersionsAsync();
                 Assert.NotEmpty(actualVersions);
                 Assert.Equal(
                     new[] { "2.0.1", "2.0.0", "1.0.1", "1.0.0", "0.0.1" },
@@ -307,11 +309,11 @@ namespace NuGet.PackageManagement.VisualStudio.Test
             public async Task GetPackageMetadataForIdentityAsync_WithoutVersions()
             {
                 // Arrange
-                var testProject = SetupProject(TestPackageIdentity, "[1,2)");
+                NuGetProject testProject = SetupProject(TestPackageIdentity, "[1,2)");
                 SetupRemotePackageMetadata(TestPackageIdentity.Id, "0.0.1", "1.0.0", "1.12", "2.0.1", "2.0.0", "1.0.1");
 
                 // Act
-                var specificVersion = await _target.GetPackageMetadataForIdentityAsync(
+                IPackageSearchMetadata specificVersion = await _target.GetPackageMetadataForIdentityAsync(
                     new PackageIdentity(TestPackageIdentity.Id, new NuGetVersion("1.12")),
                     cancellationToken: CancellationToken.None);
 
@@ -319,7 +321,7 @@ namespace NuGet.PackageManagement.VisualStudio.Test
                 Assert.NotNull(specificVersion);
                 Assert.Equal("1.12", specificVersion.Identity.Version.ToString());
 
-                var actualVersions = await specificVersion.GetVersionsAsync();
+                IEnumerable<VersionInfo> actualVersions = await specificVersion.GetVersionsAsync();
                 Assert.Equal(new[] { "1.12" }, actualVersions.Select(v => v.Version.ToString()).ToArray());
             }
 
@@ -331,7 +333,7 @@ namespace NuGet.PackageManagement.VisualStudio.Test
                 SetupRemotePackageMetadata(TestPackageIdentity.Id, "0.0.1", "1.0.0", "2.0.1", "2.0.0", "1.0.1");
 
                 // Act
-                var latest = await _target.GetLatestPackageMetadataAsync(
+                IPackageSearchMetadata latest = await _target.GetLatestPackageMetadataAsync(
                     TestPackageIdentity,
                     testProject,
                     includePrerelease: true,
@@ -341,7 +343,7 @@ namespace NuGet.PackageManagement.VisualStudio.Test
                 Assert.NotNull(latest);
                 Assert.Equal("1.0.1", latest.Identity.Version.ToString());
 
-                var actualVersions = await latest.GetVersionsAsync();
+                IEnumerable<VersionInfo> actualVersions = await latest.GetVersionsAsync();
                 Assert.NotEmpty(actualVersions);
                 Assert.Equal(
                     new[] { "2.0.1", "2.0.0", "1.0.1", "1.0.0", "0.0.1" },
@@ -356,7 +358,7 @@ namespace NuGet.PackageManagement.VisualStudio.Test
                 SetupRemotePackageMetadata(testPackageId, "1.0.0", "2.0.0", "2.0.1", "1.0.1", "2.0.0", "1.0.0", "1.0.1");
 
                 // Act
-                var packages = await _target.GetPackageMetadataListAsync(
+                IEnumerable<IPackageSearchMetadata> packages = await _target.GetPackageMetadataListAsync(
                     testPackageId,
                     includePrerelease: true,
                     includeUnlisted: false,
@@ -365,7 +367,7 @@ namespace NuGet.PackageManagement.VisualStudio.Test
                 // Assert
                 Assert.NotEmpty(packages);
 
-                var actualVersions = packages.Select(p => p.Identity.Version.ToString()).ToArray();
+                string[] actualVersions = packages.Select(p => p.Identity.Version.ToString()).ToArray();
                 Assert.Equal(
                     new[] { "1.0.0", "2.0.0", "2.0.1", "1.0.1" },
                     actualVersions);
@@ -375,7 +377,7 @@ namespace NuGet.PackageManagement.VisualStudio.Test
             public async Task GetLatestPackageMetadataAsync_CancellationThrows()
             {
                 // Arrange
-                var testProject = SetupProject(TestPackageIdentity, allowedVersions: null);
+                NuGetProject testProject = SetupProject(TestPackageIdentity, allowedVersions: null);
 
                 CancellationToken token = new CancellationToken(canceled: true);
 
