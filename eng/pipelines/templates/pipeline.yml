@@ -52,7 +52,7 @@ stages:
     displayName: Get NuGet.Client semantic version
     timeoutInMinutes: 10
     pool:
-      vmImage: windows-latest
+      vmImage: windows-2022
     steps:
     - template: Initialize_Build_SemanticVersion.yml
 
@@ -63,7 +63,7 @@ stages:
       SemanticVersion: $[dependencies.GetSemanticVersion.outputs['setsemanticversion.SemanticVersion']]
       BuildRevision: $[counter(format('{0}.{1}', variables['SemanticVersion'], variables['build.definitionname']), 1)]
     pool:
-      vmImage: windows-latest
+      vmImage: windows-2022
     steps:
     - template: Initialize_Build.yml
 
@@ -75,7 +75,7 @@ stages:
     displayName: Run Static Source Analysis
     timeoutInMinutes: 15
     pool:
-      vmImage: windows-latest
+      vmImage: windows-2022
     steps:
     - template: Static_Source_Analysis.yml
       parameters:
@@ -175,7 +175,7 @@ stages:
       SDKVersionForBuild: $[stageDependencies.Initialize.Initialize_Build.outputs['getSDKVersionForBuild.SDKVersionForBuild']]
     condition: "and(succeeded(),eq(variables['RunCrossFrameworkTestsOnWindows'], 'true')) "
     pool:
-      vmImage: windows-latest
+      vmImage: windows-2022
     steps:
     - template: CrossFramework_Tests_On_Windows.yml
 
