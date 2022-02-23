@@ -328,6 +328,18 @@ namespace NuGet.Commands.Test
         }
 
         //[Fact]
+        //public async Task RelatedProperty_NativePakcage_RelatedPropertyNOTAppliedOnCompile()
+        //{
+
+        //}
+
+        //[Fact]
+        //public async Task RelatedProperty_DotnetToolPakcage_RelatedPropertyNOTAppliedOnCompile()
+        //{
+
+        //}
+
+        //[Fact]
         //public async Task RelatedProperty_ProjectReferenceWithCompileAssets_RelatedPropertyNOTAppliedOnCompile()
         //{
 
