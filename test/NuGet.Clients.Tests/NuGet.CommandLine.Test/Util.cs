@@ -804,7 +804,7 @@ namespace NuGet.CommandLine.Test
 
         public static XElement CreateProjFileXmlContent(
             string projectName = "proj1",
-            string targetFrameworkVersion = "v4.5",
+            string targetFrameworkVersion = "v4.8",
             string[] references = null,
             string[] contentFiles = null)
         {

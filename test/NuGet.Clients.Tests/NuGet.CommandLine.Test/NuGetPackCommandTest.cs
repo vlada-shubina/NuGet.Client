@@ -812,7 +812,7 @@ namespace NuGet.CommandLine.Test
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include='proj1_file1.cs' />
@@ -848,7 +848,7 @@ namespace Proj1
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include='..\proj1\proj1.csproj' />
@@ -887,8 +887,8 @@ namespace Proj2
                     new string[]
                     {
                         Path.Combine("content", "proj1_file2.txt"),
-                        Path.Combine("lib", "net40", "proj1.dll"),
-                        Path.Combine("lib", "net40", "proj2.dll")
+                        Path.Combine("lib", "net48", "proj1.dll"),
+                        Path.Combine("lib", "net48", "proj2.dll")
                     },
                     files);
             }
@@ -1028,7 +1028,7 @@ namespace Proj1
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include='proj1_file1.cs'/>
@@ -1114,7 +1114,7 @@ namespace Proj1
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include='proj1_file1.cs' />
@@ -1150,7 +1150,7 @@ namespace Proj1
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include='..\proj1\proj1.csproj' />
@@ -1192,18 +1192,18 @@ namespace Proj2
                         new string[]
                         {
                             Path.Combine("content", "proj1_file2.txt"),
-                            Path.Combine("lib", "net40", "proj1.dll"),
-                            Path.Combine("lib", "net40", "proj1.pdb"),
-                            Path.Combine("lib", "net40", "proj2.dll"),
-                            Path.Combine("lib", "net40", "proj2.pdb"),
+                            Path.Combine("lib", "net48", "proj1.dll"),
+                            Path.Combine("lib", "net48", "proj1.pdb"),
+                            Path.Combine("lib", "net48", "proj2.dll"),
+                            Path.Combine("lib", "net48", "proj2.pdb"),
                             "proj2.nuspec",
                             Path.Combine("src", "proj1", "proj1_file1.cs"),
                             Path.Combine("src", "proj2", "proj2_file1.cs"),
                         }
                         : new string[]
                         {
-                            Path.Combine("lib", "net40", "proj1.pdb"),
-                            Path.Combine("lib", "net40", "proj2.pdb"),
+                            Path.Combine("lib", "net48", "proj1.pdb"),
+                            Path.Combine("lib", "net48", "proj2.pdb"),
                             "proj2.nuspec"
                         };
                     actual = actual.Select(t => NuGet.Common.PathUtility.GetPathWithForwardSlashes(t)).ToArray();
@@ -1231,7 +1231,7 @@ namespace Proj2
   <PropertyGroup>
     <OutputType>library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include='B.cs' />
@@ -1267,14 +1267,14 @@ namespace Proj2
                     var actual = symbolPackageFormat == SymbolPackageFormat.SymbolsNupkg ? new string[]
                         {
                         "A.nuspec",
-                        "lib/net40/A.dll",
-                        "lib/net40/A.pdb",
+                        "lib/net48/A.dll",
+                        "lib/net48/A.pdb",
                         "src/B.cs"
                         }
                         : new string[]
                         {
                         "A.nuspec",
-                        "lib/net40/A.pdb"
+                        "lib/net48/A.pdb"
                         };
                     actual = actual.Select(t => NuGet.Common.PathUtility.GetPathWithForwardSlashes(t)).ToArray();
                     Assert.Equal(actual, files);
@@ -1301,7 +1301,7 @@ namespace Proj2
   <PropertyGroup>
     <OutputType>exe</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>V4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include='B.cs' />
@@ -1337,14 +1337,14 @@ public class B
                     var actual = symbolPackageFormat == SymbolPackageFormat.SymbolsNupkg ? new string[]
                         {
                         "A.nuspec",
-                        "lib/net40/A.exe",
-                        "lib/net40/A.pdb",
+                        "lib/net48/A.exe",
+                        "lib/net48/A.pdb",
                         "src/B.cs"
                         }
                         : new string[]
                         {
                         "A.nuspec",
-                        "lib/net40/A.pdb"
+                        "lib/net48/A.pdb"
                         };
                     Assert.Equal(actual, files);
                 }
@@ -1368,7 +1368,7 @@ public class B
   <PropertyGroup>
     <OutputType>library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <DocumentationFile>out\A.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
@@ -1406,8 +1406,8 @@ public class B
                 Assert.Equal(
                     new string[]
                     {
-                        Path.Combine("lib", "net40", "A.dll"),
-                        Path.Combine("lib", "net40", "A.xml"),
+                        Path.Combine("lib", "net48", "A.dll"),
+                        Path.Combine("lib", "net48", "A.xml"),
                     },
                     files);
             }
@@ -1504,9 +1504,9 @@ public class B
                 Assert.Equal(
                     new string[]
                     {
-                        Path.Combine("lib", "net40", "proj1.dll"),
-                        Path.Combine("lib", "net40", "proj3.dll"),
-                        Path.Combine("lib", "net40", "proj7.dll")
+                        Path.Combine("lib", "net48", "proj1.dll"),
+                        Path.Combine("lib", "net48", "proj3.dll"),
+                        Path.Combine("lib", "net48", "proj7.dll")
                     },
                     files);
 
@@ -1621,9 +1621,9 @@ public class B
                 Assert.Equal(
                     new string[]
                     {
-                        Path.Combine("lib", "net40", "proj1.dll"),
-                        Path.Combine("lib", "net40", "proj3.dll"),
-                        Path.Combine("lib", "net40", "proj7.dll")
+                        Path.Combine("lib", "net48", "proj1.dll"),
+                        Path.Combine("lib", "net48", "proj3.dll"),
+                        Path.Combine("lib", "net48", "proj7.dll")
                     },
                     files);
 
@@ -1733,9 +1733,9 @@ public class B
                 Assert.Equal(
                     new string[]
                     {
-                        Path.Combine("lib", "net40", "proj1.dll"),
-                        Path.Combine("lib", "net40", "proj3.dll"),
-                        Path.Combine("lib", "net40", "proj7.dll")
+                        Path.Combine("lib", "net48", "proj1.dll"),
+                        Path.Combine("lib", "net48", "proj3.dll"),
+                        Path.Combine("lib", "net48", "proj7.dll")
                     },
                     files);
 
@@ -1839,9 +1839,9 @@ public class B
                 Assert.Equal(
                     new string[]
                     {
-                        Path.Combine("lib", "net40", "proj1.dll"),
-                        Path.Combine("lib", "net40", "proj3.dll"),
-                        Path.Combine("lib", "net40", "proj7.dll")
+                        Path.Combine("lib", "net48", "proj1.dll"),
+                        Path.Combine("lib", "net48", "proj3.dll"),
+                        Path.Combine("lib", "net48", "proj7.dll")
                     },
                     files);
 
@@ -1958,9 +1958,9 @@ public class B
                 Assert.Equal(
                     new string[]
                     {
-                        Path.Combine("lib", "net40", "proj1.dll"),
-                        Path.Combine("lib", "net40", "proj3.dll"),
-                        Path.Combine("lib", "net40", "proj7.dll")
+                        Path.Combine("lib", "net48", "proj1.dll"),
+                        Path.Combine("lib", "net48", "proj3.dll"),
+                        Path.Combine("lib", "net48", "proj7.dll")
                     },
                     files);
 
@@ -2070,9 +2070,9 @@ public class B
                 Assert.Equal(
                     new string[]
                     {
-                        Path.Combine("lib", "net40", "proj1.dll"),
-                        Path.Combine("lib", "net40", "proj3.dll"),
-                        Path.Combine("lib", "net40", "proj7.dll")
+                        Path.Combine("lib", "net48", "proj1.dll"),
+                        Path.Combine("lib", "net48", "proj3.dll"),
+                        Path.Combine("lib", "net48", "proj7.dll")
                     },
                     files);
 
@@ -2314,7 +2314,7 @@ public class B
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include='file1.cs' />
@@ -2389,7 +2389,7 @@ namespace " + projectName + @"
                     new string[] {
                         @"..\proj2\proj2.csproj"
                     });
-                CreateTestProject(workingDirectory, "proj2", null, "v4.0", "1.2");
+                CreateTestProject(workingDirectory, "proj2", null, "v4.8", "1.2");
                 Util.CreateFile(
                     Path.Combine(workingDirectory, "proj2"),
                     "proj2.nuspec",
@@ -2425,7 +2425,7 @@ namespace " + projectName + @"
                 Assert.Equal(
                     new string[]
                     {
-                        Path.Combine("lib", "net40", "proj1.dll")
+                        Path.Combine("lib", "net48", "proj1.dll")
                     },
                     files);
 
@@ -2729,7 +2729,7 @@ namespace " + projectName + @"
                 Assert.Equal(
                     new string[]
                     {
-                        Path.Combine("lib", "net40", "proj1.dll")
+                        Path.Combine("lib", "net48", "proj1.dll")
                     },
                     files);
             }
@@ -2778,9 +2778,9 @@ namespace " + projectName + @"
                 Assert.Equal(
                     new string[]
                     {
-                       Path.Combine("lib", "net40", "proj1.dll"),
-                       Path.Combine("lib", "net40", "proj2.dll"),
-                       Path.Combine("lib", "net40", "proj3.dll")
+                       Path.Combine("lib", "net48", "proj1.dll"),
+                       Path.Combine("lib", "net48", "proj2.dll"),
+                       Path.Combine("lib", "net48", "proj3.dll")
                     },
                     files);
             }
@@ -2821,8 +2821,8 @@ namespace " + projectName + @"
                 Assert.Equal(
                     new string[]
                     {
-                        Path.Combine("lib", "net40", "proj1.dll"),
-                        Path.Combine("lib", "net40", "proj2.dll")
+                        Path.Combine("lib", "net48", "proj1.dll"),
+                        Path.Combine("lib", "net48", "proj2.dll")
                     },
                     files);
             }
@@ -2857,7 +2857,7 @@ namespace " + projectName + @"
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <Config Condition=" + "\" '$(Config)' == ''\"" + @">Debug</Config>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" + "\"'$(Config)'=='Debug'\"" + @">
     <OutputPath>debug_out</OutputPath>
@@ -2899,7 +2899,7 @@ namespace Proj1
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <Config Condition=" + "\" '$(Config)' == ''\"" + @">Debug</Config>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" + "\"'$(Config)'=='Debug'\"" + @">
     <OutputPath>debug_out</OutputPath>
@@ -2950,7 +2950,7 @@ namespace Proj2
                 Assert.Equal(
                     new string[]
                     {
-                        Path.Combine("lib", "net40", "proj2.dll")
+                        Path.Combine("lib", "net48", "proj2.dll")
                     },
                     files);
             }
@@ -2978,7 +2978,7 @@ namespace Proj2
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <Config Condition=" + "\" '$(Config)' == ''\"" + @">Debug</Config>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" + "\"'$(Config)'=='Debug'\"" + @">
     <OutputPath>debug_out</OutputPath>
@@ -3020,7 +3020,7 @@ namespace Proj1
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <Config Condition=" + "\" '$(Config)' == ''\"" + @">Debug</Config>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" + "\"'$(Config)'=='Debug'\"" + @">
     <OutputPath>debug_out</OutputPath>
@@ -3069,8 +3069,8 @@ namespace Proj2
                     new string[]
                     {
                         Path.Combine("content", "proj1_file2.txt"),
-                        Path.Combine("lib", "net40", "proj1.dll"),
-                        Path.Combine("lib", "net40", "proj2.dll")
+                        Path.Combine("lib", "net48", "proj1.dll"),
+                        Path.Combine("lib", "net48", "proj2.dll")
                     },
                     files);
             }
@@ -3156,7 +3156,7 @@ namespace Proj2
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include='proj1_file1.cs' />
@@ -3245,7 +3245,7 @@ namespace Proj1
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include='proj1_file1.cs' />
@@ -3330,7 +3330,7 @@ namespace Proj1
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include='proj1_file1.cs' />
@@ -3451,7 +3451,7 @@ namespace Proj1
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include='proj1_file1.cs' />
@@ -3562,7 +3562,7 @@ namespace Proj1
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <Config Condition=" + "\" '$(Config)' == ''\"" + @">Debug</Config>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" + "\"'$(Config)'=='Debug'\"" + @">
     <OutputPath>debug_out</OutputPath>
@@ -3613,7 +3613,7 @@ namespace Proj1
     </dependencies>
   </metadata>
   <files>
-    <file src=""release_out\"" target=""lib\net40"" />
+    <file src=""release_out\"" target=""lib\net48"" />
   </files>
 </package>");
                 var r = CommandRunner.Run(
@@ -3656,7 +3656,7 @@ namespace Proj1
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <Config Condition=" + "\" '$(Config)' == ''\"" + @">Debug</Config>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" + "\"'$(Config)'=='Debug'\"" + @">
     <OutputPath>debug_out</OutputPath>
@@ -3701,7 +3701,7 @@ namespace Proj1
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <Config Condition=" + "\" '$(Config)' == ''\"" + @">Debug</Config>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" + "\"'$(Config)'=='Debug'\"" + @">
     <OutputPath>debug_out</OutputPath>
@@ -3753,8 +3753,8 @@ namespace Proj2
                     new string[]
                     {
                         Path.Combine("content", "proj1_file2.txt"),
-                        Path.Combine("lib", "net40", "proj1.dll"),
-                        Path.Combine("lib", "net40", "proj2.dll")
+                        Path.Combine("lib", "net48", "proj1.dll"),
+                        Path.Combine("lib", "net48", "proj2.dll")
                     },
                     files);
             }
@@ -3781,7 +3781,7 @@ namespace Proj2
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <Config Condition=" + "\" '$(Config)' == ''\"" + @">Debug</Config>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" + "\"'$(Config)'=='Debug'\"" + @">
     <OutputPath>debug_out</OutputPath>
@@ -3826,7 +3826,7 @@ namespace Proj1
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <Config Condition=" + "\" '$(Config)' == ''\"" + @">Debug</Config>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" + "\"'$(Config)'=='Debug'\"" + @">
     <OutputPath>debug_out</OutputPath>
@@ -3878,8 +3878,8 @@ namespace Proj2
                     new string[]
                     {
                         Path.Combine("content", "proj1_file2.txt"),
-                        Path.Combine("lib", "net40", "proj1.dll"),
-                        Path.Combine("lib", "net40", "proj2.dll")
+                        Path.Combine("lib", "net48", "proj1.dll"),
+                        Path.Combine("lib", "net48", "proj2.dll")
                     },
                     files);
             }
@@ -3905,7 +3905,7 @@ namespace Proj2
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <Config Condition=" + "\" '$(Config)' == ''\"" + @">Debug</Config>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" + "\"'$(Config)'=='Debug'\"" + @">
     <OutputPath>debug_out</OutputPath>
@@ -3950,7 +3950,7 @@ namespace Proj1
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <Config Condition=" + "\" '$(Config)' == ''\"" + @">Debug</Config>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" + "\"'$(Config)'=='Debug'\"" + @">
     <OutputPath>debug_out</OutputPath>
@@ -4002,8 +4002,8 @@ namespace Proj2
                     new string[]
                     {
                         Path.Combine("content", "proj1_file2.txt"),
-                        Path.Combine("lib", "net40", "proj1.dll"),
-                        Path.Combine("lib", "net40", "proj2.dll")
+                        Path.Combine("lib", "net48", "proj1.dll"),
+                        Path.Combine("lib", "net48", "proj2.dll")
                     },
                     files);
             }
@@ -4028,7 +4028,7 @@ namespace Proj2
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <Config Condition=" + "\" '$(Config)' == ''\"" + @">Debug</Config>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" + "\"'$(Config)'=='Debug'\"" + @">
     <OutputPath>debug_out</OutputPath>
@@ -4073,7 +4073,7 @@ namespace Proj1
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <Config Condition=" + "\" '$(Config)' == ''\"" + @">Debug</Config>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" + "\"'$(Config)'=='Debug'\"" + @">
     <OutputPath>debug_out</OutputPath>
@@ -4132,8 +4132,8 @@ namespace Proj2
                     new string[]
                     {
                         Path.Combine("content", "proj1_file2.txt"),
-                        Path.Combine("lib", "net40", "proj1.dll"),
-                        Path.Combine("lib", "net40", "proj2.dll")
+                        Path.Combine("lib", "net48", "proj1.dll"),
+                        Path.Combine("lib", "net48", "proj2.dll")
                     });
             }
         }
@@ -4157,7 +4157,7 @@ namespace Proj2
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <Config Condition=" + "\" '$(Config)' == ''\"" + @">Debug</Config>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" + "\"'$(Config)'=='Debug'\"" + @">
     <OutputPath>debug_out</OutputPath>
@@ -4202,7 +4202,7 @@ namespace Proj1
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <Config Condition=" + "\" '$(Config)' == ''\"" + @">Debug</Config>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" + "\"'$(Config)'=='Debug'\"" + @">
     <OutputPath>debug_out</OutputPath>
@@ -4262,8 +4262,8 @@ namespace Proj2
                     new string[]
                     {
                         Path.Combine("content", "proj1_file2.txt"),
-                        Path.Combine("lib", "net40", "proj1.dll"),
-                        Path.Combine("lib", "net40", "proj2.dll")
+                        Path.Combine("lib", "net48", "proj1.dll"),
+                        Path.Combine("lib", "net48", "proj2.dll")
                     });
             }
         }
@@ -4287,7 +4287,7 @@ namespace Proj2
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <Config Condition=" + "\" '$(Config)' == ''\"" + @">Debug</Config>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" + "\"'$(Config)'=='Debug'\"" + @">
     <OutputPath>debug_out</OutputPath>
@@ -4332,7 +4332,7 @@ namespace Proj1
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <Config Condition=" + "\" '$(Config)' == ''\"" + @">Debug</Config>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" + "\"'$(Config)'=='Debug'\"" + @">
     <OutputPath>debug_out</OutputPath>
@@ -4419,7 +4419,7 @@ namespace Proj2
             string baseDirectory,
             string projectName,
             string[] referencedProject,
-            string targetFrameworkVersion = "v4.0",
+            string targetFrameworkVersion = "v4.8",
             string version = "0.0.0.0")
         {
             var projectDirectory = Path.Combine(baseDirectory, projectName);
@@ -4571,7 +4571,7 @@ stuff \n <<".Replace("\r\n", "\n");
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <Import Project='$(MSBuildToolsPath)\Microsoft.CSharp.targets' />
 </Project>");
@@ -4685,7 +4685,7 @@ stuff \n <<".Replace("\r\n", "\n");
     <Configuration Condition="" '$(Configuration)' == '' "">Debug</Configuration>
     <OutputType>Library</OutputType>
     <OutputPath>out\$(Configuration)\</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include=""proj1_file1.cs"" />
@@ -4731,7 +4731,7 @@ namespace Proj1
                     new string[]
                     {
                         Path.Combine("content", "proj1_file2.txt"),
-                        Path.Combine("lib", "net40", "proj1.dll")
+                        Path.Combine("lib", "net48", "proj1.dll")
                     },
                     files);
             }
@@ -4757,7 +4757,7 @@ $@"<Project ToolsVersion='4.0' DefaultTargets='Build'
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <NoWarn>{value}</NoWarn>
   </PropertyGroup>
   <ItemGroup>
@@ -4825,7 +4825,7 @@ $@"<Project ToolsVersion='4.0' DefaultTargets='Build'
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <{property}>{value}</{property}>
   </PropertyGroup>
   <ItemGroup>
@@ -6069,7 +6069,7 @@ $@"<package xmlns='http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd'>
   <PropertyGroup>
     <OutputType>library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include='B.cs' />
@@ -6140,7 +6140,7 @@ $@"<package xmlns='http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd'>
   <PropertyGroup>
     <OutputType>library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <PackageIconUrl>https://test/icon.jpg</PackageIconUrl>
     <Authors>Alice</Authors>
   </PropertyGroup>
@@ -6755,7 +6755,7 @@ $@"<package xmlns='http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd'>
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <Import Project='$(MSBuildToolsPath)\Microsoft.CSharp.targets' />
 </Project>");
@@ -6805,7 +6805,7 @@ $@"<package xmlns='http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd'>
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <Import Project='$(MSBuildToolsPath)\Microsoft.CSharp.targets' />
 </Project>");
@@ -6859,7 +6859,7 @@ $@"<package xmlns='http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd'>
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include='..\proj2\proj2.csproj' />
@@ -6873,7 +6873,7 @@ $@"<package xmlns='http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd'>
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include='Program.cs' />
@@ -6989,7 +6989,7 @@ $@"<package xmlns='http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd'>
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include='proj1_file1.cs' />
@@ -7049,7 +7049,7 @@ namespace Proj1
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include='System'/>
@@ -7164,7 +7164,7 @@ using System.Runtime.InteropServices;
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include='System'/>
@@ -7280,7 +7280,7 @@ using System.Runtime.InteropServices;
   <PropertyGroup>
     <OutputType>library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <Import Project='$(MSBuildToolsPath)\Microsoft.CSharp.targets' />
 </Project>");
@@ -7384,7 +7384,7 @@ using System.Runtime.InteropServices;
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <OutputPath>out</OutputPath>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include='file1.cs' />
@@ -7437,7 +7437,7 @@ namespace proj1
                     Assert.Equal(
                         new string[]
                         {
-                          "lib/net40/proj1.dll"
+                          "lib/net48/proj1.dll"
                         },
                         files);
 
