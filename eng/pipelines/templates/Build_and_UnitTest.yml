@@ -232,6 +232,11 @@ steps:
     configuration: "$(BuildConfiguration)"
     msbuildArguments: "/t:AfterBuild /p:SignPackages=true"
 
+- task: NuGetToolInstaller@1
+  displayName: Use NuGet 5.x
+  inputs:
+    versionSpec: 5.x
+
 - task: NuGetCommand@2
   displayName: "Verify Nupkg Signatures"
   inputs:
