@@ -103,15 +103,20 @@ steps:
     msbuildArguments: "/t:BuildNoVSIX /p:BuildRTM=$(BuildRTM) /p:BuildNumber=$(BuildNumber) /p:SkipILMergeOfNuGetExe=true /p:GitRepositoryRemoteName=github /p:IncludeApex=true"
     maximumCpuCount: true
 
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '5.x'
+
 - task: RoslynAnalyzers@3
   displayName: 'Run Roslyn Analyzers'
+  condition: "and(succeeded(), eq(variables['BuildRTM'], 'false'))"
   env:
     SYSTEM_ACCESSTOKEN: $(System.AccessToken)
   inputs:
     userProvideBuildInfo: 'autoMsBuildInfo'
     rulesetName: 'Policy'
     policyName: 'M365'
-    condition: "and(succeeded(),eq(variables['BuildRTM'], 'false'))"
 
 - task: MSBuild@1
   displayName: "Localize Assemblies"
