@@ -104,6 +104,9 @@ steps:
     maximumCpuCount: true
 
 - task: RoslynAnalyzers@3
+  displayName: 'Run Roslyn Analyzers'
+  env:
+    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
   inputs:
     userProvideBuildInfo: 'autoMsBuildInfo'
     rulesetName: 'Policy'
