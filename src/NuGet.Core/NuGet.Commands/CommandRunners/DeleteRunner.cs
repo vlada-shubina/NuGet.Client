@@ -5,7 +5,6 @@ using System;
 using System.Threading.Tasks;
 using NuGet.Common;
 using NuGet.Configuration;
-using NuGet.Protocol.Core.Types;
 
 namespace NuGet.Commands
 {
@@ -14,11 +13,6 @@ namespace NuGet.Commands
     /// </summary>
     public static class DeleteRunner
     {
-        internal static void Run(DeleteArgs args, ILogger logger)
-        {
-            
-        }
-
         public static async Task Run(
             ISettings settings,
             IPackageSourceProvider sourceProvider,
