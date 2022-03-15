@@ -188,7 +188,7 @@ stages:
   dependsOn:
   - Initialize
   - Build_Insertable
-  condition: "and(succeeded(), eq(variables['RunTestsOnMac'], 'true'))"
+  condition: false
   jobs:
   - job: Tests_On_Mac
     timeoutInMinutes: 90
