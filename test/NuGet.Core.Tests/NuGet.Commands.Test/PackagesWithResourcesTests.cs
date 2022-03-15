@@ -270,8 +270,8 @@ namespace NuGet.Commands.Test
                 packageY.AddFile($"embed/net5.0/Y.dll");
                 packageY.AddFile("embed/net5.0/Y.xml");
                 // Resources
-                packageX.AddFile("lib/net5.0/en-US/Y.resources.dll");
-                packageX.AddFile("lib/net5.0/en-US/Y.resources.xml");
+                packageY.AddFile("lib/net5.0/en-US/Y.resources.dll");
+                packageY.AddFile("lib/net5.0/en-US/Y.resources.xml");
 
                 packageX.Dependencies.Add(packageY);
 
@@ -303,11 +303,11 @@ namespace NuGet.Commands.Test
 
                 var targets = assetsFile.GetTarget(NuGetFramework.Parse(framework), null);
 
-                var libX = targets.Libraries.Single(i => i.Name.Equals("packageX/1.0.0"));
+                var libX = targets.Libraries.Single(i => i.Name.Equals("packageX"));
                 var runtimeAssembliesX = libX.RuntimeAssemblies;
                 AssertRelatedProperty(runtimeAssembliesX, $"lib/net5.0/X.dll", null);
 
-                var libY = targets.Libraries.Single(i => i.Name.Equals("packageY/1.0.0"));
+                var libY = targets.Libraries.Single(i => i.Name.Equals("packageY"));
 
                 // Compile, "related" property is applied.
                 var compileAssembliesY = libY.CompileTimeAssemblies;
@@ -323,9 +323,81 @@ namespace NuGet.Commands.Test
 
                 // Resources, "related" property is NOT applied.
                 var resourceAssembliesY = libY.ResourceAssemblies;
-                AssertRelatedProperty(resourceAssembliesY, "lib/net5.0/en-US/X.resources.dll", null);
+                AssertRelatedProperty(resourceAssembliesY, "lib/net5.0/en-US/Y.resources.dll", null);
             }
         }
+
+        //[Fact]
+        //public async Task RelatedProperty_ProjectReferenceWithCompileAssets_RelatedPropertyNOTAppliedOnCompile()
+        //{
+        //    // Arrange
+        //    using (var pathContext = new SimpleTestPathContext())
+        //    {
+        //        var framework = "net5.0";
+        //        // A -> B
+        //        // Set up solution, project
+        //        var solution = new SimpleTestSolutionContext(pathContext.SolutionRoot);
+
+        //        var projectA = SimpleTestProjectContext.CreateNETCore(
+        //            "A",
+        //            pathContext.SolutionRoot,
+        //            framework);
+
+        //        var projectB = SimpleTestProjectContext.CreateNETCore(
+        //            "B",
+        //            pathContext.SolutionRoot,
+        //            framework);
+        //        // Make sure projectB has a .pdb file
+        //        projectB.Properties.Add("Configuration", "Debug");
+
+        //        projectA.AddProjectToAllFrameworks(projectB);
+        //        solution.Projects.Add(projectA);
+        //        solution.Projects.Add(projectB);
+        //        solution.Create(pathContext.SolutionRoot);
+
+        //        var sources = new List<PackageSource>();
+        //        sources.Add(new PackageSource(pathContext.PackageSource));
+        //        projectA.Sources = sources;
+        //        projectA.FallbackFolders = new List<string>();
+        //        projectA.FallbackFolders.Add(pathContext.FallbackFolder);
+        //        projectA.GlobalPackagesFolder = pathContext.UserPackagesFolder;
+
+        //        var logger = new TestLogger();
+        //        var request = new TestRestoreRequest(projectA.PackageSpec, projectA.Sources, pathContext.UserPackagesFolder, logger)
+        //        {
+        //            LockFilePath = projectA.AssetsFileOutputPath
+        //        };
+
+        //        // Act
+        //        var command = new RestoreCommand(request);
+        //        var result = await command.ExecuteAsync();
+        //        await result.CommitAsync(logger, CancellationToken.None);
+
+        //        // Asert
+        //        Assert.True(result.Success);
+        //        var assetsFile = projectA.AssetsFile;
+        //        Assert.NotNull(assetsFile);
+
+        //        var targets = assetsFile.GetTarget(NuGetFramework.Parse(framework), null);
+        //        var lib = targets.Libraries.Single();
+
+        //        // Compile, "related" property is applied.
+        //        var compileAssemblies = lib.CompileTimeAssemblies;
+        //        AssertRelatedProperty(compileAssemblies, $"ref/net5.0/X.dll", ".xml");
+
+        //        // Runtime, "related" property is applied.
+        //        var runtimeAssemblies = lib.RuntimeAssemblies;
+        //        AssertRelatedProperty(runtimeAssemblies, $"lib/net5.0/X.dll", ".xml");
+
+        //        // Embed, "related" property is applied.
+        //        var embedAssemblies = lib.EmbedAssemblies;
+        //        AssertRelatedProperty(embedAssemblies, $"embed/net5.0/X.dll", ".xml");
+
+        //        // Resources, "related" property is NOT applied.
+        //        var resourceAssemblies = lib.ResourceAssemblies;
+        //        AssertRelatedProperty(resourceAssemblies, "lib/net5.0/en-US/X.resources.dll", null);
+        //    }
+        //}
 
         //[Fact]
         //public async Task RelatedProperty_NativePakcage_RelatedPropertyNOTAppliedOnCompile()
@@ -339,11 +411,7 @@ namespace NuGet.Commands.Test
 
         //}
 
-        //[Fact]
-        //public async Task RelatedProperty_ProjectReferenceWithCompileAssets_RelatedPropertyNOTAppliedOnCompile()
-        //{
 
-        //}
 
         private void AssertResourceAssembly(IList<LockFileItem> items, string path, string locale)
         {
