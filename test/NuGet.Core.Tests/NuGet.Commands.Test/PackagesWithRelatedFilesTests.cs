@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,91 +13,15 @@ using NuGet.Configuration;
 using NuGet.Frameworks;
 using NuGet.ProjectModel;
 using NuGet.Test.Utility;
-using Test.Utility.Commands;
-using NuGet.Packaging;
-using NuGet.Packaging.Core;
 using Xunit;
 
 namespace NuGet.Commands.Test
 {
-    public class PackagesWithResourcesTests
+    public class PackagesWithRelatedFilesTests
     {
-        [Fact]
-        public async Task Resources_AppearInLockFileWithAppropriateLocaleValue()
-        {
-            // Arrange
-            var logger = new TestLogger();
-            var framework = "net46";
-
-            using (var workingDir = TestDirectory.Create())
-            {
-                var repository = Path.Combine(workingDir, "repository");
-                Directory.CreateDirectory(repository);
-                var projectDir = Path.Combine(workingDir, "project");
-                Directory.CreateDirectory(projectDir);
-                var packagesDir = Path.Combine(workingDir, "packages");
-                Directory.CreateDirectory(packagesDir);
-
-                var file = new FileInfo(Path.Combine(repository, "packageA.1.0.0.nupkg"));
-
-                using (var zip = new ZipArchive(File.Create(file.FullName), ZipArchiveMode.Create))
-                {
-                    zip.AddEntry("lib/net46/MyPackage.dll", new byte[] { 0 });
-                    zip.AddEntry("lib/net46/en-US/MyPackage.resources.dll", new byte[] { 0 });
-                    zip.AddEntry("lib/net46/en-CA/MyPackage.resources.dll", new byte[] { 0 });
-                    zip.AddEntry("lib/net46/fr-CA/MyPackage.resources.dll", new byte[] { 0 });
-
-                    zip.AddEntry("packageA.nuspec", @"<?xml version=""1.0"" encoding=""utf-8""?>
-                        <package xmlns=""http://schemas.microsoft.com/packaging/2013/01/nuspec.xsd"">
-                        <metadata>
-                            <id>packageA</id>
-                            <version>1.0.0</version>
-                            <title />
-                            <contentFiles>
-                                <files include=""**/*.*"" copyToOutput=""TRUE"" flatten=""true"" />
-                            </contentFiles>
-                        </metadata>
-                        </package>", Encoding.UTF8);
-                }
-
-                var sources = new List<PackageSource>();
-                sources.Add(new PackageSource(repository));
-
-                var configJson = JObject.Parse(@"{
-                    ""dependencies"": {
-                    ""packageA"": ""1.0.0""
-                    },
-                    ""frameworks"": {
-                    ""_FRAMEWORK_"": {}
-                    }
-                }".Replace("_FRAMEWORK_", framework));
-
-                var specPath = Path.Combine(projectDir, "TestProject", "project.json");
-                var spec = JsonPackageSpecReader.GetPackageSpec(configJson.ToString(), "TestProject", specPath).EnsureProjectJsonRestoreMetadata();
-
-                var request = new TestRestoreRequest(spec, sources, packagesDir, logger);
-                request.LockFilePath = Path.Combine(projectDir, "project.lock.json");
-
-                var command = new RestoreCommand(request);
-
-                // Act
-                var result = await command.ExecuteAsync();
-                await result.CommitAsync(logger, CancellationToken.None);
-
-                // Assert
-                var target = result.LockFile.GetTarget(NuGetFramework.Parse(framework), null);
-                var lib = target.Libraries.Single();
-                var resourceAssemblies = lib.ResourceAssemblies;
-
-                AssertResourceAssembly(resourceAssemblies, "lib/net46/en-US/MyPackage.resources.dll", "en-US");
-                AssertResourceAssembly(resourceAssemblies, "lib/net46/en-CA/MyPackage.resources.dll", "en-CA");
-                AssertResourceAssembly(resourceAssemblies, "lib/net46/fr-CA/MyPackage.resources.dll", "fr-CA");
-            }
-        }
-
         [Theory]
         [InlineData(".exe", "X", new[] { ".config.json", ".pdb", ".xml" })]
-        [InlineData(".dll", "Test.X", new string[] {})]
+        [InlineData(".dll", "Test.X", new string[] { })]
         [InlineData(".winmd", "NuGet.Test.X", new[] { ".pdb", ".some.random.extension", ".xml" })]
         public async Task RelatedProperty_TopLevelPackageWithDifferentExtensions_RelatedPropertyAddedSuccessfully(string assemblyExtension, string assemblyName, string[] relatedExtensionList)
         {
@@ -157,7 +80,7 @@ namespace NuGet.Commands.Test
                 {
                     expectedRelatedProperty = string.Join(";", relatedExtensionList);
                 }
-                
+
                 // Compile, "related" property is applied.
                 AssertRelatedProperty(compileAssemblies, $"lib/net5.0/{assemblyName}{assemblyExtension}", expectedRelatedProperty);
 
@@ -257,7 +180,7 @@ namespace NuGet.Commands.Test
                 var packageX = new SimpleTestPackageContext("packageX", "1.0.0");
                 packageX.Files.Clear();
                 packageX.AddFile($"lib/net5.0/X.dll");
-    
+
                 var packageY = new SimpleTestPackageContext("packageY", "1.0.0");
                 packageY.Files.Clear();
                 // Compile
@@ -399,33 +322,52 @@ namespace NuGet.Commands.Test
             }
         }
 
-        //[Fact]
-        //public async Task RelatedProperty_NativePakcage_RelatedPropertyNOTAppliedOnCompile()
-        //{
+        [Fact]
+        public async Task RelatedProperty_NativePakcage_RelatedPropertyNOTAppliedOnCompile()
+        {
+            // Arrange
+            using (var pathContext = new SimpleTestPathContext())
+            {
+                // Set-up packages
+                var packageX = new SimpleTestPackageContext("x", "1.0.0");
+                packageX.AddFile("build/native/x.targets");
+                packageX.AddFile("lib/native/x.dll");
+                packageX.AddFile("lib/native/x.h");
+                await SimpleTestPackageUtility.CreateFolderFeedV3Async(
+                    pathContext.PackageSource,
+                    packageX);
+                // Set up project
+                var solution = new SimpleTestSolutionContext(pathContext.SolutionRoot);
+                var framework = NuGetFramework.Parse("net5.0-windows7.0");
+                var projectA = SimpleTestProjectContext.CreateNETCore("projectName", pathContext.SolutionRoot, framework);
+                projectA.Properties.Add("CLRSupport", "NetCore");
+                //update path to vcxproj
+                projectA.ProjectPath = Path.Combine(Path.GetDirectoryName(projectA.ProjectPath), projectA.ProjectName + ".vcxproj");
+                projectA.AddPackageToAllFrameworks(packageX);
+                solution.Projects.Add(projectA);
+                solution.Create(pathContext.SolutionRoot);
+                // Act
+                var result = _msbuildFixture.RunMsBuild(pathContext.WorkingDirectory, $"/t:restore {pathContext.SolutionRoot}");
 
-        //}
+                // Assert
+                result.Success.Should().BeTrue(because: result.AllOutput);
+                File.Exists(projectA.AssetsFileOutputPath).Should().BeTrue(because: result.AllOutput);
+                File.Exists(projectA.TargetsOutput).Should().BeTrue(because: result.AllOutput);
+                File.Exists(projectA.PropsOutput).Should().BeTrue(because: result.AllOutput);
+
+                var targetsSection = projectA.AssetsFile.Targets.First(e => string.IsNullOrEmpty(e.RuntimeIdentifier));
+                targetsSection.Libraries.Should().Contain(e => e.Name.Equals("x"), because: string.Join(",", targetsSection.Libraries));
+                var lockFileTargetLibrary = targetsSection.Libraries.First(e => e.Name.Equals("x"));
+                lockFileTargetLibrary.CompileTimeAssemblies.Should().Contain("lib/native/x.dll");
+                lockFileTargetLibrary.Build.Should().Contain("build/native/x.targets");
+            }
+        }
 
         //[Fact]
         //public async Task RelatedProperty_DotnetToolPakcage_RelatedPropertyNOTAppliedOnCompile()
         //{
 
         //}
-
-
-
-        private void AssertResourceAssembly(IList<LockFileItem> items, string path, string locale)
-        {
-            var item = items.Single(i => i.Path.Equals(path));
-            var equal = item.Equals(path);
-            if (locale == null)
-            {
-                Assert.False(item.Properties.ContainsKey("locale"));
-            }
-            else
-            {
-                Assert.Equal(locale, item.Properties["locale"]);
-            }
-        }
 
         private void AssertRelatedProperty(IList<LockFileItem> items, string path, string related)
         {
