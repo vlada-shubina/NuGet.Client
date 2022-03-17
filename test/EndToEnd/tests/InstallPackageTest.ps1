@@ -2,7 +2,6 @@
 # https://github.com/NuGet/Home/issues/1711
 
 function Test-SimpleBindingRedirectsIndirectReference {
-    [SkipTest("https://github.com/NuGet/Home/issues/11223")]
     param($context)
 
     # Arrange
@@ -26,7 +25,6 @@ function Test-SimpleBindingRedirectsIndirectReference {
 }
 
 function Test-SimpleBindingRedirectsNonWeb {
-    [SkipTest('https://github.com/NuGet/Home/issues/8402')]
     param($context)
 
     # Arrange
@@ -47,7 +45,6 @@ function Test-SimpleBindingRedirectsNonWeb {
 }
 
 function Test-BindingRedirectComplex {
-    [SkipTest("https://github.com/NuGet/Home/issues/11223")]
     param($context)
 
     # Arrange
@@ -89,7 +86,6 @@ function Test-SimpleBindingRedirectsWebsite {
 
 
 function Test-BindingRedirectInstallLargeProject {
-    [SkipTest("https://github.com/NuGet/Home/issues/11223")]
     param($context)
 
     $numProjects = 25
@@ -108,7 +104,6 @@ function Test-BindingRedirectInstallLargeProject {
 }
 
 function Test-BindingRedirectDuplicateReferences {
-    [SkipTest("https://github.com/NuGet/Home/issues/11223")]
     param($context)
 
     # Arrange
@@ -133,7 +128,6 @@ function Test-BindingRedirectDuplicateReferences {
 }
 
 function Test-BindingRedirectClassLibraryWithDifferentDependents {
-    [SkipTest("https://github.com/NuGet/Home/issues/11223")]
     param($context)
 
     # Arrange
@@ -158,7 +152,6 @@ function Test-BindingRedirectClassLibraryWithDifferentDependents {
 }
 
 function Test-BindingRedirectProjectsThatReferenceSameAssemblyFromDifferentLocations {
-    [SkipTest("https://github.com/NuGet/Home/issues/11223")]
     param($context)
 
     # Arrange
@@ -210,7 +203,6 @@ function Test-BindingRedirectsMixNonStrongNameAndStrongNameAssemblies {
 }
 
 function Test-BindingRedirectProjectsThatReferenceDifferentVersionsOfSameAssembly {
-    [SkipTest("https://github.com/NuGet/Home/issues/11223")]
     param($context)
 
     # Arrange
