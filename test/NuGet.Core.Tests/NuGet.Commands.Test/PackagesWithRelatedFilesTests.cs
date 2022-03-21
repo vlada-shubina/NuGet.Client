@@ -322,9 +322,9 @@ namespace NuGet.Commands.Test
             }
         }
 
-        [Fact]
-        public async Task RelatedProperty_NativePakcage_RelatedPropertyNOTAppliedOnCompile()
-        {
+        //[Fact]
+        //public async Task RelatedProperty_NativePakcage_RelatedPropertyNOTAppliedOnCompile()
+        //{
             //// Arrange
             //using (var pathContext = new SimpleTestPathContext())
             //{
@@ -361,7 +361,7 @@ namespace NuGet.Commands.Test
             //    lockFileTargetLibrary.CompileTimeAssemblies.Should().Contain("lib/native/x.dll");
             //    lockFileTargetLibrary.Build.Should().Contain("build/native/x.targets");
             //}
-        }
+        //}
 
         //[Fact]
         //public async Task RelatedProperty_DotnetToolPakcage_RelatedPropertyNOTAppliedOnCompile()
