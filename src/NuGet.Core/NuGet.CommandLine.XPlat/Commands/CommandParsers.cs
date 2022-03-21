@@ -18,7 +18,6 @@ namespace NuGet.CommandLine.XPlat
             AddVerbParser.Register(app, getLogger);
             DisableVerbParser.Register(app, getLogger);
             EnableVerbParser.Register(app, getLogger);
-            ListVerbParser.Register(app, getLogger);
             RemoveVerbParser.Register(app, getLogger);
             UpdateVerbParser.Register(app, getLogger);
         }

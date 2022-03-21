@@ -19,6 +19,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils.Sources" PrivateAssets="All" />
+    <PackageReference Include="System.CommandLine" />
+    <PackageReference Include="System.CommandLine.NamingConventionBinder" />
     <PackageReference Include="System.Diagnostics.Debug" />
   </ItemGroup>
 
@@ -40,6 +42,11 @@
 
   <ItemGroup>
     <Compile Remove="external\*" />
+    <Compile Update="Commands\VerbParser.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>VerbParser.tt</DependentUpon>
+    </Compile>
     <Compile Update="Commands\Verbs.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -69,6 +76,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Commands\VerbParser.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>VerbParser.cs</LastGenOutput>
+    </None>
     <None Update="Commands\Verbs.tt">
       <LastGenOutput>Verbs.cs</LastGenOutput>
       <Generator>TextTemplatingFileGenerator</Generator>

@@ -221,67 +221,6 @@ namespace NuGet.CommandLine.XPlat
         }
     }
 
-    internal partial class ListVerbParser
-    {
-        internal static void Register(CommandLineApplication app,
-                                      Func<ILogger> getLogger)
-        {
-            app.Command("list", ListCmd =>
-            {
-                ListCmd.Command("source", SourceCmd =>
-                {
-                    CommandOption format = SourceCmd.Option(
-                        "--format",
-                        Strings.SourcesCommandFormatDescription,
-                        CommandOptionType.SingleValue);
-                    CommandOption configfile = SourceCmd.Option(
-                        "--configfile",
-                        Strings.Option_ConfigFile,
-                        CommandOptionType.SingleValue);
-                    SourceCmd.HelpOption("-h|--help");
-                    SourceCmd.Description = Strings.ListSourceCommandDescription;
-                    SourceCmd.OnExecute(() =>
-                    {
-                        var args = new ListSourceArgs()
-                        {
-                            Format = format.Value(),
-                            Configfile = configfile.Value(),
-                        };
-
-                        ListSourceRunner.Run(args, getLogger);
-                        return 0;
-                    });
-                });
-                ListCmd.Command("client-cert", ClientCertCmd =>
-                {
-                    CommandOption configfile = ClientCertCmd.Option(
-                        "--configfile",
-                        Strings.Option_ConfigFile,
-                        CommandOptionType.SingleValue);
-                    ClientCertCmd.HelpOption("-h|--help");
-                    ClientCertCmd.Description = Strings.ListClientCertCommandDescription;
-                    ClientCertCmd.OnExecute(() =>
-                    {
-                        var args = new ListClientCertArgs()
-                        {
-                            Configfile = configfile.Value(),
-                        };
-
-                        ListClientCertRunner.Run(args, getLogger);
-                        return 0;
-                    });
-                });
-                ListCmd.HelpOption("-h|--help");
-                ListCmd.Description = Strings.List_Description;
-                ListCmd.OnExecute(() =>
-                {
-                    app.ShowHelp("list");
-                    return 0;
-                });
-            });
-        }
-    }
-
     internal partial class RemoveVerbParser
     {
         internal static void Register(CommandLineApplication app,
