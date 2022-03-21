@@ -990,9 +990,10 @@ namespace NuGet.ProjectModel.Test
 
         [Theory]
         [InlineData("a", "a", true)]
-        [InlineData("a .pdb;.xml", "a;", true)]
-        [InlineData("a .pdb", "b .pdb", true)]
         [InlineData("a .pdb;.xml", "a .pdb;.xml", true)]
+        [InlineData("a .pdb;.xml", "a;", false)]
+        [InlineData("a .pdb", "b .pdb", false)]
+        [InlineData("a .pdb;.xml", "a .xml;.pdb", false)]
         public void Equals_WithRuntimeAssembliesAndRelatedFiles(string left, string right, bool expected)
         {
             string[] leftParts = left.Trim().Split(' ');
