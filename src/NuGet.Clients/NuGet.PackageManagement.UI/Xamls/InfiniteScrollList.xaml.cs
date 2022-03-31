@@ -476,7 +476,7 @@ namespace NuGet.PackageManagement.UI
         /// <param name="refresh">Clears <see cref="Items"> list if set to <c>true</c></param>
         private void UpdatePackageList(IEnumerable<PackageItemViewModel> packages, bool refresh)
         {
-            _joinableTaskFactory.Value.Run(async () =>
+            NuGetUIThreadHelper.JoinableTaskFactory.RunAsync(async () =>
             {
                 // Synchronize updating Items list
                 await _list.ItemsLock.ExecuteAsync(() =>
@@ -508,7 +508,7 @@ namespace NuGet.PackageManagement.UI
 
                     return Task.CompletedTask;
                 });
-            });
+            }).PostOnFailure(nameof(InfiniteScrollList), nameof(UpdatePackageList));
         }
 
         /// <summary>
