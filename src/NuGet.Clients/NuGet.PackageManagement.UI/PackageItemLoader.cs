@@ -275,6 +275,7 @@ namespace NuGet.PackageManagement.UI
                     transitiveToolTipMessage = string.Format(CultureInfo.CurrentUICulture, Resources.PackageVersionWithTransitiveOrigins, metadata.Identity.Version, string.Join(", ", metadata.TransitiveOrigins));
                 }
 
+
                 var listItem = new PackageItemViewModel(_searchService)
                 {
                     Id = metadata.Identity.Id,
@@ -302,6 +303,7 @@ namespace NuGet.PackageManagement.UI
                 }
                 else
                 {
+                    listItem.Project = _context.Projects.First();
                     listItem.UpdateTransitivePackageStatus(metadata.Identity.Version);
                 }
 
