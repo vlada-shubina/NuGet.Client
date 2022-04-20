@@ -13,7 +13,7 @@ function Test-GetPackageListsInstalledPackages {
 
     # Act
     Install-Package elmah -Project $p.Name -Version 1.1
-    Install-Package jQuery -Project $p.Name -Version 2.2.4
+    Install-Package jQuery -Project $p.Name -Version 3.6.0
     $packages = Get-Package
 
     # Assert
@@ -65,7 +65,7 @@ function Test-GetPackageWithUpdatesAcceptsSourceName {
 
     # Act
     Install-Package Antlr -Version 3.1.1 -Project $p.Name -Source $SourceNuGet
-    Install-Package jQuery -Version 1.4.1 -Project $p.Name -Source $SourceNuGet
+    Install-Package jQuery -Version 3.5.1 -Project $p.Name -Source $SourceNuGet
     $packages = Get-Package -Updates -Source $SourceNuGet
 
     # Assert
@@ -181,7 +181,7 @@ function Test-GetPackageForProjectReturnsCorrectPackages2 {
 }
 
 function Test-GetPackageForFSharpProjectReturnsCorrectPackages {
-    param()     
+    param()
     # Arrange
     $p = New-FSharpConsoleApplication
     Build-Solution # wait for project nomination
