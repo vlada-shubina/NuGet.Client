@@ -1,11 +1,4 @@
-<Project>
-
-  <PropertyGroup>
-    <IsCommandLinePackage>true</IsCommandLinePackage>
-  </PropertyGroup>
-
-  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), 'NuGet.sln'))\build\common.props" />
-  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="ilmerge.props" />
 
   <PropertyGroup>
@@ -132,8 +125,6 @@
     <Exec Command="$(IlmergeCommand)" ContinueOnError="false" />
   </Target>
 
-  <Import Project="$(BuildCommonDirectory)common.targets" />
-
   <Target Name="NuGetLinkVSSDKEmbeddableAssemblies" AfterTargets="ResolveReferences" BeforeTargets="FindReferenceAssembliesForReferences">
     <ItemGroup>
       <ReferencePath Condition="'%(FileName)' == 'Microsoft.VisualStudio.Setup.Configuration.Interop'">
@@ -160,6 +151,4 @@
       <SymbolsToIndex Include="$(ArtifactsDirectory)$(VsixOutputDirName)\NuGet.pdb" />
     </ItemGroup>
   </Target>
-
-  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 </Project>

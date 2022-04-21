@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <RepositoryRootDirectory>$(MSBuildThisFileDirectory)</RepositoryRootDirectory>
+  </PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)build\common.props" Condition="'$(UsingMicrosoftNETSdk)' == 'true'" />
+  <Import Project="$(MSBuildThisFileDirectory)build\common.legacy.props" Condition="'$(UsingMicrosoftNETSdk)' != 'true'" />
+</Project>

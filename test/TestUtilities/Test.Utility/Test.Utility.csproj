@@ -1,13 +1,9 @@
-<Project>
-  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), 'NuGet.sln'))\build\common.props" />
-  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>$(TargetFrameworksExeForSigning)</TargetFrameworks>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <NoWarn Condition=" $(TargetFramework.StartsWith('netcoreapp')) ">$(NoWarn);CS1998</NoWarn>
     <PackProject>true</PackProject>
-    <Shipping>true</Shipping>
     <IsPackable>true</IsPackable>
     <SkipShared>true</SkipShared>
     <NoWarn>$(NoWarn);VSTHRD001;VSTHRD002;VSTHRD110</NoWarn>
@@ -51,7 +47,6 @@
 
   <ItemGroup>
     <PackageReference Include="Portable.BouncyCastle" />
-    <PackageReference Include="xunit" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == '$(NETFXTargetFramework)' ">
@@ -77,7 +72,4 @@
     <Compile Remove="ProjectManagement\TestProjectKProject.cs" />
     <Compile Remove="Threading\*.cs" />
   </ItemGroup>
-
-  <Import Project="$(BuildCommonDirectory)common.targets" />
-  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 </Project>

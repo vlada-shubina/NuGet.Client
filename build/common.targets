@@ -80,6 +80,24 @@
   <PropertyGroup Condition=" '$(DotNetBuildFromSource)' != 'true' and '$(PackProject)' == 'true' ">
     <UsePublicApiAnalyzer Condition=" '$(UsePublicApiAnalyzer)' == '' " >true</UsePublicApiAnalyzer>
   </PropertyGroup>
+  
+  <!-- FxCop Analyzers -->
+  <ItemGroup Condition="'$(Shipping)' == 'true' AND '$(SkipAnalyzers)' != 'true' AND '$(DotNetBuildFromSource)' != 'true'">
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)\BannedSymbols.txt" Condition="'$(TestProject)' != 'true'" />
+  </ItemGroup>
+
+  <!-- source link -->
+  <ItemGroup Condition="'$(Shipping)' == 'true' AND '$(IsXPlat)' != 'true'">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All"/>
+  </ItemGroup>
 
   <ItemGroup Condition=" '$(UsePublicApiAnalyzer)' == 'true' ">
     <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="all" />
@@ -129,15 +147,6 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   </PropertyGroup>
-
-  <!-- These are needed because currently a VSIX project cannot reference a net core project that multi targets.
-  This is a hack for building the VSIX. It's because all these targets are available in the inner build, while the VSIX project
-  is non netcore, and isn't aware of inner/outer builds. -->
-  <Target Name="BuiltProjectOutputGroupDependencies" DependsOnTargets="PrintVSVersionAndNetcore" Condition="false" />
-  <Target Name="BuiltProjectOutputGroup" DependsOnTargets="PrintVSVersionAndNetcore" Condition="false" />
-  <Target Name="GetCopyToOutputDirectoryItems" DependsOnTargets="PrintVSVersionAndNetcore" Condition="false" />
-  <Target Name="SatelliteDllsProjectOutputGroup" DependsOnTargets="PrintVSVersionAndNetcore" Condition="false" />
-  <Target Name="DebugSymbolsProjectOutputGroup" DependsOnTargets="PrintVSVersionAndNetcore" Condition="false" />
 
   <!--
     ============================================================

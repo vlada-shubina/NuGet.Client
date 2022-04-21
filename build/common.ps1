@@ -158,7 +158,7 @@ Function Install-DotnetCLI {
     )
     $MSBuildExe = Get-MSBuildExe
 
-    $CmdOutLines = ((& $msbuildExe $NuGetClientRoot\build\config.props /v:m /nologo /t:GetCliBranchForTesting) | Out-String).Trim()
+    $CmdOutLines = ((& $msbuildExe $NuGetClientRoot\build\config.props /v:m /nologo /noautorsp /t:GetCliBranchForTesting) | Out-String).Trim()
     $CliBranchListForTesting = ($CmdOutLines -split [Environment]::NewLine)[-1]
     $CliBranchList = $CliBranchListForTesting -split ';'
 
@@ -381,7 +381,7 @@ Function Restore-SolutionPackages {
     [CmdletBinding()]
     param(
     )
-    $opts = 'msbuild', '-t:restore'
+    $opts = 'msbuild', '-t:restore', '-noautorsp'
     $opts += "${NuGetClientRoot}\build\bootstrap.proj"
 
     Trace-Log "Restoring packages @""$NuGetClientRoot"""

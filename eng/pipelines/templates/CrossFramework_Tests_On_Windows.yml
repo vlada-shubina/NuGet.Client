@@ -23,7 +23,7 @@ steps:
   inputs:
     solution: "build\\build.proj"
     configuration: "$(BuildConfiguration)"
-    msbuildArguments: "/MaxCPUCount /ConsoleLoggerParameters:Verbosity=Minimal;Summary;ForceNoAlign /t:RestoreVS /p:BuildNumber=$(BuildNumber) /p:BuildRTM=false"
+    msbuildArguments: "/restore:false /t:RestoreVS /p:BuildNumber=$(BuildNumber) /p:BuildRTM=false"
 
 - task: MSBuild@1
   displayName: "BuildNoVSIX"
@@ -31,7 +31,7 @@ steps:
   inputs:
     solution: "build\\build.proj"
     configuration: "$(BuildConfiguration)"
-    msbuildArguments: "/MaxCPUCount /ConsoleLoggerParameters:Verbosity=Minimal;Summary;ForceNoAlign /t:BuildNoVSIX /p:BuildRTM=false /p:BuildNumber=$(BuildNumber)"
+    msbuildArguments: "/restore:false /t:BuildNoVSIX /p:BuildRTM=false /p:BuildNumber=$(BuildNumber)"
 
 - task: PowerShell@1
   displayName: "Run Cross Verify Tests (continue on error)"

@@ -50,7 +50,7 @@ steps:
   displayName: "Ensure msbuild.exe can parse nuget.sln"
   inputs:
     solution: "nuget.sln"
-    msbuildArguments: "/t:EnsureNewtonsoftJsonVersion"
+    msbuildArguments: "/restore:false /t:EnsureNewtonsoftJsonVersion"
     maximumCpuCount: true
   continueOnError: ${{ parameters.isOfficialBuild }}
   condition: succeededOrFailed()
@@ -59,6 +59,6 @@ steps:
   displayName: "Ensure package versions are declared in packages.targets"
   inputs:
     solution: "build\\build.proj"
-    msbuildArguments: "/t:EnsurePackageReferenceVersionsInSolution"
+    msbuildArguments: "/restore:false /t:EnsurePackageReferenceVersionsInSolution"
   continueOnError: ${{ parameters.isOfficialBuild }}
   condition: succeededOrFailed()

@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <Shipping>true</Shipping>
+  </PropertyGroup>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+</Project>

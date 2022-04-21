@@ -71,6 +71,10 @@
     <ItemGroup Condition=" '$(MSBuildProjectFile)' == 'NuGet.CommandLine.csproj' ">
         <PackageReference Update="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="1.16.30" />
     </ItemGroup>
+    
+    <PropertyGroup>
+      <MicrosoftCodeAnalysisCSharpVersion Condition="'$(MicrosoftCodeAnalysisCSharpVersion)' == ''">3.0.0-dev-61717-03</MicrosoftCodeAnalysisCSharpVersion>
+    </PropertyGroup>
 
     <!--
       Packages that provide NuGet's Visual Studio extensibility APIs should not depend on the Visual Studio SDK, to ensure
@@ -97,7 +101,7 @@
         <PackageReference Update="Microsoft.CSharp" Version="$(SystemPackagesVersion)" />
         <PackageReference Update="Microsoft.CodeAnalysis" Version="3.0.0" />
         <PackageReference Update="Microsoft.CodeAnalysis.Build.Tasks" Version="3.0.0-dev-61717-03" />
-        <PackageReference Update="Microsoft.CodeAnalysis.CSharp" Version="3.0.0-dev-61717-03" />
+        <PackageReference Update="Microsoft.CodeAnalysis.CSharp" Version="$(MicrosoftCodeAnalysisCSharpVersion)" />
         <PackageReference Update="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.0.0" />
         <PackageReference Update="Microsoft.Net.Compilers.netcore" Version="3.0.0-dev-61717-03" />
         <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.1.0" />

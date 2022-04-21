@@ -52,10 +52,10 @@ DOTNET="$(pwd)/cli/dotnet"
 $DOTNET --info
 
 # Get CLI Branches for testing
-echo "dotnet msbuild build/config.props /v:m /nologo /t:GetCliBranchForTesting"
+echo "dotnet msbuild build/config.props /nologo /noautorsp /v:m /t:GetCliBranchForTesting"
 
 IFS=$'\n'
-CMD_OUT_LINES=(`dotnet msbuild build/config.props /v:m /nologo /t:GetCliBranchForTesting`)
+CMD_OUT_LINES=(`dotnet msbuild build/config.props /nologo /noautorsp /v:m /t:GetCliBranchForTesting`)
 # Take only last the line which has the version information and strip all the spaces
 CMD_LAST_LINE=${CMD_OUT_LINES[@]:(-1)}
 DOTNET_BRANCHES=${CMD_LAST_LINE//[[:space:]]}
@@ -138,7 +138,7 @@ fi
 echo "Restore finished at `date -u +"%Y-%m-%dT%H:%M:%S"`"
 
 # Unit tests
-echo "dotnet msbuild build/build.proj /t:CoreUnitTests /p:VisualStudioVersion=16.0 /p:Configuration=Release /p:BuildNumber=1 /p:ReleaseLabel=beta"
+echo "dotnet msbuild build/build.proj /restore:false /t:CoreUnitTests /p:VisualStudioVersion=16.0 /p:Configuration=Release /p:BuildNumber=1 /p:ReleaseLabel=beta"
 dotnet msbuild build/build.proj /t:CoreUnitTests /p:VisualStudioVersion=16.0 /p:Configuration=Release /p:BuildNumber=1 /p:ReleaseLabel=beta
 
 if [ $? -ne 0 ]; then
@@ -149,7 +149,7 @@ fi
 echo "Core tests finished at `date -u +"%Y-%m-%dT%H:%M:%S"`"
 
 # Func tests
-echo "dotnet msbuild build/build.proj /t:CoreFuncTests /p:VisualStudioVersion=16.0 /p:Configuration=Release /p:BuildNumber=1 /p:ReleaseLabel=beta"
+echo "dotnet msbuild build/build.proj /restore:false /t:CoreFuncTests /p:VisualStudioVersion=16.0 /p:Configuration=Release /p:BuildNumber=1 /p:ReleaseLabel=beta"
 dotnet msbuild build/build.proj /t:CoreFuncTests /p:VisualStudioVersion=16.0 /p:Configuration=Release /p:BuildNumber=1 /p:ReleaseLabel=beta
 
 if [ $? -ne 0 ]; then

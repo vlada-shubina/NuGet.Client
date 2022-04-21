@@ -244,6 +244,31 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NuGet.Tools.Test", "test\Nu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NuGet.Signing.CrossFramework.Test", "test\NuGet.Core.FuncTests\NuGet.Signing.CrossFramework.Test\NuGet.Signing.CrossFramework.Test.csproj", "{3CAE192D-FF86-4A51-8936-E4BFFC192C94}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eng", "eng", "{B452FC55-7ECB-40D3-AE53-4EF483FD28CF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pipelines", "pipelines", "{764F568C-ABA0-46EE-AA51-F4D85F70BB40}"
+	ProjectSection(SolutionItems) = preProject
+		eng\pipelines\compliance.yml = eng\pipelines\compliance.yml
+		eng\pipelines\official.yml = eng\pipelines\official.yml
+		eng\pipelines\pull_request.yml = eng\pipelines\pull_request.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{0BC02CA2-A162-42A0-8685-D2A1D44253E9}"
+	ProjectSection(SolutionItems) = preProject
+		eng\pipelines\templates\Apex_Tests_On_Windows.yml = eng\pipelines\templates\Apex_Tests_On_Windows.yml
+		eng\pipelines\templates\Build_and_UnitTest.yml = eng\pipelines\templates\Build_and_UnitTest.yml
+		eng\pipelines\templates\CrossFramework_Tests_On_Windows.yml = eng\pipelines\templates\CrossFramework_Tests_On_Windows.yml
+		eng\pipelines\templates\End_To_End_Tests_On_Windows.yml = eng\pipelines\templates\End_To_End_Tests_On_Windows.yml
+		eng\pipelines\templates\Functional_Tests_On_Windows.yml = eng\pipelines\templates\Functional_Tests_On_Windows.yml
+		eng\pipelines\templates\Initialize_Build.yml = eng\pipelines\templates\Initialize_Build.yml
+		eng\pipelines\templates\Initialize_Build_SemanticVersion.yml = eng\pipelines\templates\Initialize_Build_SemanticVersion.yml
+		eng\pipelines\templates\pipeline.yml = eng\pipelines\templates\pipeline.yml
+		eng\pipelines\templates\Source_Build.yml = eng\pipelines\templates\Source_Build.yml
+		eng\pipelines\templates\Static_Source_Analysis.yml = eng\pipelines\templates\Static_Source_Analysis.yml
+		eng\pipelines\templates\Tests_On_Linux.yml = eng\pipelines\templates\Tests_On_Linux.yml
+		eng\pipelines\templates\Tests_On_Mac.yml = eng\pipelines\templates\Tests_On_Mac.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -690,6 +715,8 @@ Global
 		{C24DD62A-905D-4C48-A17A-B83107F17EA7} = {01BC4531-1E25-48D7-A8FD-A47D6FEC47FB}
 		{FC1F1CF8-4902-46F0-929F-204E5B1B6D53} = {01BC4531-1E25-48D7-A8FD-A47D6FEC47FB}
 		{3CAE192D-FF86-4A51-8936-E4BFFC192C94} = {BB63CACA-866F-454F-BA4C-78B788D032BB}
+		{764F568C-ABA0-46EE-AA51-F4D85F70BB40} = {B452FC55-7ECB-40D3-AE53-4EF483FD28CF}
+		{0BC02CA2-A162-42A0-8685-D2A1D44253E9} = {764F568C-ABA0-46EE-AA51-F4D85F70BB40}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3747A66A-00D1-41B8-A9C5-ED0D7BEA9D25}

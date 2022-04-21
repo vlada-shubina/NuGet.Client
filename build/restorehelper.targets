@@ -1,5 +1,5 @@
 <Project ToolsVersion="15.0" DefaultTargets="Restore">
-  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), 'common.props'))\common.props" />
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props'))" />
 
   <Target Name="BeforeRestore" BeforeTargets="Restore">
 	<Message Text="$(RestoreGraphProjectInput)" Importance="high" />

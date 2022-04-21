@@ -27,10 +27,10 @@ steps:
         if ([System.String]::IsNullOrEmpty($env:VsTargetChannelOverride) -eq $false) {
           $targetChannel = $env:VsTargetChannelOverride
         } else {
-          $targetChannel = & dotnet msbuild $env:BUILD_REPOSITORY_LOCALPATH\build\config.props /v:m /nologo /t:GetVsTargetChannel
+          $targetChannel = & dotnet msbuild $env:BUILD_REPOSITORY_LOCALPATH\build\config.props /nologo /noautorsp /v:m /t:GetVsTargetChannel
           $targetChannel = $targetChannel.Trim()
         }
-        $targetMajorVersion = & dotnet msbuild $env:BUILD_REPOSITORY_LOCALPATH\build\config.props /v:m /nologo /t:GetVsTargetMajorVersion
+        $targetMajorVersion = & dotnet msbuild $env:BUILD_REPOSITORY_LOCALPATH\build\config.props /nologo /noautorsp /v:m /t:GetVsTargetMajorVersion
         $targetMajorVersion = $targetMajorVersion.Trim()
         Write-Host "##vso[task.setvariable variable=VsTargetChannel;isOutput=true]$targetChannel"
         Write-Host "##vso[task.setvariable variable=VsTargetMajorVersion;isOutput=true]$targetMajorVersion"
