@@ -15,7 +15,7 @@ function Test-PackageManagerServicesAreAvailableThroughMEF {
 
 # If this test fails with the cryptic error:
 #
-#    Exception calling "NewProject" with "5" argument(s): "The method or operation is not implemented." 
+#    Exception calling "NewProject" with "5" argument(s): "The method or operation is not implemented."
 #
 # ...it is because the specific Windows 10 SDK build indicated by the <TargetPlatformVersion /> element in the test's
 # project file (test\EndToEnd\ProjectTemplates\UwpClassLibraryProjectJson.zip\ClassLibrary6.csproj) is not installed.
@@ -92,7 +92,7 @@ function Test-GetInstalledPackagesWithCustomRestorePackagesPath {
     # Act
     $packages = @($installerServices.GetInstalledPackages())
 
-    # Assert    
+    # Assert
     Assert-NotNull $packages
     $package = $packages | where Id -eq NuGet.Versioning
     Assert-NotNull $package.InstallPath
@@ -116,7 +116,7 @@ function Test-GetInstalledPackagesForProjectWithCustomRestorePackagesPath {
     # Act
     $packages = @($installerServices.GetInstalledPackages($p))
 
-    # Assert    
+    # Assert
     Assert-NotNull $packages
     $package = $packages | where Id -eq NuGet.Versioning
     Assert-NotNull $package.InstallPath
@@ -153,9 +153,9 @@ function Test-GetInstalledPackagesMultipleProjectsDifferentVersion {
 
     # Arrange
     $p = New-WebApplication
-    $p | Install-Package jquery -Version 1.5 -Source $context.RepositoryPath
+    $p | Install-Package NuGetjquery -Version 1.5 -Source $context.RepositoryPath
     $p = New-WebApplication
-    $p | Install-Package jquery -Version 1.6 -Source $context.RepositoryPath
+    $p | Install-Package NuGetjquery -Version 1.6 -Source $context.RepositoryPath
 
     $cm = Get-VsComponentModel
     $installerServices = $cm.GetService([NuGet.VisualStudio.IVsPackageInstallerServices])
@@ -166,9 +166,9 @@ function Test-GetInstalledPackagesMultipleProjectsDifferentVersion {
     # Assert
     Assert-NotNull $packages
     Assert-AreEqual 2 $packages.Count
-    Assert-AreEqual jQuery $packages[0].Id
+    Assert-AreEqual NuGetjQuery $packages[0].Id
     Assert-AreEqual 1.5 $packages[0].VersionString
-    Assert-AreEqual jQuery $packages[1].Id
+    Assert-AreEqual NuGetjQuery $packages[1].Id
     Assert-AreEqual 1.6 $packages[1].VersionString
 }
 <#
@@ -1005,6 +1005,6 @@ function Test-InstallPackageAsyncWithPackageReferenceFormat {
 	# Assert
     $packageRefs = @(Get-MsBuildItems $p 'PackageReference')
     Assert-AreEqual 1 $packageRefs.Count
-    Assert-AreEqual $packageRefs[0].GetMetadataValue("Identity") 'owin' 
+    Assert-AreEqual $packageRefs[0].GetMetadataValue("Identity") 'owin'
     Assert-AreEqual $packageRefs[0].GetMetadataValue("Version") '1.0.0'
 }
