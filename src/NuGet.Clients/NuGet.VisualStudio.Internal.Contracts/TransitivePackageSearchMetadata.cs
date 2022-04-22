@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using NuGet.Packaging;
 using NuGet.Packaging.Core;
@@ -55,7 +56,7 @@ namespace NuGet.VisualStudio.Internal.Contracts
 
         public LicenseMetadata LicenseMetadata => _packageSearchMetadata.LicenseMetadata;
 
-        public IEnumerable<PackageVulnerabilityMetadata> Vulnerabilities => _packageSearchMetadata.Vulnerabilities;
+        public IEnumerable<PackageVulnerabilityMetadata> Vulnerabilities => Enumerable.Empty<PackageVulnerabilityMetadata>(); // disabled for transitive packages
 
         private readonly IPackageSearchMetadata _packageSearchMetadata;
 
@@ -67,7 +68,7 @@ namespace NuGet.VisualStudio.Internal.Contracts
 
         public Task<PackageDeprecationMetadata> GetDeprecationMetadataAsync()
         {
-            return _packageSearchMetadata.GetDeprecationMetadataAsync();
+            return Task.FromResult(new PackageDeprecationMetadata()); // disabled for transitive packages
         }
 
         public Task<IEnumerable<VersionInfo>> GetVersionsAsync()
