@@ -646,7 +646,7 @@ namespace NuGet.PackageManagement.UI
                 {
                     var packageIdentity = new PackageIdentity(packageItemViewModel.Id, nugetVersion);
                     (PackageSearchMetadataContextInfo searchMetadata, PackageDeprecationMetadataContextInfo deprecationData) =
-                        await searchService.GetPackageMetadataAsync(packageIdentity, packageItemViewModel.Sources, includePrerelease: true, cancellationToken);
+                        await searchService.GetPackageMetadataAsync(packageIdentity, packageItemViewModel.Sources, includePrerelease: true, isTransitive: packageItemViewModel.PackageLevel == PackageLevel.Transitive, cancellationToken);
 
                     if (cancellationToken.IsCancellationRequested || _searchResultPackage != packageItemViewModel)
                     {

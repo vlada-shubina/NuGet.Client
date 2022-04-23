@@ -68,7 +68,8 @@ namespace NuGet.VisualStudio.Internal.Contracts
 
         public Task<PackageDeprecationMetadata> GetDeprecationMetadataAsync()
         {
-            return Task.FromResult(new PackageDeprecationMetadata()); // disabled for transitive packages
+            var noData = JsonExtensions.FromJson<PackageDeprecationMetadata>(""); // simulate null deprecation data
+            return Task.FromResult(noData);
         }
 
         public Task<IEnumerable<VersionInfo>> GetVersionsAsync()

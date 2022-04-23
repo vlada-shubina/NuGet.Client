@@ -515,7 +515,7 @@ namespace NuGet.PackageManagement.UI
             new Common.AsyncLazy<(PackageSearchMetadataContextInfo, PackageDeprecationMetadataContextInfo)>(async () =>
             {
                 var identity = new PackageIdentity(Id, Version);
-                return await _searchService.GetPackageMetadataAsync(identity, Sources, IncludePrerelease, _cancellationTokenSource.Token);
+                return await _searchService.GetPackageMetadataAsync(identity, Sources, IncludePrerelease, PackageLevel == PackageLevel.Transitive, _cancellationTokenSource.Token);
             });
         public Task<(PackageSearchMetadataContextInfo, PackageDeprecationMetadataContextInfo)> GetDetailedPackageSearchMetadataAsync()
         {
@@ -716,7 +716,7 @@ namespace NuGet.PackageManagement.UI
             {
                 var identity = new PackageIdentity(Id, Version);
                 (PackageSearchMetadataContextInfo packageMetadata, PackageDeprecationMetadataContextInfo deprecationMetadata) =
-                    await _searchService.GetPackageMetadataAsync(identity, Sources, IncludePrerelease, cancellationToken);
+                    await _searchService.GetPackageMetadataAsync(identity, Sources, IncludePrerelease, isTransitive: PackageLevel == PackageLevel.Transitive, cancellationToken);
 
                 await NuGetUIThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
                 cancellationToken.ThrowIfCancellationRequested();
