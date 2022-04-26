@@ -3859,6 +3859,57 @@ namespace NuGet.Commands.FuncTest
             logMessage.Message.Should().Be("You are running the 'restore' operation with an 'http' source, 'http://api.source/index.json'. Support for 'http' sources will be removed in a future version.");
         }
 
+
+        /// <summary>
+        /// Project -> X 1.0.0 -> N 1.0.0
+        ///         -> Y 1.0.0 -> N 2.0.0
+        /// N is referenced twice, and both versions will be downloaded in the assets file, but only 1 will be used.
+        /// </summary>
+        [Fact]
+        public async Task Restore_WithCommonTransitiveDependency_DownloadsBothInGlobalPackagesFolder()
+        {
+            using var pathContext = new SimpleTestPathContext();
+            var logger = new TestLogger();
+            var packageX10 = new SimpleTestPackageContext("x", "1.0");
+            var packageY10 = new SimpleTestPackageContext("y", "1.0");
+            var packageN10 = new SimpleTestPackageContext("n", "1.0");
+            var packageN20 = new SimpleTestPackageContext("n", "2.0");
+
+            packageX10.Dependencies.Add(packageN10);
+            packageY10.Dependencies.Add(packageN20);
+
+            await SimpleTestPackageUtility.CreateFolderFeedV3Async(
+                 pathContext.PackageSource,
+                 PackageSaveMode.Defaultv3,
+                 packageX10,
+                 packageY10,
+                 packageN10,
+                 packageN20);
+
+            var projectSpec = ProjectTestHelpers.GetPackageSpec("Project1", pathContext.SolutionRoot, framework: "net5.0", dependencyList: new string[] { packageX10.Id, packageY10.Id });
+            var command = new RestoreCommand(
+               ProjectTestHelpers.CreateRestoreRequest(
+                   projectSpec,
+                   pathContext,
+                   logger));
+
+            // Act
+            var result = await command.ExecuteAsync();
+
+            // Assert
+            result.Success.Should().BeFalse(because: logger.ShowMessages());
+            result.LockFile.Libraries.Should().HaveCount(3); // 3 packages are used.
+            result.LockFile.LogMessages.Should().HaveCount(0);
+
+            var globalPackagesFolderDir = new DirectoryInfo(pathContext.UserPackagesFolder);
+            DirectoryInfo[] gpfFiles = globalPackagesFolderDir.GetDirectories();
+            gpfFiles.Should().HaveCount(4); // 4 packages are installed.
+
+            var nFolder = gpfFiles.Where(e => e.Name.EndsWith("n")).Single();
+            var nPackagesDirectories = nFolder.GetDirectories();
+            nPackagesDirectories.Should().HaveCount(2); // The n package is download twice.
+        }
+
         static TestRestoreRequest CreateRestoreRequest(PackageSpec spec, string userPackagesFolder, List<PackageSource> sources, ILogger logger)
         {
             var dgSpec = new DependencyGraphSpec();
