@@ -208,7 +208,8 @@ namespace NuGet.PackageManagement.VisualStudio
                     IPackageSearchMetadata transitivePackageMetadata = await transitivePackageMetadataProvider.GetPackageMetadataAsync(identity, includePrerelease, cancellationToken);
                     backgroundDataCache.UpdateSearchMetadata(transitivePackageMetadata);
                 }
-                return await backgroundDataCache.AllVersionsContextInfo;
+                IEnumerable<VersionInfoContextInfo> col = await backgroundDataCache.AllVersionsContextInfo;
+                return col.Select(TransitiveVersionContextInfo.Create).ToArray();
             }
 
             IPackageMetadataProvider packageMetadataProvider = await GetPackageMetadataProviderAsync(packageSources, projects?.ToList().AsReadOnly(), cancellationToken);
@@ -222,15 +223,20 @@ namespace NuGet.PackageManagement.VisualStudio
             return await cacheEntry.AllVersionsContextInfo;
         }
 
-
         public async ValueTask<PackageDeprecationMetadataContextInfo?> GetDeprecationMetadataAsync(
             PackageIdentity identity,
             IReadOnlyCollection<PackageSourceContextInfo> packageSources,
             bool includePrerelease,
+            bool isTransitive,
             CancellationToken cancellationToken)
         {
             Assumes.NotNull(identity);
             Assumes.NotNullOrEmpty(packageSources);
+
+            if (isTransitive)
+            {
+                return null;
+            }
 
             string cacheId = PackageSearchMetadataCacheItem.GetCacheId(identity.Id, includePrerelease, packageSources);
             PackageSearchMetadataCacheItem? backgroundDataCache = PackageSearchMetadataMemoryCache.Get(cacheId) as PackageSearchMetadataCacheItem;
@@ -249,6 +255,13 @@ namespace NuGet.PackageManagement.VisualStudio
             }
             return PackageDeprecationMetadataContextInfo.Create(deprecationMetadata);
         }
+
+        public ValueTask<PackageDeprecationMetadataContextInfo?> GetDeprecationMetadataAsync(
+            PackageIdentity identity,
+            IReadOnlyCollection<PackageSourceContextInfo> packageSources,
+            bool includePrerelease,
+            CancellationToken cancellationToken) => GetDeprecationMetadataAsync(identity, packageSources, includePrerelease, isTransitive: false, cancellationToken);
+
 
         public async ValueTask<SearchResultContextInfo> RefreshSearchAsync(CancellationToken cancellationToken)
         {

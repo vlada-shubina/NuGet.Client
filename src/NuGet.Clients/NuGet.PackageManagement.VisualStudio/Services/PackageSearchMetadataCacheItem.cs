@@ -31,7 +31,7 @@ namespace NuGet.PackageManagement.VisualStudio
 
             _cachedItemEntries = new ConcurrentDictionary<NuGetVersion, PackageSearchMetadataCacheItemEntry>
             {
-                [packageSearchMetadata.Identity.Version] = new PackageSearchMetadataCacheItemEntry(packageSearchMetadata, packageMetadataProvider)
+                [packageSearchMetadata.Identity.Version] = new PackageSearchMetadataCacheItemEntry(packageSearchMetadata, packageMetadataProvider),
             };
 
             _packageMetadataProvider = packageMetadataProvider;
