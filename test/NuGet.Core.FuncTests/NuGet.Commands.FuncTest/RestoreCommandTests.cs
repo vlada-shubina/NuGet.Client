@@ -3897,13 +3897,14 @@ namespace NuGet.Commands.FuncTest
             var result = await command.ExecuteAsync();
 
             // Assert
-            result.Success.Should().BeFalse(because: logger.ShowMessages());
-            result.LockFile.Libraries.Should().HaveCount(3); // 3 packages are used.
-            result.LockFile.LogMessages.Should().HaveCount(0);
+            result.Success.Should().BeTrue(because: logger.ShowMessages());
+            var lockFile = result.LockFile;
+            lockFile.Libraries.Should().HaveCount(3); // 3 packages are used.
+            lockFile.LogMessages.Should().HaveCount(0);
 
             var globalPackagesFolderDir = new DirectoryInfo(pathContext.UserPackagesFolder);
             DirectoryInfo[] gpfFiles = globalPackagesFolderDir.GetDirectories();
-            gpfFiles.Should().HaveCount(4); // 4 packages are installed.
+            gpfFiles.Should().HaveCount(3); // 3 unique packages are installed.
 
             var nFolder = gpfFiles.Where(e => e.Name.EndsWith("n")).Single();
             var nPackagesDirectories = nFolder.GetDirectories();

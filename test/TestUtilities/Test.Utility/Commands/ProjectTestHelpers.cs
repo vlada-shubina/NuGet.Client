@@ -360,7 +360,7 @@ namespace NuGet.Commands.Test
         public static PackageSpec GetPackageSpec(string projectName, string rootPath, string framework, string[] dependencyList, bool useAssetTargetFallback = false, string assetTargetFallbackFrameworks = "", bool asAssetTargetFallback = true)
         {
             var actualAssetTargetFallback = GetFallbackString(useAssetTargetFallback, assetTargetFallbackFrameworks, asAssetTargetFallback);
-            var dependencyTemplate = @"DEPENDENCY_NAME"" : ""1.0.0";
+            var dependencyTemplate = @"""DEPENDENCY_NAME"" : ""1.0.0""";
             var dependency = string.Join($"\r\n,", dependencyList.Select(e => dependencyTemplate.Replace("DEPENDENCY_NAME", e)));
 
             const string referenceSpec = @"
