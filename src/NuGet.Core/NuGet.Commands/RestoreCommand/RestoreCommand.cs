@@ -16,6 +16,7 @@ using NuGet.Frameworks;
 using NuGet.LibraryModel;
 using NuGet.Packaging.Core;
 using NuGet.ProjectModel;
+using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Repositories;
 using NuGet.RuntimeModel;
@@ -280,6 +281,9 @@ namespace NuGet.Commands
                     });
                 }
 
+                var sources = _request.DependencyProviders.RemoteProviders.Select(e => e.SourceRepository);
+                await CheckVulnerabilitiesAsync(sources, graphs, _logger, token);
+
                 telemetry.StartIntervalMeasure();
                 // Create assets file
                 LockFile assetsFile = BuildAssetsFile(
@@ -440,6 +444,33 @@ namespace NuGet.Commands
                     dependencyGraphSpec: _request.DependencyGraphSpec,
                     _request.ProjectStyle,
                     restoreTime.Elapsed);
+            }
+        }
+
+        private async Task CheckVulnerabilitiesAsync(IEnumerable<SourceRepository> sourceRepos, IEnumerable<RestoreTargetGraph> graphs, ILogger logger, CancellationToken token)
+        {
+            List<VulnerabilityInfoResource> vulnerabilityInfoSources = new();
+
+            foreach (var sourceRepo in sourceRepos)
+            {
+                var resourceResult = await sourceRepo.GetResourceAsync<VulnerabilityInfoResource>();
+                if (resourceResult != null)
+                {
+                    vulnerabilityInfoSources.Add(resourceResult);
+                }
+            }
+
+            foreach (var infoSource in vulnerabilityInfoSources)
+            {
+                foreach (var package in graphs.SelectMany(e => e.Flattened))
+                {
+                    var identity = new PackageIdentity(package.Key.Name, package.Key.Version);
+                    if (await infoSource.IsPackageVulnerable(identity, logger, token))
+                    {
+                        _logger.LogWarning("Uh oh, found a vulnerable package: " + identity);
+                    }
+
+                }
             }
         }
 
