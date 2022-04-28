@@ -467,7 +467,8 @@ namespace NuGet.Commands
                     var identity = new PackageIdentity(package.Key.Name, package.Key.Version);
                     if (await infoSource.IsPackageVulnerable(identity, logger, token))
                     {
-                        _logger.LogWarning("Uh oh, found a vulnerable package: " + identity);
+                        await _logger.LogAsync(RestoreLogMessage.CreateWarning(NuGetLogCode.NU1901,
+                            string.Format("The following package has a reported vulnerability '{0}'", identity)));
                     }
 
                 }
