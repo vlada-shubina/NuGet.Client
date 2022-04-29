@@ -462,13 +462,12 @@ namespace NuGet.Commands
 
             foreach (var infoSource in vulnerabilityInfoSources)
             {
-                foreach (var package in graphs.SelectMany(e => e.Flattened))
+                foreach (var package in graphs.SelectMany(e => e.Flattened).Distinct())
                 {
-                    var identity = new PackageIdentity(package.Key.Name, package.Key.Version);
-                    if (await infoSource.IsPackageVulnerable(identity, logger, token))
+                    if (await infoSource.IsPackageVulnerableAsync(package.Key.Name, package.Key.Version, logger, token))
                     {
                         await _logger.LogAsync(RestoreLogMessage.CreateWarning(NuGetLogCode.NU1901,
-                            string.Format("The following package has a reported vulnerability '{0}'", identity)));
+                            string.Format("The following package has a reported vulnerability '{0} {1}'", package.Key.Name, package.Key.Version)));
                     }
 
                 }
