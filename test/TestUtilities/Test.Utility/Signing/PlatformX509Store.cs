@@ -13,8 +13,8 @@ namespace Test.Utility.Signing
     {
         private const string KeychainForMac = "/Library/Keychains/System.keychain";
 
-        //Macos-11.6 (Big Sur) has different security settings and permissions
-        //This command will bypass a popup asking for unlocking a keychain.
+        // Macos-11.6 (Big Sur) has different security settings and permissions
+        // This command will bypass a popup asking for unlocking a keychain.
         private const string BypassGUICommandForMac = "sudo security authorizationdb write com.apple.trust-settings.admin allow";
 
         internal static PlatformX509Store Instance { get; } = new();
@@ -22,8 +22,8 @@ namespace Test.Utility.Signing
         public void Add(X509Certificate2 certificate, StoreLocation storeLocation, StoreName storeName)
         {
             // According to https://github.com/dotnet/runtime/blob/master/docs/design/features/cross-platform-cryptography.md#x509store,
-            // on macOS, when StoreName = My, StoreLocation = CurrentUser, the X509Store is read/write. 
-            // For other cases, the X509Store is read-only, writing will throw CryptographicException.
+            // on macOS, when StoreName = My, StoreLocation = CurrentUser, the X509Store is read/write.
+            // For other cases, the X509Store is read-only and attempting to write will throw a CryptographicException.
             if ((RuntimeEnvironmentHelper.IsMacOSX && storeName.Equals(StoreName.My) && storeLocation.Equals(StoreLocation.CurrentUser))
                 || !RuntimeEnvironmentHelper.IsMacOSX)
             {
@@ -69,9 +69,9 @@ namespace Test.Utility.Signing
                 store.Open(OpenFlags.ReadWrite);
                 store.Add(certificate);
 
-                //Add wait for Linux, as https://github.com/dotnet/runtime/issues/32608
-                //Windows has a live-synchronized model, and on Linux, there is a filesystem/rescan delay problem.
-                //For performance reasons, dotnet/runtime only check to see if the store has been modified once a second.
+                // Add wait for Linux, as https://github.com/dotnet/runtime/issues/32608
+                // Windows has a live-synchronized model, and on Linux, there is a filesystem/rescan delay problem.
+                // For performance reasons, dotnet/runtime only check to see if the store has been modified once a second.
                 if (RuntimeEnvironmentHelper.IsLinux)
                 {
                     Thread.Sleep(1500);
@@ -98,9 +98,9 @@ namespace Test.Utility.Signing
             }
         }
 
-        //According to https://github.com/dotnet/runtime/blob/master/docs/design/features/cross-platform-cryptography.md#x509store,
-        //on macOS the X509Store class is a projection of system trust decisions (read-only), user trust decisions (read-only), and user key storage (read-write).
-        //So we have to run command to add certificate to System.keychain to make it trusted.
+        // According to https://github.com/dotnet/runtime/blob/master/docs/design/features/cross-platform-cryptography.md#x509store,
+        // on macOS the X509Store class is a projection of system trust decisions (read-only), user trust decisions (read-only), and user key storage (read-write).
+        // So we have to run command to add certificate to System.keychain to make it trusted.
         private static void AddCertificateToStoreForMacOSX(X509Certificate2 certificate)
         {
             FileInfo certFile = new(Path.Combine("/tmp", $"{certificate.Thumbprint}.cer"));
@@ -116,9 +116,9 @@ namespace Test.Utility.Signing
             RunMacCommand(addToKeyChainCmd);
         }
 
-        //According to https://github.com/dotnet/runtime/blob/master/docs/design/features/cross-platform-cryptography.md#x509store,
-        //on macOS the X509Store class is a projection of system trust decisions (read-only), user trust decisions (read-only), and user key storage (read-write).
-        //So we have to run command to remove certificate from System.keychain to make it untrusted.
+        // According to https://github.com/dotnet/runtime/blob/master/docs/design/features/cross-platform-cryptography.md#x509store,
+        // on macOS the X509Store class is a projection of system trust decisions (read-only), user trust decisions (read-only), and user key storage (read-write).
+        // So we have to run command to remove certificate from System.keychain to make it untrusted.
         private static void RemoveTrustedCert(X509Certificate2 certificate)
         {
             FileInfo certFile = new(Path.Combine("/tmp", $"{certificate.Thumbprint}.cer"));

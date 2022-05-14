@@ -49,8 +49,6 @@ namespace NuGet.Commands
             RestoreArgs restoreArgs,
             CancellationToken token)
         {
-            X509TrustStore.Initialize(restoreArgs.Log);
-
             var maxTasks = GetMaxTaskCount(restoreArgs);
 
             var log = restoreArgs.Log;
@@ -106,8 +104,6 @@ namespace NuGet.Commands
             IEnumerable<RestoreSummaryRequest> restoreRequests,
             RestoreArgs restoreContext)
         {
-            X509TrustStore.Initialize(restoreContext.Log);
-
             var maxTasks = GetMaxTaskCount(restoreContext);
 
             var log = restoreContext.Log;

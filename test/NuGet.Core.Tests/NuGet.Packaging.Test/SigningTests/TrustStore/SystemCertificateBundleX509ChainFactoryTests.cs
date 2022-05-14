@@ -37,8 +37,8 @@ namespace NuGet.Packaging.Test
             FileInfo nonexistentFile = new(Path.Combine(_directory.Path, "certificates.bundle"));
 
             bool wasCreated = SystemCertificateBundleX509ChainFactory.TryCreate(
-                out SystemCertificateBundleX509ChainFactory factory,
-                new[] { nonexistentFile.FullName });
+                new[] { nonexistentFile.FullName },
+                out SystemCertificateBundleX509ChainFactory factory);
 
             Assert.False(wasCreated);
             Assert.Null(factory);
@@ -60,8 +60,8 @@ namespace NuGet.Packaging.Test
                 CreateBundleFile(files[indexOfMatch], certificate);
 
                 bool wasCreated = SystemCertificateBundleX509ChainFactory.TryCreate(
-                    out SystemCertificateBundleX509ChainFactory factory,
-                    files.Select(file => file.FullName).ToArray());
+                    files.Select(file => file.FullName).ToArray(),
+                    out SystemCertificateBundleX509ChainFactory factory);
 
                 Assert.True(wasCreated);
                 Assert.Equal(1, factory.Certificates.Count);
@@ -79,8 +79,8 @@ namespace NuGet.Packaging.Test
                 CreateBundleFile(bundleFile, certificate);
 
                 bool wasCreated = SystemCertificateBundleX509ChainFactory.TryCreate(
-                    out SystemCertificateBundleX509ChainFactory factory,
-                    new[] { bundleFile.FullName });
+                    new[] { bundleFile.FullName },
+                    out SystemCertificateBundleX509ChainFactory factory);
 
                 Assert.True(wasCreated);
 

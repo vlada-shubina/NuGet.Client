@@ -9,12 +9,12 @@ using Xunit;
 
 namespace NuGet.Packaging.Test
 {
-    public class DefaultTrustStoreX509ChainFactoryTests
+    public class DotNetDefaultTrustStoreX509ChainFactoryTests
     {
         [Fact]
         public void Create_Always_ReturnsInstance()
         {
-            DefaultTrustStoreX509ChainFactory factory = new();
+            DotNetDefaultTrustStoreX509ChainFactory factory = new();
 
             using (X509Chain chain = factory.Create())
             {

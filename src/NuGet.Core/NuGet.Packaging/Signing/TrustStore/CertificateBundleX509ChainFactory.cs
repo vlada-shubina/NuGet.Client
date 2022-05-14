@@ -45,7 +45,12 @@ namespace NuGet.Packaging.Signing
 
                 return true;
             }
-            catch (Exception ex) when (ex is CryptographicException || ex is IOException)
+            catch (Exception ex) when
+            (
+                ex is CryptographicException ||
+                ex is FileNotFoundException ||
+                ex is DirectoryNotFoundException
+            )
             {
                 certificates.Clear();
             }

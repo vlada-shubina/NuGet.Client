@@ -169,7 +169,7 @@ namespace NuGet.Packaging {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to X.509 certificate chain validation will use the default trust store..
+        ///   Looks up a localized string similar to X.509 certificate chain validation will use the default trust store selected by .NET..
         /// </summary>
         internal static string ChainBuilding_UsingDefaultTrustStore {
             get {
@@ -178,7 +178,7 @@ namespace NuGet.Packaging {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to X.509 certificate chain validation will use the fallback certificate bundle at {0}..
+        ///   Looks up a localized string similar to X.509 certificate chain validation will use the fallback certificate bundle at &apos;{0}&apos;..
         /// </summary>
         internal static string ChainBuilding_UsingFallbackCertificateBundle {
             get {
@@ -187,7 +187,7 @@ namespace NuGet.Packaging {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to X.509 certificate chain validation will not have any trusted roots.  Chain building will fail with an untrusted status..
+        ///   Looks up a localized string similar to X.509 certificate chain validation will not have any trusted roots. Chain building will fail with an untrusted status..
         /// </summary>
         internal static string ChainBuilding_UsingNoCertificateBundle {
             get {
@@ -196,7 +196,7 @@ namespace NuGet.Packaging {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to X.509 certificate chain validation will use the system certificate bundle at {0}..
+        ///   Looks up a localized string similar to X.509 certificate chain validation will use the system certificate bundle at &apos;{0}&apos;..
         /// </summary>
         internal static string ChainBuilding_UsingSystemCertificateBundle {
             get {
@@ -651,15 +651,6 @@ namespace NuGet.Packaging {
         internal static string InvalidNuspecEntry {
             get {
                 return ResourceManager.GetString("InvalidNuspecEntry", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The file at &apos;{0}&apos; is invalid.  The file must be a valid PKCS #7 file with a &apos;.p7b&apos; extension..
-        /// </summary>
-        internal static string InvalidP7bFileExtension {
-            get {
-                return ResourceManager.GetString("InvalidP7bFileExtension", resourceCulture);
             }
         }
         
@@ -1128,15 +1119,6 @@ namespace NuGet.Packaging {
         internal static string NuGetV3ServiceIndexUrlInvalidValue {
             get {
                 return ResourceManager.GetString("NuGetV3ServiceIndexUrlInvalidValue", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The file at &apos;{0}&apos; was not found..
-        /// </summary>
-        internal static string P7bFileNotFound {
-            get {
-                return ResourceManager.GetString("P7bFileNotFound", resourceCulture);
             }
         }
         

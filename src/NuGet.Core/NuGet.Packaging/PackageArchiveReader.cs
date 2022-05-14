@@ -528,11 +528,11 @@ namespace NuGet.Packaging
 
                 if (!string.IsNullOrEmpty(signVerifyEnvVariable))
                 {
-                    if (string.Equals("TRUE", signVerifyEnvVariable, StringComparison.Ordinal))
+                    if (string.Equals(bool.TrueString, signVerifyEnvVariable, StringComparison.OrdinalIgnoreCase))
                     {
                         canVerify = true;
                     }
-                    else if (string.Equals("FALSE", signVerifyEnvVariable, StringComparison.Ordinal))
+                    else if (string.Equals(bool.FalseString, signVerifyEnvVariable, StringComparison.OrdinalIgnoreCase))
                     {
                         canVerify = false;
                     }

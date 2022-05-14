@@ -26,6 +26,10 @@ namespace Test.Utility.Signing
 #if NET5_0_OR_GREATER
         private static X509Certificate2Collection LoadCertificates()
         {
+            // Load an extract from the May 2022 Windows CTL update.
+            // The file contains root certificates valid for both code signing and timestamping.
+            // Similar to Windows' trusted root authority certificates trust store, this file contains
+            // both expired and active root certificates.  Tests should not be affected by expiration.
             byte[] bytes = SigningTestUtility.GetResourceBytes("codesignctl.pem");
             string pem = Encoding.UTF8.GetString(bytes);
             X509Certificate2Collection certificates = new();

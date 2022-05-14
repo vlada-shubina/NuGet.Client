@@ -5,7 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace NuGet.Packaging.Signing
 {
-    internal sealed class DefaultTrustStoreX509ChainFactory : IX509ChainFactory
+    internal sealed class DotNetDefaultTrustStoreX509ChainFactory : IX509ChainFactory
     {
         public X509Chain Create()
         {

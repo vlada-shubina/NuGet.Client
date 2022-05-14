@@ -22,11 +22,11 @@ namespace NuGet.Packaging.Signing
 
         internal static bool TryCreate(out SystemCertificateBundleX509ChainFactory factory)
         {
-            return TryCreate(out factory, ProbePaths);
+            return TryCreate(ProbePaths, out factory);
         }
 
         // For testing purposes only.
-        internal static bool TryCreate(out SystemCertificateBundleX509ChainFactory factory, IReadOnlyList<string> probePaths)
+        internal static bool TryCreate(IReadOnlyList<string> probePaths, out SystemCertificateBundleX509ChainFactory factory)
         {
             factory = null;
 
@@ -37,11 +37,11 @@ namespace NuGet.Packaging.Signing
                 {
                     factory = new SystemCertificateBundleX509ChainFactory(certificates, probePath);
 
-                    break;
+                    return true;
                 }
             }
 
-            return factory is not null;
+            return false;
         }
     }
 }

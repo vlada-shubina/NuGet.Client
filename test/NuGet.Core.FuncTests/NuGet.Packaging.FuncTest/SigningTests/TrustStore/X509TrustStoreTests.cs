@@ -17,12 +17,10 @@ namespace NuGet.Packaging.FuncTest
     [Collection(SigningTestCollection.Name)]
     public class X509TrustStoreTests : IDisposable
     {
-        private readonly SigningTestFixture _fixture;
         private readonly TestLogger _logger;
 
-        public X509TrustStoreTests(SigningTestFixture fixture)
+        public X509TrustStoreTests()
         {
-            _fixture = fixture ?? throw new ArgumentNullException(nameof(fixture));
             _logger = new TestLogger();
 
             // For these tests, use whatever factory X509TrustStore creates by default.
@@ -37,20 +35,32 @@ namespace NuGet.Packaging.FuncTest
         }
 
         [Fact]
-        public void Initialize_WhenArgumentIsNull_Throws()
+        public void InitializeForDotNetSdk_WhenArgumentIsNull_Throws()
         {
             ArgumentNullException exception = Assert.Throws<ArgumentNullException>(
-                () => X509TrustStore.Initialize(logger: null));
+                () => X509TrustStore.InitializeForDotNetSdk(logger: null));
 
             Assert.Equal("logger", exception.ParamName);
         }
 
-        [PlatformFact(Platform.Windows)]
-        public void CreateX509ChainFactory_OnWindowsAlways_ReturnsInstance()
+        [Fact]
+        public void CreateX509ChainFactory_Always_ReturnsInstance()
         {
             IX509ChainFactory factory = X509TrustStore.CreateX509ChainFactory(_logger);
 
-            Assert.IsType<DefaultTrustStoreX509ChainFactory>(factory);
+            Assert.IsType<DotNetDefaultTrustStoreX509ChainFactory>(factory);
+            Assert.Equal(1, _logger.Messages.Count);
+            Assert.Equal(1, _logger.VerboseMessages.Count);
+            Assert.True(_logger.VerboseMessages.TryDequeue(out string actualMessage));
+            Assert.Equal(Strings.ChainBuilding_UsingDefaultTrustStore, actualMessage);
+        }
+
+        [PlatformFact(Platform.Windows)]
+        public void CreateX509ChainFactoryForDotNetSdk_OnWindowsAlways_ReturnsInstance()
+        {
+            IX509ChainFactory factory = X509TrustStore.CreateX509ChainFactoryForDotNetSdk(_logger);
+
+            Assert.IsType<DotNetDefaultTrustStoreX509ChainFactory>(factory);
             Assert.Equal(1, _logger.Messages.Count);
             Assert.Equal(1, _logger.VerboseMessages.Count);
             Assert.True(_logger.VerboseMessages.TryDequeue(out string actualMessage));
@@ -59,9 +69,9 @@ namespace NuGet.Packaging.FuncTest
 
 #if NET5_0_OR_GREATER
         [PlatformFact(Platform.Linux)]
-        public void CreateX509ChainFactory_OnLinuxAlways_ReturnsInstance()
+        public void CreateX509ChainFactoryForDotNetSdk_OnLinuxAlways_ReturnsInstance()
         {
-            IX509ChainFactory factory = X509TrustStore.CreateX509ChainFactory(_logger);
+            IX509ChainFactory factory = X509TrustStore.CreateX509ChainFactoryForDotNetSdk(_logger);
 
             bool wasFound = TryReadFirstBundle(
                 SystemCertificateBundleX509ChainFactory.ProbePaths,
@@ -86,7 +96,7 @@ namespace NuGet.Packaging.FuncTest
             }
             else
             {
-                Assert.IsType<DefaultTrustStoreX509ChainFactory>(factory);
+                Assert.IsType<DotNetDefaultTrustStoreX509ChainFactory>(factory);
             }
 
             Assert.Equal(1, _logger.Messages.Count);
@@ -121,9 +131,9 @@ namespace NuGet.Packaging.FuncTest
         }
 
         [PlatformFact(Platform.Darwin)]
-        public void CreateX509ChainFactory_OnMacOsAlways_ReturnsInstance()
+        public void CreateX509ChainFactoryForDotNetSdk_OnMacOsAlways_ReturnsInstance()
         {
-            IX509ChainFactory factory = X509TrustStore.CreateX509ChainFactory(_logger);
+            IX509ChainFactory factory = X509TrustStore.CreateX509ChainFactoryForDotNetSdk(_logger);
             string expectedMessage;
             
             if (X509TrustStore.IsEnabled)
@@ -137,7 +147,7 @@ namespace NuGet.Packaging.FuncTest
             }
             else
             {
-                Assert.IsType<DefaultTrustStoreX509ChainFactory>(factory);
+                Assert.IsType<DotNetDefaultTrustStoreX509ChainFactory>(factory);
 
                 expectedMessage = Strings.ChainBuilding_UsingDefaultTrustStore;
             }
@@ -163,8 +173,8 @@ namespace NuGet.Packaging.FuncTest
                 oneProbePath[0] = probePath;
 
                 if (SystemCertificateBundleX509ChainFactory.TryCreate(
-                    out SystemCertificateBundleX509ChainFactory factory,
-                    oneProbePath))
+                    oneProbePath,
+                    out SystemCertificateBundleX509ChainFactory factory))
                 {
                     certificates = factory.Certificates;
                     successfulProbePath = probePath;

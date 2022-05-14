@@ -25,25 +25,22 @@ namespace NuGet.Packaging.Signing
         }
 
         /// <summary>
-        /// Attempts to discover and load an X.509 trust store and log details about the attempt.
+        /// Initializes the X.509 trust store for NuGet .NET SDK scenarios and logs details about the attempt.
         /// If initialization has already happened, a call to this method will have no effect.
         /// </summary>
-        /// <remarks>Explicit initialization is unnecessary for X.509 certificate chain building;
-        /// initialization will happen automatically on demand.  This method provides an opportunity
-        /// to log diagnostic information about trust store discovery.</remarks>
         /// <param name="logger">A logger.</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="logger" /> is <c>null</c>.</exception>
-        public static void Initialize(ILogger logger)
+        public static void InitializeForDotNetSdk(ILogger logger)
         {
-            if (logger is null)
-            {
-                throw new ArgumentNullException(nameof(logger));
-            }
-
-            _ = GetX509ChainFactory(logger);
+            _ = GetX509ChainFactory(logger, CreateX509ChainFactoryForDotNetSdk);
         }
 
         internal static IX509ChainFactory GetX509ChainFactory(ILogger logger)
+        {
+            return GetX509ChainFactory(logger, CreateX509ChainFactory);
+        }
+
+        private static IX509ChainFactory GetX509ChainFactory(ILogger logger, Func<ILogger, IX509ChainFactory> creator)
         {
             if (logger is null)
             {
@@ -62,14 +59,14 @@ namespace NuGet.Packaging.Signing
                     return Instance;
                 }
 
-                Instance = CreateX509ChainFactory(logger);
+                Instance = creator(logger);
             }
 
             return Instance;
         }
 
         // Non-private for testing purposes only
-        internal static IX509ChainFactory CreateX509ChainFactory(ILogger logger)
+        internal static IX509ChainFactory CreateX509ChainFactoryForDotNetSdk(ILogger logger)
         {
             if (IsEnabled)
             {
@@ -126,9 +123,15 @@ namespace NuGet.Packaging.Signing
 #endif
             }
 
+            return CreateX509ChainFactory(logger);
+        }
+
+        // Non-private for testing purposes only
+        internal static IX509ChainFactory CreateX509ChainFactory(ILogger logger)
+        {
             logger.LogVerbose(Strings.ChainBuilding_UsingDefaultTrustStore);
 
-            return new DefaultTrustStoreX509ChainFactory();
+            return new DotNetDefaultTrustStoreX509ChainFactory();
         }
 
         // Only for testing
