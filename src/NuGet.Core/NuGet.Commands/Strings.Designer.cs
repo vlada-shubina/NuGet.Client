@@ -2384,7 +2384,7 @@ namespace NuGet.Commands {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A &apos;http&apos; source, &apos;{0}&apos;, was found. Support for &apos;http&apos; sources will be removed in a future version..
+        ///   Looks up a localized string similar to An &apos;HTTP&apos; source, &apos;{0}&apos;, was found. Support for &apos;HTTP&apos; sources will be removed in a future version..
         /// </summary>
         internal static string Warning_HttpSource {
             get {

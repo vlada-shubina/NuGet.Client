@@ -1037,7 +1037,7 @@ For more information, visit https://docs.nuget.org/docs/reference/command-line-r
     <comment>0 - The command name. Ex. Push/Delete. 1 - server uri.</comment>
   </data>
   <data name="Warning_HttpSource" xml:space="preserve">
-    <value>A 'http' source, '{0}', was found. Support for 'http' sources will be removed in a future version.</value>
-    <comment>0 - source</comment>
+    <value>An 'HTTP' source, '{0}', was found. Support for 'HTTP' sources will be removed in a future version.</value>
+    <comment>0 - URI of the source</comment>
   </data>
 </root>
