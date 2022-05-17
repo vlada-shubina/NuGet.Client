@@ -40,6 +40,10 @@ resources:
   - repository: DartLabTemplates
     type: git
     name: DartLab.Templates
+  - repository: RepoInsights
+    type: git
+    name: Insights
+    
 
 variables:
   DOTNET_NOLOGO: 1
