@@ -32,10 +32,6 @@ parameters:
   - stop
 
 resources:
-  pipelines:
-  - pipeline: DartLab
-    source: DartLab
-    branch: main
   repositories:
   - repository: DartLabTemplates
     type: git
@@ -43,6 +39,10 @@ resources:
   - repository: RepoInsights
     type: git
     name: Insights
+  pipelines:
+  - pipeline: DartLab
+    source: DartLab
+    branch: main
     
 
 variables:
