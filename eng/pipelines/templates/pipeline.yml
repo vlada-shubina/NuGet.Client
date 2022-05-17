@@ -36,14 +36,16 @@ resources:
   - repository: DartLab.Templates
     type: git
     name: DartLab.Templates
+    ref: refs/heads/main
   - repository: Insights
     type: git
     name: Insights
+    ref: refs/heads/main
   pipelines:
   - pipeline: DartLab
     source: DartLab
     branch: main
-    
+
 
 variables:
   DOTNET_NOLOGO: 1
