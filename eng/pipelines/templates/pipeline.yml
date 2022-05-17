@@ -33,10 +33,10 @@ parameters:
 
 resources:
   repositories:
-  - repository: DartLabTemplates
+  - repository: DartLab.Templates
     type: git
     name: DartLab.Templates
-  - repository: RepoInsights
+  - repository: Insights
     type: git
     name: Insights
   pipelines:
